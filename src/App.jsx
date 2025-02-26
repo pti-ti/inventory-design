@@ -4,11 +4,13 @@ import { ColorModeContext, useMode } from "./theme";
 import Login from "./scenes/login";
 import Layout from "./components/Layout";
 import Dashboard from "./scenes/dashboard";
-import Team from "./scenes/team";
+import Device from "./scenes/device/index";
 import Invoices from "./scenes/invoices";
 import Contacts from "./scenes/contacts";
 import UserRegister from "./scenes/form/UserRegister";
 import DeviceRegister from "./scenes/form/DeviceRegister";
+import LogbookRegister from "./scenes/form/LogbookRegister";
+import MaintenanceRegister from "./scenes/form/MaintenanceRegister";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -24,11 +26,13 @@ function App() {
           {/* Layout con Sidebar y Topbar */}
           <Route path="/*" element={<Layout />}>
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="team" element={<Team />} />
+            <Route path="dispositivos" element={<Device />} />
             <Route path="contacts" element={<Contacts />} />
             <Route path="invoices" element={<Invoices />} />
             <Route path="registrar-usuario" element={<UserRegister />} />
             <Route path="registrar-dispositivo" element={<DeviceRegister />} />
+            <Route path="registrar-bitacora" element={<LogbookRegister />} />
+            <Route path="registrar-mantenimiento" element={<MaintenanceRegister />} />
           </Route>
         </Routes>
       </ThemeProvider>

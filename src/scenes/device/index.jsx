@@ -1,39 +1,94 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataTeam } from "../../data/mockData";
+import axios from  "axios";
+import { useEffect, useState } from "react";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 
-const Team = () => {
+const Device = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token"); // 🔹 Obtiene el token guardado
+  
+        if (!token) {
+          console.error("No se encontró un token en localStorage");
+          return;
+        }
+  
+        const response = await axios.get("http://localhost:8085/api/v1/admin/devices", {
+          headers: {
+            Authorization: `Bearer ${token}`, // 🔹 Agrega el token en los headers
+          },
+        });
+  
+        console.log("Datos recibidos:", response.data); // 👀 Verifica la estructura aquí
+  
+        if (Array.isArray(response.data)) {
+          setRows(response.data);
+        } else {
+          console.error("La respuesta no es un array:", response.data);
+          setRows([]); // Evita errores si los datos no son un array
+        }
+      } catch (error) {
+        console.error("Error al obtener los datos:", error);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
+  
   const columns = [
     { field: "id", headerName: "ID" },
     {
-      field: "name",
-      headerName: "Name",
+      field: "code",
+      headerName: "Código",
       flex: 1,
       cellClassName: "name-column--cell",
     },
     {
-      field: "age",
-      headerName: "Age",
-      type: "number",
-      headerAlign: "left",
-      align: "left",
+      field: "name",
+      headerName: "Nombre",
+      flex: 1,
+      cellClassName: "name-column--cell",
     },
     {
-      field: "phone",
-      headerName: "Phone Number",
+      field: "serial",
+      headerName: "Serial",
       flex: 1,
+      cellClassName: "name-column--cell",
     },
     {
-      field: "email",
-      headerName: "Email",
+      field: "specification",
+      headerName: "Especificaciones",
       flex: 1,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "type",
+      headerName: "Tipo",
+      flex: 1,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "price",
+      headerName: "Precio",
+      flex: 1,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "status",
+      headerName: "Estado",
+      flex: 1,
+      cellClassName: "name-column--cell",
     },
     {
       field: "accessLevel",
@@ -70,7 +125,7 @@ const Team = () => {
 
   return (
     <Box m="20px">
-      <Header title="DISPOSITIVOS" subtitle="Gestión de los dispositivos de TI" />
+      <Header title="DISPOSITIVOS" subtitle="Busqueda de los dispositivos de TI" />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -100,10 +155,10 @@ const Team = () => {
           },
         }}
       >
-        <DataGrid checkboxSelection rows={mockDataTeam} columns={columns} />
+        <DataGrid checkboxSelection rows={rows} columns={columns} />
       </Box>
     </Box>
   );
 };
 
-export default Team;
+export default Device;

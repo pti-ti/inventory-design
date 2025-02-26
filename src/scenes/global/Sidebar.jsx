@@ -136,7 +136,7 @@ const Sidebar = () => {
             </Typography>
             <Item
               title="Dispositivos"
-              to="/team"
+              to="/dispositivos"
               icon={<DevicesOtherOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -187,14 +187,14 @@ const Sidebar = () => {
             />
             <Item
               title="Crear Bitácora"
-              to="/faq"
+              to="/registrar-bitacora"
               icon={<FactCheckOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Crear Mantenimiento"
-              to="/faq"
+              to="/registrar-mantenimiento"
               icon={<BuildOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

@@ -13,7 +13,7 @@ const UserRegister = () => {
     const userData = {
       email: values.email,
       location: {
-        id: parseInt(values.ciudad),
+        id: parseInt(values.location),
       },
     };
 
@@ -71,11 +71,11 @@ const UserRegister = () => {
               />
 
               {/* Campo de selección de ciudad */}
-              <FormControl fullWidth variant="filled" error={!!touched.ciudad && !!errors.ciudad} sx={{ gridColumn: "span 2" }}>
+              <FormControl fullWidth variant="filled" error={!!touched.location && !!errors.location} sx={{ gridColumn: "span 2" }}>
                 <InputLabel>Ciudad</InputLabel>
                 <Select
-                  name="ciudad"
-                  value={values.ciudad || ""}
+                  name="location"
+                  value={values.location || ""}
                   onBlur={handleBlur}
                   onChange={handleChange}
                 >
@@ -84,7 +84,7 @@ const UserRegister = () => {
                   <MenuItem value="3">Bogotá</MenuItem>
                   <MenuItem value="4">Popayán</MenuItem>
                 </Select>
-                {touched.ciudad && errors.ciudad && <FormHelperText>{errors.ciudad}</FormHelperText>}
+                {touched.location && errors.location && <FormHelperText>{errors.location}</FormHelperText>}
               </FormControl>
               
             </Box>
