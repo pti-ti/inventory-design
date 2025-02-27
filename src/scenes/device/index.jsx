@@ -16,7 +16,7 @@ const Device = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token"); // 🔹 Obtiene el token guardado
+        const token = localStorage.getItem("token"); // Obtiene el token guardado
   
         if (!token) {
           console.error("No se encontró un token en localStorage");
@@ -25,7 +25,7 @@ const Device = () => {
   
         const response = await axios.get("http://localhost:8085/api/v1/admin/devices", {
           headers: {
-            Authorization: `Bearer ${token}`, // 🔹 Agrega el token en los headers
+            Authorization: `Bearer ${token}`, // Agrega el token en los headers
           },
         });
   

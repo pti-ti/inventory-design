@@ -14,7 +14,8 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import HandymanOutlinedIcon from "@mui/icons-material/HandymanOutlined";
 import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+
 
 import userImage from "../../assets/user.jpg";
 
@@ -143,14 +144,14 @@ const Sidebar = () => {
             />
             <Item
               title="Usuarios"
-              to="/contacts"
+              to="/usuarios"
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Bitácoras"
-              to="/invoices"
+              to="/bitacoras"
               icon={<MenuBookOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -158,7 +159,7 @@ const Sidebar = () => {
 
             <Item
               title="Mantenimientos"
-              to="/invoices"
+              to="/mantenimientos"
               icon={<HandymanOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -210,7 +211,7 @@ const Sidebar = () => {
             <Item
               title="Cerrar Sesión"
               to="/geography"
-              icon={<MapOutlinedIcon />}
+              icon={<LogoutOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />

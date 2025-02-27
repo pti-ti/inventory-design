@@ -5,8 +5,9 @@ import Login from "./scenes/login";
 import Layout from "./components/Layout";
 import Dashboard from "./scenes/dashboard";
 import Device from "./scenes/device/index";
-import Invoices from "./scenes/invoices";
-import Contacts from "./scenes/contacts";
+import User from "./scenes/user/index";
+import Logbook from "./scenes/logbook/index";
+import Maintenance from "./scenes/maintenance/index";
 import UserRegister from "./scenes/form/UserRegister";
 import DeviceRegister from "./scenes/form/DeviceRegister";
 import LogbookRegister from "./scenes/form/LogbookRegister";
@@ -27,8 +28,9 @@ function App() {
           <Route path="/*" element={<Layout />}>
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="dispositivos" element={<Device />} />
-            <Route path="contacts" element={<Contacts />} />
-            <Route path="invoices" element={<Invoices />} />
+            <Route path="usuarios" element={<User />} />
+            <Route path="bitacoras" element={<Logbook />} />
+            <Route path="mantenimientos" element={<Maintenance />} />
             <Route path="registrar-usuario" element={<UserRegister />} />
             <Route path="registrar-dispositivo" element={<DeviceRegister />} />
             <Route path="registrar-bitacora" element={<LogbookRegister />} />

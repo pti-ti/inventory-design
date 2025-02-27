@@ -107,12 +107,12 @@ const checkoutSchema = yup.object().shape({
     .email("Correo inválido")
     .matches(/^[a-zA-Z0-9._%+-]+@pti-sa\.com\.co$/, "El correo debe pertenecer a pti-sa.com.co")
     .required("Este campo es obligatorio"),
-  ciudad: yup.string().required("Seleccione una ciudad"),
+  location: yup.string().required("Seleccione una ciudad"),
 });
 
 const initialValues = {
   email: "",
-  ciudad: "",
+  location: "",
 };
 
 export default UserRegister;
