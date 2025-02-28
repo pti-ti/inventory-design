@@ -12,6 +12,7 @@ const Device = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
+  const [filteredDevices, setFilteredDevices] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,6 +45,19 @@ const Device = () => {
   
     fetchData();
   }, []);
+
+  const handleSearch = (searchTerm) => {
+    const lowerCaseTerm = searchTerm.toLowerCase();
+    const filtered = rows.filter(
+        (device) =>
+            device.code.toLowerCase().includes(lowerCaseTerm) ||
+            device.name.toLowerCase().includes(lowerCaseTerm) ||
+            device.serial.toLowerCase().includes(lowerCaseTerm) ||
+            device.specification.toLowerCase().includes(lowerCaseTerm) ||
+            device.type.toLowerCase().includes(lowerCaseTerm)
+    );
+    setFilteredDevices(filtered);
+};
   
   
   const columns = [
