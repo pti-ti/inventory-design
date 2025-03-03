@@ -3,21 +3,25 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
-    const [editedDevice, setEditedDevice] = useState(device || {});
-    const [openConfirm, setOpenConfirm] = useState(false); // Estado del modal de confirmación
-    
+    const [editedDevice, setEditedDevice] = useState({});
+    const [openConfirm, setOpenConfirm] = useState(false);
 
     useEffect(() => {
-        if (device) {
-            setEditedDevice(device);
+        if (open) {
+            setEditedDevice(device || {});
         }
-    }, [device]);
+    }, [open, device]);
 
     const handleChange = (e) => {
         setEditedDevice({ ...editedDevice, [e.target.name]: e.target.value });
     };
-    
+
     const handleUpdate = async () => {
+        if (!editedDevice.name || !editedDevice.code) {
+            alert("El código y el nombre son obligatorios.");
+            return;
+        }
+
         try {
             const token = localStorage.getItem("token");
             await axios.put(`http://localhost:8085/api/v1/admin/devices/${device.id}`, editedDevice, {
@@ -28,10 +32,6 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
         } catch (error) {
             console.error("Error al actualizar el dispositivo", error);
         }
-    };
-
-    const confirmDelete = () => {
-        setOpenConfirm(true); // Abre el modal de confirmación
     };
 
     const handleDelete = async () => {
@@ -45,7 +45,7 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
         } catch (error) {
             console.error("Error al eliminar el dispositivo", error);
         }
-        setOpenConfirm(false); // Cierra el modal de confirmación
+        setOpenConfirm(false);
     };
 
     return (
@@ -70,12 +70,13 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     <TextField fullWidth margin="normal" label="Tipo" name="type" value={editedDevice.type || ''} onChange={handleChange} />
                     <TextField fullWidth margin="normal" label="Estado" name="status" value={editedDevice.status || ''} onChange={handleChange} />
                     <TextField fullWidth margin="normal" label="Precio" name="price" type="number" value={editedDevice.price || ''} onChange={handleChange} />
-                    <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 2 }}>Guardar Cambios</Button>
-                    <Button variant="contained" color="error" onClick={confirmDelete} sx={{ mt: 2, ml: 2 }}>Eliminar</Button>
+                    <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
+                        <Button variant="contained" color="primary" onClick={handleUpdate}>Guardar Cambios</Button>
+                        <Button variant="contained" color="error" onClick={() => setOpenConfirm(true)}>Eliminar</Button>
+                    </Box>
                 </Box>
             </Modal>
 
-            {/* Modal de confirmación para eliminar */}
             <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
                 <DialogTitle>¿Estás seguro?</DialogTitle>
                 <DialogContent>

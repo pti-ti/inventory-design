@@ -81,7 +81,10 @@ const User = () => {
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton color="primary" onClick={() => handleEdit(params.row)}>
+          <IconButton color="primary" onClick={() => {
+          console.log("Botón Editar presionado:", params.row);
+          handleEdit(params.row);
+        }}>
             <EditIcon />
           </IconButton>
           <IconButton color="error" onClick={() => handleOpenConfirmModal(params.row.id)}>
