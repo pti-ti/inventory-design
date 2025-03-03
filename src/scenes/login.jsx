@@ -29,7 +29,7 @@ const Login = () => {
       const data = await response.json();
       localStorage.setItem("token", data.token);
       alert("Login exitoso");
-      window.location.href = "/dashboard";
+      window.location.href = "/dispositivos";
     } catch (err){
       setError(err.message);
     };

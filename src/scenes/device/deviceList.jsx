@@ -25,15 +25,27 @@ const Device = () => {
         console.error("No se encontró un token en localStorage");
         return;
       }
+      
       const response = await axios.get("http://localhost:8085/api/v1/admin/devices", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setRows(Array.isArray(response.data) ? response.data : []);
+  
+      console.log("Dispositivos obtenidos:", response.data);
+      
+      // Formatear datos correctamente
+      const formattedDevices = response.data.map(device => ({
+        ...device,
+        id: device.id,  // Se asume que `id` siempre está presente
+        status: device.status?.name || "Desconocido"
+      }));
+  
+      setRows(formattedDevices);
     } catch (error) {
       console.error("Error al obtener los datos:", error);
+      alert("Error al cargar los dispositivos, intenta nuevamente.");
     }
   };
-
+  
   useEffect(() => {
     fetchData();
   }, []);
@@ -76,7 +88,10 @@ const Device = () => {
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton color="primary" onClick={() => handleEdit(params.row)}>
+          <IconButton color="primary" onClick={() => {
+          console.log("Botón Editar presionado:", params.row);
+          handleEdit(params.row);
+        }}>
             <EditIcon />
           </IconButton>
           <IconButton color="error" onClick={() => handleOpenConfirmModal(params.row.id)}>
@@ -105,11 +120,15 @@ const Device = () => {
       >
         <DataGrid checkboxSelection rows={rows} columns={columns} />
       </Box>
+
+      {/* Modal para editar usuario */}
       <DeviceModal open={openModal} handleClose={() => setOpenModal(false)} device={selectedDevice} refreshDevices={fetchData} />
+
+      {/* Modal de confirmación de eliminación */}
       <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>
         <DialogTitle>Confirmar eliminación</DialogTitle>
         <DialogContent>
-          <DialogContentText>¿Estás seguro de que deseas eliminar este dispositivo? Esta acción no se puede deshacer.</DialogContentText>
+          <DialogContentText>¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenConfirmModal(false)} color="primary">Cancelar</Button>
