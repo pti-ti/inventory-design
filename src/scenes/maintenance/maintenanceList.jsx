@@ -6,17 +6,17 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DeviceModal from "./deviceModal";
+import MaintenanceModal from "./maintenanceModal";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
-const Device = () => {
+const Maintenance = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
-  const [selectedDevice, setSelectedDevice] = useState(null);
+  const [selectedMaintenance, setSelectedMaintenance] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
-  const [deviceToDelete, setDeviceToDelete] = useState(null);
+  const [maintenanceToDelete, setMaintenanceToDelete] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -26,62 +26,76 @@ const Device = () => {
         return;
       }
       
-      const response = await axios.get("http://localhost:8085/api/v1/admin/devices", {
+      const response = await axios.get("http://localhost:8085/api/v1/admin/maintenances", {
         headers: { Authorization: `Bearer ${token}` },
       });
   
       console.log("Dispositivos obtenidos:", response.data);
       
       // Formatear datos correctamente
-      const formattedDevices = response.data.map(device => ({
-        ...device,
-        id: device.id,  // Se asume que `id` siempre está presente
-        status: device.status?.name || "Desconocido"
-      }));
+      const formattedMaintenances = response.data.map(maintenance => ({
+        ...maintenance,
+        deviceId: maintenance.deviceId,  // Se asume que `id` siempre está presente
+        deviceCode: maintenance.deviceCode || "Desconocido",
+        deviceName: maintenance.deviceName || "Desconocido",
+        userEmail: maintenance.userEmail || "Desconocido",
+        maintenanceType: maintenance.maintenanceType || "Desconocido",
+        comment: maintenance.comment || "Desconocido",
+        maintenanceDate: maintenance.maintenanceDate 
+          ? new Date(maintenance.maintenanceDate).toLocaleDateString("es-ES", {
+              year: "numeric", month: "2-digit", day: "2-digit"
+      })
+    : "Fecha no disponible"
+  }));
   
-      setRows(formattedDevices);
+      setRows(formattedMaintenances);
     } catch (error) {
       console.error("Error al obtener los datos:", error);
-      alert("Error al cargar los dispositivos, intenta nuevamente.");
+      alert("Error al cargar los mantenimientos, intenta nuevamente.");
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, []);
 
-  const handleEdit = (device) => {
-    setSelectedDevice(device);
+  const handleEdit = (maintenance) => {
+    setSelectedMaintenance(maintenance);
     setOpenModal(true);
   };
 
   const handleOpenConfirmModal = (id) => {
-    setDeviceToDelete(id);
+    setMaintenanceToDelete(id);
     setOpenConfirmModal(true);
   };
 
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8085/api/v1/admin/devices/${deviceToDelete}`, {
+      await axios.delete(`http://localhost:8085/api/v1/admin/maintenances/${maintenanceToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchData();
     } catch (error) {
-      console.error("Error al eliminar el dispositivo:", error);
+      console.error("Error al eliminar el mantenimiento:", error);
     }
     setOpenConfirmModal(false);
   };
 
   const columns = [
-    { field: "id", headerName: "ID" },
-    { field: "code", headerName: "Código", flex: 1, cellClassName: "name-column--cell" },
-    { field: "name", headerName: "Nombre", flex: 1, cellClassName: "name-column--cell" },
-    { field: "serial", headerName: "Serial", flex: 1, cellClassName: "name-column--cell" },
-    { field: "specification", headerName: "Especificaciones", flex: 1, cellClassName: "name-column--cell" },
-    { field: "type", headerName: "Tipo", flex: 1, cellClassName: "name-column--cell" },
-    { field: "price", headerName: "Precio", flex: 1, cellClassName: "name-column--cell" },
-    { field: "status", headerName: "Estado", flex: 1, cellClassName: "name-column--cell" },
+    { field: "id", headerName: "ID", width: 90 },
+    { field: "deviceId", headerName: "ID dispositivo", flex: 1, cellClassName: "name-column--cell" },
+    { field: "deviceCode", headerName: "Código del dispositivo", flex: 1, cellClassName: "name-column--cell" },
+    { field: "deviceName", headerName: "Nombre del dispositivo", flex: 1, cellClassName: "name-column--cell" },
+    { field: "userEmail", headerName: "Email del usuario", flex: 1, cellClassName: "name-column--cell" },
+    { field: "maintenanceType", headerName: "Tipo de mantenimiento", flex: 1, cellClassName: "name-column--cell" },
+    { field: "comment", headerName: "Comentarios", flex: 1, cellClassName: "name-column--cell" },
+    { 
+      field: "maintenanceDate", 
+      headerName: "Fecha de mantenimiento", 
+      flex: 1, 
+      cellClassName: "name-column--cell"
+    },
     {
       field: "actions",
       headerName: "Acciones",
@@ -102,9 +116,10 @@ const Device = () => {
     },
   ];
 
+
   return (
     <Box m="20px">
-      <Header title="DISPOSITIVOS" subtitle="Búsqueda de los dispositivos de TI" />
+      <Header title="MANTENIMIENTOS" subtitle="Búsqueda de los mantenimientos de los dispositivos de TI" />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -118,17 +133,17 @@ const Device = () => {
           "& .MuiCheckbox-root": { color: `${colors.greenAccent[200]} !important` },
         }}
       >
-      <DataGrid checkboxSelection rows={rows} columns={columns} />
+        <DataGrid checkboxSelection rows={rows} columns={columns} />
       </Box>
 
       {/* Modal para editar usuario */}
-      <DeviceModal open={openModal} handleClose={() => setOpenModal(false)} device={selectedDevice} refreshDevices={fetchData} />
+      <MaintenanceModal open={openModal} handleClose={() => setOpenModal(false)} maintenance={selectedMaintenance} refreshMaintenances={fetchData} />
 
       {/* Modal de confirmación de eliminación */}
       <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>
         <DialogTitle>Confirmar eliminación</DialogTitle>
         <DialogContent>
-          <DialogContentText>¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.</DialogContentText>
+          <DialogContentText>¿Estás seguro de que deseas eliminar este mantenimiento? Esta acción no se puede deshacer.</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenConfirmModal(false)} color="primary">Cancelar</Button>
@@ -139,4 +154,4 @@ const Device = () => {
   );
 };
 
-export default Device;
+export default Maintenance;
