@@ -6,7 +6,7 @@ import Layout from "./components/Layout";
 import Dashboard from "./scenes/dashboard";
 import Device from "./scenes/device/deviceList";
 import User from "./scenes/user/userList";
-import Logbook from "./scenes/logbook/index";
+import Logbook from "./scenes/logbook/logbookList";
 import Maintenance from "./scenes/maintenance/maintenanceList";
 import UserRegister from "./scenes/form/UserRegister";
 import DeviceRegister from "./scenes/form/DeviceRegister";

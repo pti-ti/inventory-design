@@ -17,6 +17,7 @@ const Maintenance = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [maintenanceToDelete, setMaintenanceToDelete] = useState(null);
+  const currentUserId = localStorage.getItem("userId");
 
   const fetchData = async () => {
     try {
@@ -30,12 +31,12 @@ const Maintenance = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
   
-      console.log("Dispositivos obtenidos:", response.data);
+      console.log("Mantenimientos obtenidos:", response.data);
       
       // Formatear datos correctamente
       const formattedMaintenances = response.data.map(maintenance => ({
         ...maintenance,
-        deviceId: maintenance.deviceId,  // Se asume que `id` siempre está presente
+        deviceId: maintenance.deviceId ?? 0,  // Se asume que `id` siempre está presente
         deviceCode: maintenance.deviceCode || "Desconocido",
         deviceName: maintenance.deviceName || "Desconocido",
         userEmail: maintenance.userEmail || "Desconocido",
@@ -137,7 +138,13 @@ const Maintenance = () => {
       </Box>
 
       {/* Modal para editar usuario */}
-      <MaintenanceModal open={openModal} handleClose={() => setOpenModal(false)} maintenance={selectedMaintenance} refreshMaintenances={fetchData} />
+      <MaintenanceModal 
+       open={openModal}
+       handleClose={() => setOpenModal(false)}
+       maintenance={selectedMaintenance} 
+       refreshMaintenances={fetchData}
+      
+      />
 
       {/* Modal de confirmación de eliminación */}
       <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>
