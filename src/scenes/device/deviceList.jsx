@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import LaptopOutlinedIcon from "@mui/icons-material/LaptopOutlined";
 import DeviceModal from "./deviceModal";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
@@ -104,8 +105,12 @@ const Device = () => {
 
   return (
     <Box m="20px">
-      <Header title="DISPOSITIVOS" subtitle="Búsqueda de los dispositivos de TI" />
-      <Box
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Header title="DISPOSITIVOS" subtitle="Búsqueda de los dispositivos del registro TI" />
+        <Button variant="contained" color="primary" onClick={() => setOpenModal(true)} startIcon={<LaptopOutlinedIcon />}>
+          Agregar Dispositivo
+        </Button>
+      </Box>      <Box
         m="40px 0 0 0"
         height="75vh"
         sx={{

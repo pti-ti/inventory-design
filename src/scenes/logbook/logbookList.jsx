@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
 import LogbookModal from "./logbookModal";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
@@ -130,7 +131,12 @@ const Logbook = () => {
 
   return (
     <Box m="20px">
-      <Header title="BITÁCORAS" subtitle="Búsqueda de las bitácoras de los dispositivos de TI" />
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Header title="BITÁCORAS" subtitle="Búsqueda de las bitácoras del registro TI" />
+        <Button variant="contained" color="primary" onClick={() => setOpenModal(true)} startIcon={<FactCheckOutlinedIcon />}>
+          Agregar bitácora
+        </Button>
+      </Box>
       <Box
         m="40px 0 0 0"
         height="75vh"

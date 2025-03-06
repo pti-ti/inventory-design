@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/PersonAdd";
 import UserModal from "./userModal";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
@@ -31,10 +32,9 @@ const User = () => {
 
       console.log("Usuarios obtenidos:", response.data);
       
-      // Asegurar que cada usuario tenga un ID único para DataGrid
       const formattedUsers = response.data.map(user => ({
         ...user,
-        id: user.id || user._id, // Ajustar según la API
+        id: user.id || user._id,
         location: user.location?.name || "No disponible"
       }));
 
@@ -81,10 +81,7 @@ const User = () => {
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton color="default" onClick={() => {
-          console.log("Botón Editar presionado:", params.row);
-          handleEdit(params.row);
-        }}>
+          <IconButton color="default" onClick={() => handleEdit(params.row)}>
             <EditIcon />
           </IconButton>
           <IconButton color="error" onClick={() => handleOpenConfirmModal(params.row.id)}>
@@ -97,7 +94,13 @@ const User = () => {
 
   return (
     <Box m="20px">
-      <Header title="USUARIOS" subtitle="Búsqueda de los usuarios del registro TI" />
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Header title="USUARIOS" subtitle="Búsqueda de los usuarios del registro TI" />
+        <Button variant="contained" color="primary" onClick={() => setOpenModal(true)} startIcon={<AddIcon />}>
+          Agregar Usuario
+        </Button>
+      </Box>
+      
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -114,10 +117,8 @@ const User = () => {
         <DataGrid checkboxSelection rows={rows} columns={columns} />
       </Box>
 
-      {/* Modal para editar usuario */}
       <UserModal open={openModal} handleClose={() => setOpenModal(false)} user={selectedUser} refreshUsers={fetchData} />
 
-      {/* Modal de confirmación de eliminación */}
       <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>
         <DialogTitle>Confirmar eliminación</DialogTitle>
         <DialogContent>

@@ -1,90 +1,60 @@
-import { Box, Button, Modal, TextField, Typography, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { Box, Button, Modal, Typography, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { useState, useEffect } from "react";
-import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import { MenuItem, Select, InputLabel, FormControl, TextField } from "@mui/material";
+import { Formik } from "formik";
+import * as yup from "yup";
 import axios from "axios";
 
 const UserModal = ({ open, handleClose, user, refreshUsers }) => {
-    const [editedUser, setEditedUser] = useState(user || {});
-    const [openConfirm, setOpenConfirm] = useState(false); // Estado del modal de confirmación
-    const [openSuccess, setOpenSuccess] = useState(false); // Estado del modal de éxito
-    
-    const locationMap = {
-        "Cali": 1,
-        "Barranquilla": 2,
-        "Bogotá": 3,
-        "Popayán": 4
+    const [openConfirm, setOpenConfirm] = useState(false);
+    const [openSuccess, setOpenSuccess] = useState(false);
+
+    const locationMap = { "Cali": 1, "Barranquilla": 2, "Bogotá": 3, "Popayán": 4 };
+
+    const initialValues = {
+        email: user?.email || "",
+        location: user?.location ? locationMap[user.location] : ""
     };
-    
-    useEffect(() => {
-        if (open && user) {
-            console.log("Datos recibidos del backend:", user);
-    
-            setEditedUser({
-                id: user.id || "",
-                email: user.email || "",
-                location: locationMap[user.location] || "" // Convertir el nombre en ID
-            });
-    
-            console.log("Ubicación cargada:", user.location, "->", locationMap[user.location]);
-        }
-    }, [user, open]);
-    
-    const handleChange = (e) => {
-        setEditedUser({ ...editedUser, [e.target.name]: e.target.value });
-    };
-    
-    const handleUpdate = async () => {
+
+    const validationSchema = yup.object().shape({
+        email: yup.string()
+            .email("Correo inválido")
+            .matches(/^[a-zA-Z0-9._%+-]+@pti-sa\.com\.co$/, "El correo debe pertenecer a pti-sa.com.co")
+            .required("Este campo es obligatorio"),
+        location: yup.string().required("Seleccione una ciudad")
+    });
+
+    const handleFormSubmit = async (values, { resetForm }) => {
         try {
             const token = localStorage.getItem("token");
-    
-            const updateUser = {
-                ...editedUser,
-                location: { id: editedUser.location } // Convertir ID a objeto
+            const requestData = {
+                email: values.email,
+                location: { id: values.location }
             };
-    
-            console.log("Datos enviados al backend:", updateUser);
-    
-            await axios.put(`http://localhost:8085/api/v1/admin/users/${user.id}`, updateUser, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-    
+
+            if (user?.id) {
+                await axios.put(`http://localhost:8085/api/v1/admin/users/${user.id}`, requestData, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+            } else {
+                await axios.post("http://localhost:8085/api/v1/admin/users/register", requestData, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+            }
+
             refreshUsers();
-            setOpenSuccess(true); // mostrar mensaje éxito
-            setTimeout(() => setOpenSuccess(false), 2000); // cerrar el modal automáticamente después de 2 segundos
+            setOpenSuccess(true);
+            setTimeout(() => setOpenSuccess(false), 2000);
+            resetForm();
             handleClose();
         } catch (error) {
-            console.error("Error al actualizar el usuario", error);
+            console.error("Error al guardar el usuario", error);
         }
-        setOpenConfirm(false); // Cierra el modal de confirmación
-    };
-    
-
-    const confirmDelete = () => {
-        setOpenConfirm(true); // Abre el modal de confirmación
-    };
-
-    const handleDelete = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            await axios.delete(`http://localhost:8085/api/v1/admin/users/${user.id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            refreshUsers();
-            handleClose();
-        } catch (error) {
-            console.error("Error al eliminar el dispositivo", error);
-        }
-        setOpenConfirm(false); // Cierra el modal de confirmación
-    };
-
-    const handleCloseModal = () => {
-        console.log ("Cerrando modal...");
-        handleClose();
     };
 
     return (
         <>
-            <Modal open={open} onClose={handleCloseModal}>
+            <Modal open={open} onClose={handleClose}>
                 <Box sx={{
                     position: "absolute",
                     top: "50%",
@@ -96,29 +66,47 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
                     p: 4,
                     borderRadius: 2,
                 }}>
-                    <Typography variant="h6">Editar Usuario</Typography>
-                    <TextField fullWidth margin="normal" label="ID" name="id" value={editedUser.id || ''} onChange={handleChange} disabled/>
-                    <TextField fullWidth margin="normal" label="Email" name="email" value={editedUser.email || ''} onChange={handleChange} />
-                    <FormControl fullWidth margin="normal">
-                    <InputLabel id="location-label">Ubicación</InputLabel>
-                        {<Select
-                            labelId="location-label"
-                            name="location"
-                            value={editedUser.location || ""}
-                            onChange={(e) => setEditedUser({ ...editedUser, location: e.target.value })}
-                        >
-                            <MenuItem value={1}>Cali</MenuItem>
-                            <MenuItem value={2}>Barranquilla</MenuItem>
-                            <MenuItem value={3}>Bogotá</MenuItem>
-                            <MenuItem value={4}>Popayán</MenuItem>
-                        </Select>}
-                    </FormControl>
-                    <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 2 }}>Guardar Cambios</Button>
-                    <Button variant="contained" color="error" onClick={confirmDelete} sx={{ mt: 2, ml: 2 }}>Eliminar</Button>
+                    <Typography variant="h6">{user ? "Editar Usuario" : "Agregar Usuario"}</Typography>
+
+                    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleFormSubmit}>
+                        {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
+                            <form onSubmit={handleSubmit}>
+                                <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    label="Email"
+                                    name="email"
+                                    value={values.email}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={touched.email && Boolean(errors.email)}
+                                    helperText={touched.email && errors.email}
+                                />
+
+                                <FormControl fullWidth margin="normal" error={touched.location && Boolean(errors.location)}>
+                                    <InputLabel>Ubicación</InputLabel>
+                                    <Select
+                                        name="location"
+                                        value={values.location}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    >
+                                        <MenuItem value={1}>Cali</MenuItem>
+                                        <MenuItem value={2}>Barranquilla</MenuItem>
+                                        <MenuItem value={3}>Bogotá</MenuItem>
+                                        <MenuItem value={4}>Popayán</MenuItem>
+                                    </Select>
+                                </FormControl>
+
+                                <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+                                    {user ? "Guardar Cambios" : "Agregar Usuario"}
+                                </Button>
+                            </form>
+                        )}
+                    </Formik>
                 </Box>
             </Modal>
 
-            {/* Modal de confirmación para eliminar */}
             <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
                 <DialogTitle>¿Estás seguro?</DialogTitle>
                 <DialogContent>
@@ -126,13 +114,12 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenConfirm(false)} color="primary">Cancelar</Button>
-                    <Button onClick={handleDelete} color="error" autoFocus>Eliminar</Button>
+                    <Button color="error" autoFocus>Eliminar</Button>
                 </DialogActions>
             </Dialog>
 
-            {/* Modal de éxito */}
             <Dialog open={openSuccess} onClose={() => setOpenSuccess(false)}>
-                <DialogTitle>¡Usuario actualizado!</DialogTitle>
+                <DialogTitle>¡Usuario guardado!</DialogTitle>
                 <DialogContent>
                     Los cambios se guardaron correctamente.
                 </DialogContent>

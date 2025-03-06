@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined";
 import MaintenanceModal from "./maintenanceModal";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
@@ -120,8 +121,12 @@ const Maintenance = () => {
 
   return (
     <Box m="20px">
-      <Header title="MANTENIMIENTOS" subtitle="Búsqueda de los mantenimientos de los dispositivos de TI" />
-      <Box
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Header title="MANTENIMIENTOS" subtitle="Búsqueda de los mantenimientos del registro TI" />
+        <Button variant="contained" color="primary" onClick={() => setOpenModal(true)} startIcon={<BuildOutlinedIcon />}>
+          Agregar Mantenimiento
+        </Button>
+      </Box>      <Box
         m="40px 0 0 0"
         height="75vh"
         sx={{
