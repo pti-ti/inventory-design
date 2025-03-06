@@ -103,7 +103,7 @@ const Maintenance = () => {
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton color="primary" onClick={() => {
+          <IconButton color="default" onClick={() => {
           console.log("Botón Editar presionado:", params.row);
           handleEdit(params.row);
         }}>
@@ -153,7 +153,7 @@ const Maintenance = () => {
           <DialogContentText>¿Estás seguro de que deseas eliminar este mantenimiento? Esta acción no se puede deshacer.</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenConfirmModal(false)} color="primary">Cancelar</Button>
+          <Button onClick={() => setOpenConfirmModal(false)} color="default">Cancelar</Button>
           <Button onClick={handleDelete} color="error">Eliminar</Button>
         </DialogActions>
       </Dialog>

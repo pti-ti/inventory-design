@@ -88,7 +88,7 @@ const Device = () => {
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton color="primary" onClick={() => {
+          <IconButton color="default" onClick={() => {
           console.log("Botón Editar presionado:", params.row);
           handleEdit(params.row);
         }}>
