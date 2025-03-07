@@ -1,9 +1,7 @@
-import { 
-    Box, Button, Modal, TextField, Typography, Dialog, DialogActions, 
-    DialogContent, DialogTitle 
-} from "@mui/material";
+import { Box, Button, Modal, TextField, Typography, MenuItem, Select, FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { DiOpensource } from "react-icons/di";
 
 const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const initialLogbookState = {
@@ -19,152 +17,156 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     };
 
     const [editedLogbook, setEditedLogbook] = useState(initialLogbookState);
-    const [openConfirm, setOpenConfirm] = useState(false);
     const [openSuccess, setOpenSuccess] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+
+    const statuses = [
+        { id: 1, name: "Entregado" },
+        { id: 2, name: "Dañado" },
+        { id: 3, name: "Mantenimiento" },
+        { id: 4, name: "Disponible" },
+        { id: 5, name: "No disponible" }
+    ];
+
+    const locations = [
+        { id: 1, name: "Cali" },
+        { id: 2, name: "Barranquilla" },
+        { id: 3, name: "Bogotá" },
+        { id: 4, name: "Popayán" }
+    ];
 
     useEffect(() => {
         if (open && logbook) {
-            console.log("Datos recibidos del backend:", logbook);
-    
-            const formatDate = (dateString) => {
-                if (!dateString) return "";
-                if (dateString.includes("-")) return dateString; // Ya está en formato yyyy-MM-dd
-                const [day, month, year] = dateString.split("/");
-                return `${year}-${month}-${day}`;
-            };
-
             setEditedLogbook({
                 id: logbook.id ?? "",
+                deviceId: logbook.deviceId ?? "",
                 deviceCode: logbook.deviceCode ?? "",
                 deviceName: logbook.deviceName ?? "",
                 userEmail: logbook.userEmail ?? "",
-                statusName: logbook.statusName ?? "",
-                locationName: logbook.locationName ?? "",
+                statusId: logbook.statusId ?? "",
+                locationId: logbook.locationId ?? "",
                 note: logbook.note ?? "",
-                createdAt: formatDate(logbook.createdAt)
+                createdAt: logbook.createdAt ?? ""
             });
+            setIsEditing(!!logbook.id);
         } else {
             setEditedLogbook(initialLogbookState);
+            setIsEditing(false);
         }
     }, [logbook, open]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setEditedLogbook((prev) => ({
-            ...prev,
-            [name]: name === "maintenanceDate" ? formatDate(value) : value
-        }));
+        setEditedLogbook((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleUpdate = async () => {
-        console.log("Datos enviados al backend:", editedLogbook);
-        
+    const handleCreateOrUpdate = async () => {
         try {
             const token = localStorage.getItem("token");
-            
 
-            console.log("UserID desde localStorage:"); 
+            if (!editedLogbook.id) {
+                if (!editedLogbook.deviceId || !editedLogbook.userEmail || !editedLogbook.statusId || !editedLogbook.locationId) {
+                    alert("Todos los campos son obligatorios para registrar una nueva bitácora.");
+                    return;
+                }
+            }
 
-            const updateLogbook = {
+            const logbookData = {
                 device: { id: editedLogbook.deviceId },
-                user: { id: editedLogbook.userId },
-                location: { id: editedLogbook.locationId },
+                user: { email: editedLogbook.userEmail },
                 status: { id: editedLogbook.statusId },
-                note: editedLogbook.note, 
+                location: { id: editedLogbook.locationId },
+                note: editedLogbook.note
             };
 
-            console.log("Datos enviados para actualizar:", updateLogbook);
-            
-            await axios.put(
-                `http://localhost:8085/api/v1/admin/logbooks/${id}`, 
-                updateLogbook, 
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            if (editedLogbook.id) {
+                await axios.put(`http://localhost:8085/api/v1/admin/logbooks/${editedLogbook.id}`, logbookData, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+            } else {
+                await axios.post("http://localhost:8085/api/v1/admin/logbooks/register", logbookData, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+            }
 
             refreshLogbooks();
             setOpenSuccess(true);
-            setTimeout(() => setOpenSuccess(false), 2000);
             handleClose();
         } catch (error) {
-            console.error("Error al actualizar el mantenimiento", error);
+            console.error("Error al guardar la bitácora", error.response?.data || error.message);
+            alert(`Error: ${error.response?.data?.message || "No se pudo procesar la solicitud"}`);
         }
-    };
-
-    const confirmDelete = () => {
-        setOpenConfirm(true);
-    };
-
-    const handleDelete = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            await axios.delete(
-                `http://localhost:8085/api/v1/admin/logbooks/${logbook.id}`, 
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            refreshLogbooks();
-            handleClose();
-        } catch (error) {
-            console.error("Error al eliminar el mantenimiento", error);
-        }
-        setOpenConfirm(false);
     };
 
     return (
         <>
             <Modal open={open} onClose={handleClose}>
                 <Box sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: 400,
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                    borderRadius: 2,
+                    position: "absolute", top: "50%", left: "50%",
+                    transform: "translate(-50%, -50%)", width: 400,
+                    bgcolor: "background.paper", boxShadow: 24,
+                    p: 4, borderRadius: 2
                 }}>
-                    <Typography variant="h6">Editar Bitácoras</Typography>
-                    <TextField fullWidth margin="normal" label="ID" name="id" value={editedLogbook.id} disabled />
-                    <TextField fullWidth margin="normal" label="Código dispositivo" name="deviceCode" value={editedLogbook.deviceCode || ""} disabled onChange={handleChange} />
-                    <TextField fullWidth margin="normal" label="Nombre del dispositivo" name="deviceName" value={editedLogbook.deviceName || ""} disabled onChange={handleChange} />
-                    <TextField fullWidth margin="normal" label="Email del usuario" name="userEmail" value={editedLogbook.userEmail || ""} disabled onChange={handleChange} />
-                    <TextField fullWidth margin="normal" label="Estado" name="statusName" value={editedLogbook.statusName || ""} disabled onChange={handleChange} />
-                    <TextField fullWidth margin="normal" label="Ubicación" name="locationName" value={editedLogbook.locationName || ""} disabled onChange={handleChange} />
-                    <TextField fullWidth margin="normal" label="Notas" name="note" value={editedLogbook.note || ""} onChange={handleChange} />
-                    <TextField 
-                        fullWidth 
-                        margin="normal" 
-                        label="Creado el: " 
-                        name="createdAt" 
-                        type="date"
-                        value={editedLogbook.createdAt || ""}
-                        onChange={handleChange}
-                        disabled 
-                        InputLabelProps={{ shrink: true }} 
+                    <Typography variant="h6">{editedLogbook.id ? "Editar Bitácora" : "Registrar Bitácora"}</Typography>
+
+                    <TextField
+                        fullWidth margin="normal" label="Código dispositivo"
+                        name="deviceCode" value={editedLogbook.deviceCode || ""}
+                        disabled={!!editedLogbook.id} onChange={handleChange}
                     />
-                    
-                    <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 2 }}>Guardar Cambios</Button>
-                    <Button variant="contained" color="error" onClick={confirmDelete} sx={{ mt: 2, ml: 2 }}>Eliminar</Button>
+                    <TextField
+                        fullWidth margin="normal" label="Nombre del dispositivo"
+                        name="deviceName" value={editedLogbook.deviceName || ""}
+                        disabled={!!editedLogbook.id} onChange={handleChange}
+                    />
+                    <TextField
+                        fullWidth margin="normal" label="Email del usuario"
+                        name="userEmail" value={editedLogbook.userEmail || ""}
+                        onChange={handleChange}
+                        disabled={isEditing} // Inhabilita cuando se está editando
+                    />
+
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel>Estado</InputLabel>
+                        <Select
+                            name="statusId"
+                            value={editedLogbook.statusId || ""}
+                            onChange={handleChange}
+                            disabled={isEditing} // Inhabilita cuando se está editando
+                        >
+                            {statuses.map((status) => (
+                                <MenuItem key={status.id} value={status.id}>{status.name}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel>Ubicación</InputLabel>
+                        <Select
+                            name="locationId"
+                            value={editedLogbook.locationId || ""}
+                            onChange={handleChange}
+                            disabled={isEditing} // Inhabilita cuando se está editando
+                        >
+                            {locations.map((location) => (
+                                <MenuItem key={location.id} value={location.id}>{location.name}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <TextField fullWidth margin="normal" label="Notas" name="note" value={editedLogbook.note || ""} onChange={handleChange} />
+
+                    <Button variant="contained" color="primary" onClick={handleCreateOrUpdate} sx={{ mt: 2 }}>
+                        {editedLogbook.id ? "Guardar Cambios" : "Registrar"}
+                    </Button>
                 </Box>
             </Modal>
 
-            {/* Modal de confirmación para eliminar */}
-            <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
-                <DialogTitle>¿Estás seguro?</DialogTitle>
-                <DialogContent>
-                    ¿Quieres eliminar esta bitácora? Esta acción no se puede deshacer.
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenConfirm(false)} color="primary">Cancelar</Button>
-                    <Button onClick={handleDelete} color="error" autoFocus>Eliminar</Button>
-                </DialogActions>
-            </Dialog>
-                    
-            {/* Modal de éxito */}
+            {/* Dialog de confirmación */}
             <Dialog open={openSuccess} onClose={() => setOpenSuccess(false)}>
-                <DialogTitle>Mantenimiento actualizado!</DialogTitle>
+                <DialogTitle>¡{isEditing ? "Bitácora actualizada" : "Bitácora registrada"}!</DialogTitle>
                 <DialogContent>
-                    Los cambios se guardaron correctamente.
+                    {isEditing ? "Los cambios se guardaron correctamente." : "La bitácora ha sido creada con éxito."}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenSuccess(false)} color="primary" autoFocus>Cerrar</Button>
@@ -172,6 +174,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             </Dialog>
         </>
     );
+
 };
 
 export default LogbookModal;
