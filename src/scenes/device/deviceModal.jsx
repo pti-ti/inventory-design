@@ -55,36 +55,55 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
         setEditedDevice({ ...editedDevice, [e.target.name]: e.target.value });
     };
 
-    const handleSave = async () => {
+    // Nuevo handle para registrar un dispositivo
+    const handleRegisterDevice = async () => {
         try {
             const token = localStorage.getItem("token");
-            const apiUrl = isEditing
-                ? `http://localhost:8085/api/v1/admin/devices/${device.id}`
-                : "http://localhost:8085/api/v1/admin/devices/register";
-            const method = isEditing ? "put" : "post";
-            const cleanPrice = Number(editedDevice.price.replace(/[^0-9]/g, ""));
-
+            const apiUrl = "http://localhost:8085/api/v1/admin/devices/register";
+    
             const deviceData = {
                 ...editedDevice,
-                status: { id: editedDevice.status } // Convertimos status a objeto con id
+                status: { id: editedDevice.status }
             };
-
-            console.log("Payload enviado:", JSON.stringify(deviceData, null, 2)); // Agregar este log
-
-            
-            await axios({
-                method,
-                url: apiUrl,
-                data: deviceData,
+    
+            console.log("Registrando dispositivo:", JSON.stringify(deviceData, null, 2));
+    
+            await axios.post(apiUrl, deviceData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            
+    
             refreshDevices();
             setOpenSuccess(true);
             setTimeout(() => setOpenSuccess(false), 2000);
             handleClose();
         } catch (error) {
-            console.error("Error al guardar el dispositivo", error);
+            console.error("Error al registrar el dispositivo", error);
+        }
+    };
+    
+    // Nuevo handle para actualizar un dispositivo
+    const handleUpdateDevice = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const apiUrl = `http://localhost:8085/api/v1/admin/devices/${device.id}`;
+    
+            const deviceData = {
+                ...editedDevice,
+                status: { id: editedDevice.status }
+            };
+    
+            console.log("Actualizando dispositivo:", JSON.stringify(deviceData, null, 2));
+    
+            await axios.put(apiUrl, deviceData, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+    
+            refreshDevices();
+            setOpenSuccess(true);
+            setTimeout(() => setOpenSuccess(false), 2000);
+            handleClose();
+        } catch (error) {
+            console.error("Error al actualizar el dispositivo", error);
         }
     };
 
@@ -127,12 +146,17 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
 
                     <TextField fullWidth margin="normal" label="Precio" name="price" value={editedDevice.price} onChange={handleChange} />
                     
-                    <Button variant="contained" color="primary" onClick={handleSave} sx={{ mt: 2 }}>
+                    {/* Se modificó el onClick del botón */}
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        onClick={isEditing ? handleUpdateDevice : handleRegisterDevice} 
+                        sx={{ mt: 2 }}
+                    >
                         {isEditing ? "Guardar Cambios" : "Registrar"}
                     </Button>
                 </Box>
             </Modal>
-
             <Dialog open={openSuccess} onClose={() => setOpenSuccess(false)}>
                 <DialogTitle>¡{isEditing ? "Dispositivo actualizado" : "Dispositivo registrado"}!</DialogTitle>
                 <DialogContent>

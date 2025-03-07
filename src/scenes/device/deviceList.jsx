@@ -16,6 +16,7 @@ const Device = () => {
   const [rows, setRows] = useState([]);
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [deviceToDelete, setDeviceToDelete] = useState(null);
 
@@ -30,29 +31,65 @@ const Device = () => {
       const response = await axios.get("http://localhost:8085/api/v1/admin/devices", {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       console.log("Dispositivos obtenidos:", response.data);
       
-      // Formatear datos correctamente
       const formattedDevices = response.data.map(device => ({
         ...device,
-        id: device.id,  // Se asume que `id` siempre está presente
+        id: device.id,
         status: device.status?.name || "Desconocido"
       }));
-  
+
       setRows(formattedDevices);
     } catch (error) {
       console.error("Error al obtener los datos:", error);
       alert("Error al cargar los dispositivos, intenta nuevamente.");
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, []);
 
+  const handleRegisterDevice = async (deviceData) => {
+    try {
+      const token = localStorage.getItem("token");
+      const apiUrl = "http://localhost:8085/api/v1/admin/devices/register";
+
+      console.log("Registrando dispositivo:", JSON.stringify(deviceData, null, 2));
+
+      await axios.post(apiUrl, deviceData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      fetchData();
+      setOpenModal(false);
+    } catch (error) {
+      console.error("Error al registrar el dispositivo", error);
+    }
+  };
+
+  const handleUpdateDevice = async (deviceData) => {
+    try {
+      const token = localStorage.getItem("token");
+      const apiUrl = `http://localhost:8085/api/v1/admin/devices/${deviceData.id}`;
+
+      console.log("Actualizando dispositivo:", JSON.stringify(deviceData, null, 2));
+
+      await axios.put(apiUrl, deviceData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      fetchData();
+      setOpenModal(false);
+    } catch (error) {
+      console.error("Error al actualizar el dispositivo", error);
+    }
+  };
+
   const handleEdit = (device) => {
     setSelectedDevice(device);
+    setIsEditing(true);
     setOpenModal(true);
   };
 
@@ -89,10 +126,7 @@ const Device = () => {
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton color="default" onClick={() => {
-          console.log("Botón Editar presionado:", params.row);
-          handleEdit(params.row);
-        }}>
+          <IconButton color="default" onClick={() => handleEdit(params.row)}>
             <EditIcon />
           </IconButton>
           <IconButton color="error" onClick={() => handleOpenConfirmModal(params.row.id)}>
@@ -107,10 +141,15 @@ const Device = () => {
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="DISPOSITIVOS" subtitle="Búsqueda de los dispositivos del registro TI" />
-        <Button variant="contained" color="primary" onClick={() => setOpenModal(true)} startIcon={<LaptopOutlinedIcon />}>
+        <Button variant="contained" color="primary" onClick={() => {
+          setSelectedDevice(null);
+          setIsEditing(false);
+          setOpenModal(true);
+        }} startIcon={<LaptopOutlinedIcon />}>
           Agregar Dispositivo
         </Button>
-      </Box>      <Box
+      </Box>      
+      <Box
         m="40px 0 0 0"
         height="75vh"
         sx={{
@@ -123,11 +162,19 @@ const Device = () => {
           "& .MuiCheckbox-root": { color: `${colors.greenAccent[200]} !important` },
         }}
       >
-      <DataGrid checkboxSelection rows={rows} columns={columns} />
+        <DataGrid checkboxSelection rows={rows} columns={columns} />
       </Box>
 
-      {/* Modal para editar usuario */}
-      <DeviceModal open={openModal} handleClose={() => setOpenModal(false)} device={selectedDevice} refreshDevices={fetchData} />
+      {/* Modal para registrar/editar dispositivo */}
+      <DeviceModal 
+        open={openModal} 
+        handleClose={() => setOpenModal(false)} 
+        device={selectedDevice} 
+        refreshDevices={fetchData} 
+        handleRegister={handleRegisterDevice}
+        handleUpdate={handleUpdateDevice}
+        isEditing={isEditing}
+      />
 
       {/* Modal de confirmación de eliminación */}
       <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>
@@ -143,5 +190,6 @@ const Device = () => {
     </Box>
   );
 };
+
 
 export default Device;
