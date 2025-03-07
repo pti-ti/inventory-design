@@ -6,7 +6,6 @@ import * as yup from "yup";
 import axios from "axios";
 
 const UserModal = ({ open, handleClose, user, refreshUsers }) => {
-    const [openConfirm, setOpenConfirm] = useState(false);
     const [openSuccess, setOpenSuccess] = useState(false);
 
     const locationMap = { "Cali": 1, "Barranquilla": 2, "Bogotá": 3, "Popayán": 4 };
@@ -24,31 +23,41 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
         location: yup.string().required("Seleccione una ciudad")
     });
 
-    const handleFormSubmit = async (values, { resetForm }) => {
+    const handleRegisterUser = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            const requestData = {
+            await axios.post("http://localhost:8085/api/v1/admin/users/register", {
                 email: values.email,
                 location: { id: values.location }
-            };
-
-            if (user?.id) {
-                await axios.put(`http://localhost:8085/api/v1/admin/users/${user.id}`, requestData, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-            } else {
-                await axios.post("http://localhost:8085/api/v1/admin/users/register", requestData, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-            }
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
             refreshUsers();
             setOpenSuccess(true);
-            setTimeout(() => setOpenSuccess(false), 2000);
             resetForm();
             handleClose();
         } catch (error) {
-            console.error("Error al guardar el usuario", error);
+            console.error("Error al registrar el usuario", error);
+        }
+    };
+
+    const handleUpdateUser = async (values, resetForm) => {
+        try {
+            const token = localStorage.getItem("token");
+            await axios.put(`http://localhost:8085/api/v1/admin/users/${user.id}`, {
+                email: values.email,
+                location: { id: values.location }
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            refreshUsers();
+            setOpenSuccess(true);
+            resetForm();
+            handleClose();
+        } catch (error) {
+            console.error("Error al actualizar el usuario", error);
         }
     };
 
@@ -68,7 +77,14 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
                 }}>
                     <Typography variant="h6">{user ? "Editar Usuario" : "Agregar Usuario"}</Typography>
 
-                    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleFormSubmit}>
+                    <Formik initialValues={initialValues} validationSchema={validationSchema} 
+                        onSubmit={(values, { resetForm }) => {
+                            if (user?.id) {
+                                handleUpdateUser(values, resetForm);
+                            } else {
+                                handleRegisterUser(values, resetForm);
+                            }
+                        }}>
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
                             <form onSubmit={handleSubmit}>
                                 <TextField
@@ -106,17 +122,6 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
                     </Formik>
                 </Box>
             </Modal>
-
-            <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
-                <DialogTitle>¿Estás seguro?</DialogTitle>
-                <DialogContent>
-                    ¿Quieres eliminar el usuario? Esta acción no se puede deshacer.
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenConfirm(false)} color="primary">Cancelar</Button>
-                    <Button color="error" autoFocus>Eliminar</Button>
-                </DialogActions>
-            </Dialog>
 
             <Dialog open={openSuccess} onClose={() => setOpenSuccess(false)}>
                 <DialogTitle>¡Usuario guardado!</DialogTitle>

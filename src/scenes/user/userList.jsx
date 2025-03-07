@@ -15,7 +15,8 @@ const User = () => {
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [openModal, setOpenModal] = useState(false);
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
 
@@ -50,7 +51,12 @@ const User = () => {
 
   const handleEdit = (user) => {
     setSelectedUser(user);
-    setOpenModal(true);
+    setOpenEditModal(true);
+  };
+
+  const handleOpenAddModal = () => {
+    setSelectedUser(null);
+    setOpenAddModal(true);
   };
 
   const handleOpenConfirmModal = (id) => {
@@ -96,7 +102,7 @@ const User = () => {
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="USUARIOS" subtitle="Búsqueda de los usuarios del registro TI" />
-        <Button variant="contained" color="primary" onClick={() => setOpenModal(true)} startIcon={<AddIcon />}>
+        <Button variant="contained" color="primary" onClick={handleOpenAddModal} startIcon={<AddIcon />}>
           Agregar Usuario
         </Button>
       </Box>
@@ -117,7 +123,8 @@ const User = () => {
         <DataGrid checkboxSelection rows={rows} columns={columns} />
       </Box>
 
-      <UserModal open={openModal} handleClose={() => setOpenModal(false)} user={selectedUser} refreshUsers={fetchData} />
+      <UserModal open={openAddModal} handleClose={() => setOpenAddModal(false)} user={null} refreshUsers={fetchData} />
+      <UserModal open={openEditModal} handleClose={() => setOpenEditModal(false)} user={selectedUser} refreshUsers={fetchData} />
 
       <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>
         <DialogTitle>Confirmar eliminación</DialogTitle>
