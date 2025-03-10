@@ -18,6 +18,7 @@ const Logbook = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [logbookToDelete, setLogbookToDelete] = useState(null);
+  const currentUserId = localStorage.getItem("userId");
 
   const fetchData = async () => {
     try {
@@ -30,7 +31,10 @@ const Logbook = () => {
       const response = await axios.get("http://localhost:8085/api/v1/admin/logbooks", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
+      console.log("Bitácoras obtenidas:", response.data);
+      
+      // Formatear datos correctamente
       const formattedLogbooks = response.data.map(logbook => ({
         id: logbook.id || 0,
         deviceCode: logbook.deviceCode || "Desconocido",
@@ -40,10 +44,12 @@ const Logbook = () => {
         locationName: logbook.locationName || "Sin ubicación",
         note: logbook.note || "Sin notas",
         createdAt: logbook.createdAt
-          ? new Date(logbook.createdAt).toLocaleDateString("es-ES", { year: "numeric", month: "2-digit", day: "2-digit" })
-          : "Fecha no disponible"
-      }));
-
+        ? new Date(logbook.createdAt).toLocaleDateString("es-ES", {
+          year: "numeric", month: "2-digit", day: "2-digit"
+      })
+    : "Fecha no disponible"
+  }));
+      console.log("Bitácoras formateadas:", formattedLogbooks);
       setRows(formattedLogbooks);
     } catch (error) {
       console.error("Error al obtener los datos:", error);
@@ -55,6 +61,12 @@ const Logbook = () => {
     fetchData();
   }, []);
 
+  const handleEdit = (logbook) => {
+    console.log("Bitácora seleccionada para editar:", logbook)
+    setSelectedLogbook(logbook);
+    setOpenModal(true);
+  };
+
   const handleOpenModal = (logbook = null) => {
     setSelectedLogbook(logbook);
     setOpenModal(true);
@@ -65,42 +77,81 @@ const Logbook = () => {
     setOpenConfirmModal(true);
   };
 
+  const handleUpdateLogbook = async (updatedLogbook) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No se encontró un token en localStorage");
+        return;
+      }
+  
+      const response = await axios.put(
+        `http://localhost:8085/api/v1/admin/logbooks/${updatedLogbook.id}`,
+        {
+          statusName: updatedLogbook.statusName,
+          locationName: updatedLogbook.locationName,
+          note: updatedLogbook.note,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      console.log("Bitácora actualizada:", response.data);
+      setOpenModal(false);
+      fetchData(); // Recargar la lista después de editar
+    } catch (error) {
+      console.error("Error al actualizar la bitácora:", error);
+      alert("No se pudo actualizar la bitácora. Inténtalo nuevamente.");
+    }
+  };
+  
+
   const handleDelete = async () => {
     if (!logbookToDelete) {
-      console.error("No se ha seleccionado ninguna bitácora para eliminar.");
-      return;
+        console.error("No se ha seleccionado ninguna bitácora para eliminar.");
+        return;
     }
 
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8085/api/v1/admin/logbooks/${logbookToDelete}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchData();
+        console.log("Intentando eliminar bitácora con ID:", logbookToDelete);
+        const token = localStorage.getItem("token");
+        const response = await axios.delete(`http://localhost:8085/api/v1/admin/logbooks/${logbookToDelete}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Respuesta del backend al eliminar:", response);
+        fetchData(); // Recargar la lista después de eliminar
     } catch (error) {
-      console.error("Error al eliminar la bitácora:", error);
+        console.error("Error al eliminar la bitácora:", error);
     }
 
     setOpenConfirmModal(false);
-    setLogbookToDelete(null);
-  };
+    setLogbookToDelete(null); // Limpiar la variable de estado
+};
+
 
   const columns = [
     { field: "id", headerName: "ID", width: 90 },
-    { field: "deviceCode", headerName: "Código del dispositivo", flex: 1 },
-    { field: "deviceName", headerName: "Nombre del dispositivo", flex: 1 },
-    { field: "userEmail", headerName: "Email del usuario", flex: 1 },
-    { field: "statusName", headerName: "Estado", flex: 1 },
-    { field: "locationName", headerName: "Ubicación", flex: 1 },
-    { field: "note", headerName: "Notas", flex: 1 },
-    { field: "createdAt", headerName: "Creado el", flex: 1 },
+    { field: "deviceCode", headerName: "Código del dispositivo", flex: 1, cellClassName: "name-column--cell" },
+    { field: "deviceName", headerName: "Nombre del dispositivo", flex: 1, cellClassName: "name-column--cell" },
+    { field: "userEmail", headerName: "Email del usuario", flex: 1, cellClassName: "name-column--cell" },
+    { field: "statusName", headerName: "Estado", flex: 1, cellClassName: "name-column--cell" },
+    { field: "locationName", headerName: "Ubicación", flex: 1, cellClassName: "name-column--cell" },
+    { field: "note", headerName: "Notas", flex: 1, cellClassName: "name-column--cell" },
+    { 
+      field: "createdAt", 
+      headerName: "Creado el", 
+      flex: 1, 
+      cellClassName: "name-column--cell"
+    },
     {
       field: "actions",
       headerName: "Acciones",
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton color="default" onClick={() => handleOpenModal(params.row)}>
+          <IconButton color="default" onClick={() => {
+          console.log("Botón Editar presionado:", params.row);
+          handleEdit(params.row);
+        }}>
             <EditIcon />
           </IconButton>
           <IconButton color="error" onClick={() => handleOpenConfirmModal(params.row.id)}>
@@ -111,20 +162,22 @@ const Logbook = () => {
     },
   ];
 
+
   return (
     <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="BITÁCORAS" subtitle="Búsqueda de las bitácoras del registro TI" />
+      <Box display="flex" justifyContent="space-between" alignItems="center"></Box>
+        <Header title="BITÁCORAS" subtitle="Búsqueda de las bitácoras de los dispositivos de TI" />
         <Button variant="contained" color="primary" onClick={() => handleOpenModal()} startIcon={<FactCheckOutlinedIcon />}>
-          Agregar bitácora
+          Agregar Bitácora
         </Button>
-      </Box>
+        
       <Box
         m="40px 0 0 0"
         height="75vh"
         sx={{
           "& .MuiDataGrid-root": { border: "none" },
           "& .MuiDataGrid-cell": { borderBottom: "none" },
+          "& .name-column--cell": { color: colors.greenAccent[300] },
           "& .MuiDataGrid-columnHeaders": { backgroundColor: colors.blueAccent[700], borderBottom: "none" },
           "& .MuiDataGrid-virtualScroller": { backgroundColor: colors.primary[400] },
           "& .MuiDataGrid-footerContainer": { borderTop: "none", backgroundColor: colors.blueAccent[700] },
@@ -134,14 +187,15 @@ const Logbook = () => {
         <DataGrid checkboxSelection rows={rows} columns={columns} />
       </Box>
 
-      {/* Modal para registrar/editar bitácora */}
+      {/* Modal para editar usuario */}
       <LogbookModal 
         open={openModal}
         handleClose={() => setOpenModal(false)}
-        logbook={selectedLogbook}
-        isEditing={!!selectedLogbook} 
+        logbook={selectedLogbook} 
         refreshLogbooks={fetchData}
+        handleUpdateLogbook={handleUpdateLogbook} 
       />
+
 
       {/* Modal de confirmación de eliminación */}
       <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>

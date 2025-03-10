@@ -126,7 +126,8 @@ const Maintenance = () => {
         <Button variant="contained" color="primary" onClick={() => setOpenModal(true)} startIcon={<BuildOutlinedIcon />}>
           Agregar Mantenimiento
         </Button>
-      </Box>      <Box
+      </Box>      
+      <Box
         m="40px 0 0 0"
         height="75vh"
         sx={{
