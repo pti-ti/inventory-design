@@ -37,7 +37,7 @@ const Maintenance = () => {
       // Formatear datos correctamente
       const formattedMaintenances = response.data.map(maintenance => ({
         ...maintenance,
-        deviceId: maintenance.deviceId ?? 0,  // Se asume que `id` siempre está presente
+        deviceId: maintenance.deviceId ?? 0,
         deviceCode: maintenance.deviceCode || "Desconocido",
         deviceName: maintenance.deviceName || "Desconocido",
         userEmail: maintenance.userEmail || "Desconocido",
@@ -46,9 +46,9 @@ const Maintenance = () => {
         maintenanceDate: maintenance.maintenanceDate 
           ? new Date(maintenance.maintenanceDate).toLocaleDateString("es-ES", {
               year: "numeric", month: "2-digit", day: "2-digit"
-      })
-    : "Fecha no disponible"
-  }));
+            })
+          : "Fecha no disponible"
+      }));
   
       setRows(formattedMaintenances);
     } catch (error) {
@@ -61,9 +61,19 @@ const Maintenance = () => {
     fetchData();
   }, []);
 
-  const handleEdit = (maintenance) => {
-    setSelectedMaintenance(maintenance);
+  const handleOpenCreateModal = () => {
+    setSelectedMaintenance(null); // Indica que se creará un nuevo mantenimiento
     setOpenModal(true);
+  };
+
+  const handleEdit = (maintenance) => {
+    setSelectedMaintenance(maintenance); // Se pasa el mantenimiento seleccionado para edición
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedMaintenance(null); // Se limpia el estado para evitar persistencia accidental
   };
 
   const handleOpenConfirmModal = (id) => {
@@ -104,10 +114,7 @@ const Maintenance = () => {
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton color="default" onClick={() => {
-          console.log("Botón Editar presionado:", params.row);
-          handleEdit(params.row);
-        }}>
+          <IconButton color="default" onClick={() => handleEdit(params.row)}>
             <EditIcon />
           </IconButton>
           <IconButton color="error" onClick={() => handleOpenConfirmModal(params.row.id)}>
@@ -118,15 +125,14 @@ const Maintenance = () => {
     },
   ];
 
-
   return (
     <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="MANTENIMIENTOS" subtitle="Búsqueda de los mantenimientos del registro TI" />
-        <Button variant="contained" color="primary" onClick={() => setOpenModal(true)} startIcon={<BuildOutlinedIcon />}>
+      <Box display="flex" justifyContent="space-between" alignItems="center"></Box>
+        <Header title="MANTENIMIENTOS" subtitle="Búsqueda de los mantenimientos de los dispositivos de TI" />
+        <Button variant="contained" color="primary" onClick={handleOpenCreateModal} startIcon={<BuildOutlinedIcon />}>
           Agregar Mantenimiento
-        </Button>
-      </Box>      
+        </Button> 
+             
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -143,13 +149,13 @@ const Maintenance = () => {
         <DataGrid checkboxSelection rows={rows} columns={columns} />
       </Box>
 
-      {/* Modal para editar usuario */}
+      {/* Modal para registrar/editar mantenimiento */}
       <MaintenanceModal 
-       open={openModal}
-       handleClose={() => setOpenModal(false)}
-       maintenance={selectedMaintenance} 
-       refreshMaintenances={fetchData}
-      
+        open={openModal}
+        handleClose={handleCloseModal}
+        maintenance={selectedMaintenance} 
+        isEditing={!!selectedMaintenance} // true si se está editando, false si se está creando
+        refreshMaintenances={fetchData}
       />
 
       {/* Modal de confirmación de eliminación */}

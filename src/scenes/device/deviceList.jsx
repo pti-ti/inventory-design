@@ -139,8 +139,8 @@ const Device = () => {
 
   return (
     <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DISPOSITIVOS" subtitle="Búsqueda de los dispositivos del registro TI" />
+      <Box display="flex" justifyContent="space-between" alignItems="center"></Box>
+        <Header title="DISPOSITIVOS" subtitle="Búsqueda de los dispositivos de TI" />
         <Button variant="contained" color="primary" onClick={() => {
           setSelectedDevice(null);
           setIsEditing(false);
@@ -148,7 +148,7 @@ const Device = () => {
         }} startIcon={<LaptopOutlinedIcon />}>
           Agregar Dispositivo
         </Button>
-      </Box>      
+        
       <Box
         m="40px 0 0 0"
         height="75vh"

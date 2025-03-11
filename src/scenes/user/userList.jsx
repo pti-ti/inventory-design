@@ -100,13 +100,11 @@ const User = () => {
 
   return (
     <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="USUARIOS" subtitle="Búsqueda de los usuarios del registro TI" />
-        <Button variant="contained" color="primary" onClick={handleOpenAddModal} startIcon={<AddIcon />}>
+      <Box display="flex" justifyContent="space-between" alignItems="center"></Box>
+        <Header title="USUARIOS" subtitle="Búsqueda de los usuarios de TI" />
+        <Button variant="contained" color="primary" onClick={() => handleOpenAddModal()} startIcon={<AddIcon />}>
           Agregar Usuario
-        </Button>
-      </Box>
-      
+        </Button>     
       <Box
         m="40px 0 0 0"
         height="75vh"

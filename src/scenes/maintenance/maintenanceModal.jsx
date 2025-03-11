@@ -1,33 +1,38 @@
 import { 
     Box, Button, Modal, TextField, Typography, Dialog, DialogActions, 
-    DialogContent, DialogTitle 
+    DialogContent, Snackbar, Alert, DialogTitle 
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
 const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances }) => {
+    const isEditing = Boolean(maintenance?.id); // Determina si es edición o registro
+
     const initialMaintenanceState = {
         id: "",
         deviceId: "",
         deviceCode: "",
         deviceName: "",
+        userId: "",
         userEmail: "",
         maintenanceType: "",
-        comment: "",
-        maintenanceDate: ""
+        maintenanceDate: "",
+        comment: ""
     };
-
+    
     const [editedMaintenance, setEditedMaintenance] = useState(initialMaintenanceState);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [openSuccess, setOpenSuccess] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+
 
     useEffect(() => {
         if (open && maintenance) {
             console.log("Datos recibidos del backend:", maintenance);
-    
+
             const formatDate = (dateString) => {
                 if (!dateString) return "";
-                if (dateString.includes("-")) return dateString; // Ya está en formato yyyy-MM-dd
+                if (dateString.includes("-")) return dateString;
                 const [day, month, year] = dateString.split("/");
                 return `${year}-${month}-${day}`;
             };
@@ -37,6 +42,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                 deviceId: maintenance.deviceId ?? "",
                 deviceCode: maintenance.deviceCode ?? "",
                 deviceName: maintenance.deviceName ?? "",
+                userId: maintenance.userId ?? "",
                 userEmail: maintenance.userEmail ?? "",
                 maintenanceType: maintenance.maintenanceType ?? "",
                 comment: maintenance.comment ?? "",
@@ -51,22 +57,50 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
         const { name, value } = e.target;
         setEditedMaintenance((prev) => ({
             ...prev,
-            [name]: name === "maintenanceDate" ? formatDate(value) : value
+            [name]: value
         }));
     };
+
+    const handleCreate = async () => {
+        try {
+            console.log("📌 Datos actuales de editedMaintenance:", editedMaintenance);
+    
+            const newMaintenance = {
+                device: { id: Number(editedMaintenance.deviceId) },
+                user: { id: Number(editedMaintenance.userId) }, // Asegurar que se usa editedMaintenance.userId
+                maintenanceType: editedMaintenance.maintenanceType,
+                maintenanceDate: editedMaintenance.maintenanceDate,
+                comment: editedMaintenance.comment,
+            };
+    
+            console.log("Datos enviados para crear mantenimiento:", newMaintenance);
+    
+            const token = localStorage.getItem("token");
+            await axios.post(
+                "http://localhost:8085/api/v1/admin/maintenances/register",
+                newMaintenance,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            refreshMaintenances();
+            setOpenSuccess(true);
+            setTimeout(() => setOpenSuccess(false), 2000);
+            setOpenSnackbar(true);
+            handleClose();
+        } catch (error) {
+            console.error("🚨 Error al crear el mantenimiento:", error);
+        }
+    };
+    
+    
 
     const handleUpdate = async () => {
         console.log("Datos enviados al backend:", editedMaintenance);
         
         try {
             const token = localStorage.getItem("token");
-            const userId = localStorage.getItem("userId");
-
-            console.log("UserID desde localStorage:", userId); 
 
             const updateMaintenance = {
-                device: { id: editedMaintenance.deviceId },
-                user: { id: editedMaintenance.userId },
                 maintenanceType: editedMaintenance.maintenanceType,
                 maintenanceDate: editedMaintenance.maintenanceDate,
                 comment: editedMaintenance.comment,
@@ -83,6 +117,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
             refreshMaintenances();
             setOpenSuccess(true);
             setTimeout(() => setOpenSuccess(false), 2000);
+            setOpenSnackbar(true);
             handleClose();
         } catch (error) {
             console.error("Error al actualizar el mantenimiento", error);
@@ -122,53 +157,60 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                     p: 4,
                     borderRadius: 2,
                 }}>
-                    <Typography variant="h6">Editar Mantenimiento</Typography>
-                    <TextField fullWidth margin="normal" label="ID" name="id" value={editedMaintenance.id} disabled />
-                    <TextField fullWidth margin="normal" label="ID dispositivo" name="deviceId" value={editedMaintenance.deviceId} disabled />
-                    <TextField fullWidth margin="normal" label="Código dispositivo" name="deviceCode" value={editedMaintenance.deviceCode || ""} onChange={handleChange} />
-                    <TextField fullWidth margin="normal" label="Nombre del dispositivo" name="deviceName" value={editedMaintenance.deviceName || ""} onChange={handleChange} />
-                    <TextField fullWidth margin="normal" label="Email del usuario" name="userEmail" value={editedMaintenance.userEmail || ""} onChange={handleChange} />
-                    <TextField fullWidth margin="normal" label="Tipo de mantenimiento" name="maintenanceType" value={editedMaintenance.maintenanceType || ""} onChange={handleChange} />
-                    <TextField fullWidth margin="normal" label="Comentarios" name="comment" value={editedMaintenance.comment || ""} onChange={handleChange} />
+                    <Typography variant="h6">
+                        {isEditing ? "Editar Mantenimiento" : "Registrar Mantenimiento"}
+                    </Typography>
+
+                    {/* Campos para Registro */}
+                    {!isEditing && (
+                        <>
+                            <TextField fullWidth margin="normal" label="ID del dispositivo" name="deviceId" value={editedMaintenance.deviceId} onChange={handleChange} required />
+                            <TextField fullWidth margin="normal" label="ID del usuario" name="userId" value={editedMaintenance.userId} onChange={handleChange} required />
+                        </>
+                    )}
+
+                    {/* Campos para Edición */}
+                    {isEditing && (
+                        <>
+                            <TextField fullWidth margin="normal" label="Código dispositivo" name="deviceCode" value={editedMaintenance.deviceCode} onChange={handleChange} disabled />
+                            <TextField fullWidth margin="normal" label="Nombre del dispositivo" name="deviceName" value={editedMaintenance.deviceName} onChange={handleChange} disabled />
+                            <TextField fullWidth margin="normal" label="Email del usuario" name="userEmail" value={editedMaintenance.userEmail} onChange={handleChange} disabled />
+                        </>
+                    )}
+
+                    <TextField fullWidth margin="normal" label="Tipo de mantenimiento" name="maintenanceType" value={editedMaintenance.maintenanceType} onChange={handleChange} />
+                    <TextField fullWidth margin="normal" label="Comentarios" name="comment" value={editedMaintenance.comment} onChange={handleChange} />
                     <TextField 
                         fullWidth 
                         margin="normal" 
                         label="Fecha de mantenimiento" 
                         name="maintenanceDate" 
                         type="date"
-                        value={editedMaintenance.maintenanceDate || ""}
+                        value={editedMaintenance.maintenanceDate}
                         onChange={handleChange}
-                        disabled 
+                        disabled
                         InputLabelProps={{ shrink: true }} 
                     />
-                    
-                    <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 2 }}>Guardar Cambios</Button>
-                    <Button variant="contained" color="error" onClick={confirmDelete} sx={{ mt: 2, ml: 2 }}>Eliminar</Button>
+
+                    <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                        <Button variant="contained" color="info" onClick={isEditing ? handleUpdate : handleCreate}>
+                            {isEditing ? "Guardar Cambios" : "Registrar"}
+                        </Button>
+                    </Box>
+
+                    {/* {isEditing && (
+                        <Button variant="contained" color="error" onClick={confirmDelete} sx={{ mt: 2, ml: 2 }}>
+                            Eliminar
+                        </Button>
+                    )} */}
                 </Box>
             </Modal>
 
-            {/* Modal de confirmación para eliminar */}
-            <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
-                <DialogTitle>¿Estás seguro?</DialogTitle>
-                <DialogContent>
-                    ¿Quieres eliminar este mantenimiento? Esta acción no se puede deshacer.
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenConfirm(false)} color="primary">Cancelar</Button>
-                    <Button onClick={handleDelete} color="error" autoFocus>Eliminar</Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Modal de éxito */}
-            <Dialog open={openSuccess} onClose={() => setOpenSuccess(false)}>
-                <DialogTitle>Mantenimiento actualizado!</DialogTitle>
-                <DialogContent>
-                    Los cambios se guardaron correctamente.
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenSuccess(false)} color="primary" autoFocus>Cerrar</Button>
-                </DialogActions>
-            </Dialog>
+            <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={() => setOpenSnackbar(false)}>
+                <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: "100%" }}>
+                    {isEditing ? "Mantenimiento actualizado correctamente" : "Mantenimiento creado correctamente"}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

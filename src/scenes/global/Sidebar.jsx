@@ -172,27 +172,7 @@ const Sidebar = () => {
             >
               Ingresos
             </Typography>
-            <Item
-              title="Crear Dispositivo"
-              to="/registrar-dispositivo"
-              icon={<LaptopOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Crear Usuario"
-              to="/registrar-usuario"
-              icon={<PersonAddOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Crear Bitácora"
-              to="/registrar-bitacora"
-              icon={<FactCheckOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            
             <Item
               title="Crear Mantenimiento"
               to="/registrar-mantenimiento"
@@ -203,14 +183,14 @@ const Sidebar = () => {
             <Typography
               variant="h6"
               color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
+              sx={{ m: "20px 0 20px 20px" }}
             >
               Sesión
             </Typography>
             
             <Item
               title="Cerrar Sesión"
-              to="/geography"
+              to="/"
               icon={<LogoutOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
