@@ -3,6 +3,8 @@ import { useContext, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import logoClaro from "../../assets/logoClaro.png";
+import logoOscuro from "../../assets/logoOscuro.png";
 //import SearchIcon from "@mui/icons-material/Search";
 
 const Topbar = ({ onSearch }) => {
@@ -11,6 +13,9 @@ const Topbar = ({ onSearch }) => {
     const colorMode = useContext(ColorModeContext);
     const [searchTerm, setSearchTerm] = useState("");
 
+    const logo = theme.palette.mode === "dark" ? logoClaro :logoOscuro;
+
+
     const handleSearch = () => {
         if (onSearch) {
             onSearch(searchTerm);
@@ -18,42 +23,24 @@ const Topbar = ({ onSearch }) => {
     };
 
     return (
-        <Box display="flex" justifyContent="space-between" p={2}>
-            {/* SEARCH BAR */}
-            {/* <Box display= "flex"
-                backgroundColor={colors.primary[400]}
-                borderRadius="3px"
-            >
-                <InputBase sx={{ ml: 2, flex: 1}}
-                 placeholder="Buscar..."
-                 value={searchTerm}
-                 onChange={(e) => setSearchTerm(e.target.value)}
-                 />
-                <IconButton onClick={handleSearch} sx={{ p: 1 }}>
-                    <SearchIcon />
-                </IconButton>
-            </Box> */}
-            {/* ICONS */}
-            <Box display="flex">
+        <Box display="flex" justifyContent="space-between" alignItems="center" p={2}>
+            {/* ICONOS */}
+            <Box display="flex" alignItems="center">
                 <IconButton onClick={colorMode.toggleColorMode}>
                     {theme.palette.mode === "dark" ? (
                         <DarkModeOutlinedIcon />
                     ) : (
                         <LightModeOutlinedIcon />
                     )}
-                    
                 </IconButton>
-                {/* <IconButton>
-                    <NotificationsOutlinedIcon />
-                </IconButton>
-                <IconButton>
-                    <SettingsOutlinedIcon />
-                </IconButton>
-                <IconButton>
-                    <PersonOutlinedIcon />
-                </IconButton> */}
             </Box>
-        </Box>);
+
+            {/* LOGO EN LA ESQUINA SUPERIOR DERECHA */}
+            <Box>
+            <img src={logo} alt="Logo" style={{ height: 50, width: "auto" }} />
+            </Box>
+        </Box>
+    );
 };
 
 export default Topbar;

@@ -142,7 +142,7 @@ const Sidebar = () => {
             />
 
             {/* Mostrar solo si es ADMIN */}
-            {user?.userType === "ADMIN" && (
+            {/* {user?.userType === "ADMIN" && (
               <Item
                 title="Usuarios"
                 to="/usuarios"
@@ -150,7 +150,16 @@ const Sidebar = () => {
                 selected={selected}
                 setSelected={setSelected}
               />
-            )}
+            )} */}
+            
+            <Item
+              title="Usuarios"
+              to="/usuarios"
+              icon={<PersonOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            
 
             <Item
               title="Bitácoras"

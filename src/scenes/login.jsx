@@ -1,12 +1,14 @@
 import React, { useState, useContext } from "react";
-import "../styles/Login.css";
 import { AuthContext } from "../context/AuthContext";
-import { IconButton, useTheme } from "@mui/material";
+import { IconButton, useTheme, Snackbar, Alert } from "@mui/material";
 import { ColorModeContext } from "../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import logoClaro from "../assets/logoClaro.png";
+import logoOscuro from "../assets/logoOscuro.png";
+import "../styles/Login.css";
 
 const API_URL = "http://localhost:8085/api/v1/security/login";
 
@@ -16,56 +18,54 @@ const Login = () => {
   const colorMode = useContext(ColorModeContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
 
   const textColor = theme.palette.mode === "dark" ? "#fff" : "#000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
 
     try {
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: username, password }),
       });
 
-      if (!response.ok) {
-        throw new Error("Credenciales incorrectas");
-      }
+      if (!response.ok) throw new Error("Credenciales incorrectas");
 
       const data = await response.json();
-      console.log("Respuesta del backend:", data);
-
       login({ username, userType: data.userType }, data.token);
 
-      alert("Login exitoso");
-      window.location.href = "/dispositivos";
+      setSnackbar({ open: true, message: "¡Login exitoso!", severity: "success" });
+
+      setTimeout(() => {
+        window.location.href = "/dispositivos";
+      }, 1500);
+      
     } catch (err) {
-      setError(err.message);
+      setSnackbar({ open: true, message: err.message, severity: "error" });
     }
   };
 
   return (
-    <div className="login-container" style={{ color: textColor }}>
+    <div className={`login-container ${theme.palette.mode === "dark" ? "dark-mode" : "light-mode"}`} style={{ color: textColor }}>
+      
+      {/* Logo y Tema */}
+      <div className="logo-container">
+        <img src={theme.palette.mode === "dark" ? logoClaro : logoOscuro} alt="Logo" className="logo" />
+      </div>
       <div className="theme-toggle">
         <IconButton onClick={colorMode.toggleColorMode}>
-          {theme.palette.mode === "dark" ? (
-            <DarkModeOutlinedIcon />
-          ) : (
-            <LightModeOutlinedIcon />
-          )}
+          {theme.palette.mode === "dark" ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
         </IconButton>
       </div>
 
+      {/* Formulario */}
       <div className="wrapper">
         <form onSubmit={handleSubmit}>
           <h1 style={{ color: textColor }}>Login</h1>
-          {error && <div className="error-message">{error}</div>}
-          
+
           <div className="input-box">
             <input
               type="text"
@@ -90,9 +90,21 @@ const Login = () => {
             <LockOutlinedIcon className="icon" style={{ color: textColor }} />
           </div>
 
-          <button type="submit">Login</button>
+          <button type="submit">Iniciar Sesión</button>
         </form>
       </div>
+
+      {/* Snackbar para mostrar alertas */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: "100%" }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

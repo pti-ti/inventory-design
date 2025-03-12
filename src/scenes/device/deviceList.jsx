@@ -111,6 +111,14 @@ const Device = () => {
     setOpenConfirmModal(false);
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0
+    }).format(price);
+  };
+
   const columns = [
     { field: "id", headerName: "ID" },
     { field: "code", headerName: "Código", flex: 1, cellClassName: "name-column--cell" },
@@ -118,7 +126,14 @@ const Device = () => {
     { field: "serial", headerName: "Serial", flex: 1, cellClassName: "name-column--cell" },
     { field: "specification", headerName: "Especificaciones", flex: 1, cellClassName: "name-column--cell" },
     { field: "type", headerName: "Tipo", flex: 1, cellClassName: "name-column--cell" },
-    { field: "price", headerName: "Precio", flex: 1, cellClassName: "name-column--cell" },
+    { 
+      field: "price", 
+      headerName: "Precio", 
+      flex: 1, 
+      cellClassName: "name-column--cell",
+      renderCell: (params) => formatPrice(params.value) // Aplicar formato a los precios
+    },
+    //{ field: "price", headerName: "Precio", flex: 1, cellClassName: "name-column--cell" },
     { field: "status", headerName: "Estado", flex: 1, cellClassName: "name-column--cell" },
     {
       field: "actions",
@@ -180,7 +195,7 @@ const Device = () => {
       <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>
         <DialogTitle>Confirmar eliminación</DialogTitle>
         <DialogContent>
-          <DialogContentText>¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.</DialogContentText>
+          <DialogContentText>¿Estás seguro de que deseas eliminar este dispositivo? Esta acción no se puede deshacer.</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenConfirmModal(false)} color="primary">Cancelar</Button>

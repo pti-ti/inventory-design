@@ -3,7 +3,8 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: url("../assets/background.jpg") no-repeat center center/cover; /* Opcional */
+    background: url("../assets/background.jpg") no-repeat center center/cover;
+    transition: background-color 0.3s ease;
 }
 
 .wrapper {
@@ -12,14 +13,15 @@
     border: 2px solid rgba(255, 255, 255, .2);
     box-shadow: 0 0 10px rgba(0, 0, 0, .2);
     backdrop-filter: blur(30px);
-    color: #fff;
     border-radius: 10px;
     padding: 30px 40px;
+    transition: background-color 0.3s ease;
 }
 
 .wrapper h1 {
     font-size: 36px;
     text-align: center;
+    transition: color 0.3s ease;
 }
 
 .wrapper .input-box {
@@ -29,50 +31,102 @@
     margin: 30px 0;
 }
 
-.input-box input{
+.input-box input {
     width: 100%;
     height: 100%;
     background: transparent;
     border: none;
     outline: none;
     border: 2px solid rgba(255, 255, 255, .2);
+    border-color: rgba(0, 0, 0, 0.2);
     border-radius: 40px;
     font-size: 16px;
-    color: #fff;
     padding: 20px 45px 20px 20px;
+    transition: color 0.3s ease;
 }
 
-.input-box input::placeholder{
-    color: rgba(255, 255, 255, 0.5);
-}
-.light-theme .input-box input::placeholder {
-    color: rgba(0, 0, 0, 0.6); /* Negro con 60% de opacidad para tema claro */
+/* Estilos para placeholder en modo claro y oscuro */
+.input-box input::placeholder {
+    transition: color 0.3s ease;
 }
 
-.dark-theme .input-box input::placeholder {
-    color: rgba(255, 255, 255, 0.6); /* Blanco con 60% de opacidad para tema oscuro */
+.light-mode .wrapper {
+    color: #000;
 }
 
-.input-box .icon{
+.light-mode .input-box input {
+    color: #000;
+    border-color: rgba(0, 0, 0, 0.2);
+    background: #fff;
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2), -3px -3px 8px rgba(255, 255, 255, 0.8);
+}
+
+.light-mode .input-box input:focus {
+    border-color: #007bff;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.9);
+}
+
+
+.light-mode .input-box input::placeholder {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.dark-mode .wrapper {
+    color: #fff;
+}
+
+.dark-mode .input-box input {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .input-box input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.input-box .icon {
     position: absolute;
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 16px;
+    transition: color 0.3s ease;
 }
 
-.wrapper button{
+.light-mode .input-box .icon {
+    color: #000;
+}
+
+.dark-mode .input-box .icon {
+    color: #fff;
+}
+
+.wrapper button {
     width: 100%;
     height: 45px;
     background: #fff;
     border: none;
     outline: none;
     border-radius: 40px;
-    box-shadow: 0 0 10px rgba(0,0,0, .1);
-    cursor: pointer; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    cursor: pointer;
     font-size: 16px;
-    color: #333;
     font-weight: 700;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.light-mode .wrapper button {
+    background: #007bff;
+    color: #fff;
+}
+
+.dark-mode .wrapper button {
+    background: #0d6efd;
+    color: #fff;
+}
+
+.wrapper button:hover {
+    background: #0056b3;
 }
 
 .error-message {
@@ -80,11 +134,23 @@
     text-align: center;
     font-size: 14px;
     margin-bottom: 10px;
-  }
+}
 
 .theme-toggle {
     position: absolute;
     top: 10px;
     right: 10px;
-  }
-  
+}
+
+.logo-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.logo {
+    width: 120px; 
+    height: auto;
+}
+
+
