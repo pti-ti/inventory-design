@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Login from "./scenes/login";
@@ -15,14 +15,19 @@ import MaintenanceRegister from "./scenes/form/MaintenanceRegister";
 
 function App() {
   const [theme, colorMode] = useMode();
+  const location = useLocation();
+  //const isLoginPage = location.pathname === "login"
 
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Routes>
-          {/* Login sin Sidebar */}
-          <Route path="/" element={<Login />} />
+          {/* Redirigir la raíz "/" a "/login" */}
+          <Route path="/" element={<Navigate to="/login" />} />
+
+          {/* Página de Login sin el Layout */}
+          <Route path="/login" element={<Login />} />
 
           {/* Layout con Sidebar y Topbar */}
           <Route path="/*" element={<Layout />}>

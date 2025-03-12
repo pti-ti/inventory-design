@@ -43,7 +43,14 @@
 }
 
 .input-box input::placeholder{
-    color: #fff;
+    color: rgba(255, 255, 255, 0.5);
+}
+.light-theme .input-box input::placeholder {
+    color: rgba(0, 0, 0, 0.6); /* Negro con 60% de opacidad para tema claro */
+}
+
+.dark-theme .input-box input::placeholder {
+    color: rgba(255, 255, 255, 0.6); /* Blanco con 60% de opacidad para tema oscuro */
 }
 
 .input-box .icon{
@@ -74,3 +81,10 @@
     font-size: 14px;
     margin-bottom: 10px;
   }
+
+.theme-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  

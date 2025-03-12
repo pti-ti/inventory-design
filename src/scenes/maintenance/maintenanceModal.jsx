@@ -166,6 +166,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                         <>
                             <TextField fullWidth margin="normal" label="ID del dispositivo" name="deviceId" value={editedMaintenance.deviceId} onChange={handleChange} required />
                             <TextField fullWidth margin="normal" label="ID del usuario" name="userId" value={editedMaintenance.userId} onChange={handleChange} required />
+                            
                         </>
                     )}
 
@@ -188,7 +189,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                         type="date"
                         value={editedMaintenance.maintenanceDate}
                         onChange={handleChange}
-                        disabled
+                        disabled={isEditing}
                         InputLabelProps={{ shrink: true }} 
                     />
 

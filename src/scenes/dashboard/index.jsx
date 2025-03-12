@@ -2,7 +2,10 @@ import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import EmailIcon from "@mui/icons-material/Email";
+import LaptopChromebookIcon from "@mui/icons-material/LaptopChromebook";
+import HeadphonesIcon from "@mui/icons-material/Headphones";
+import KeyboardIcon from "@mui/icons-material/Keyboard";
+import MouseIcon from "@mui/icons-material/Mouse";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import TrafficIcon from "@mui/icons-material/Traffic";
@@ -32,7 +35,7 @@ const Dashboard = () => {
             }}
           >
             <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-            Download Reports
+            Descargar Reportes
           </Button>
         </Box>
       </Box>
@@ -54,11 +57,11 @@ const Dashboard = () => {
         >
           <StatBox
             title="12,361"
-            subtitle="Emails Sent"
+            subtitle="Portátiles"
             progress="0.75"
-            increase="+14%"
+            //increase="+14%"
             icon={
-              <EmailIcon
+              <LaptopChromebookIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }
@@ -73,11 +76,11 @@ const Dashboard = () => {
         >
           <StatBox
             title="431,225"
-            subtitle="Sales Obtained"
+            subtitle="Auriculares"
             progress="0.50"
-            increase="+21%"
+            //increase="+21%"
             icon={
-              <PointOfSaleIcon
+              <HeadphonesIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }
@@ -92,11 +95,11 @@ const Dashboard = () => {
         >
           <StatBox
             title="32,441"
-            subtitle="New Clients"
+            subtitle="Teclados"
             progress="0.30"
-            increase="+5%"
+            //increase="+5%"
             icon={
-              <PersonAddIcon
+              <KeyboardIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }
@@ -111,11 +114,11 @@ const Dashboard = () => {
         >
           <StatBox
             title="1,325,134"
-            subtitle="Traffic Received"
+            subtitle="Mouse"
             progress="0.80"
-            increase="+43%"
+            //increase="+43%"
             icon={
-              <TrafficIcon
+              <MouseIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }
@@ -141,7 +144,7 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                Revenue Generated
+                Valor del inventario TI $
               </Typography>
               <Typography
                 variant="h3"
@@ -177,9 +180,9 @@ const Dashboard = () => {
             colors={colors.grey[100]}
             p="15px"
           >
-            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
+            {/* <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
               Recent Transactions
-            </Typography>
+            </Typography> */}
           </Box>
           {mockTransactions.map((transaction, i) => (
             <Box
@@ -191,16 +194,16 @@ const Dashboard = () => {
               p="15px"
             >
               <Box>
-                <Typography
+                {/* <Typography
                   color={colors.greenAccent[500]}
                   variant="h5"
                   fontWeight="600"
                 >
                   {transaction.txId}
-                </Typography>
-                <Typography color={colors.grey[100]}>
+                </Typography> */}
+                {/* <Typography color={colors.grey[100]}>
                   {transaction.user}
-                </Typography>
+                </Typography> */}
               </Box>
               <Box color={colors.grey[100]}>{transaction.date}</Box>
               <Box
@@ -221,9 +224,9 @@ const Dashboard = () => {
           backgroundColor={colors.primary[400]}
           p="30px"
         >
-          <Typography variant="h5" fontWeight="600">
+          {/* <Typography variant="h5" fontWeight="600">
             Campaign
-          </Typography>
+          </Typography> */}
           <Box
             display="flex"
             flexDirection="column"
@@ -231,14 +234,14 @@ const Dashboard = () => {
             mt="25px"
           >
             {/* <ProgressCircle size="125" /> */}
-            <Typography
+            {/* <Typography
               variant="h5"
               color={colors.greenAccent[500]}
               sx={{ mt: "15px" }}
             >
               $48,352 revenue generated
-            </Typography>
-            <Typography>Includes extra misc expenditures and costs</Typography>
+            </Typography> */}
+            {/* <Typography>Includes extra misc expenditures and costs</Typography> */}
           </Box>
         </Box>
         <Box
@@ -246,13 +249,13 @@ const Dashboard = () => {
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
         >
-          <Typography
+          {/* <Typography
             variant="h5"
             fontWeight="600"
             sx={{ padding: "30px 30px 0 30px" }}
           >
             Sales Quantity
-          </Typography>
+          </Typography> */}
           <Box height="250px" mt="-20px">
             <BarChart isDashboard={true} />
           </Box>
@@ -263,13 +266,13 @@ const Dashboard = () => {
           backgroundColor={colors.primary[400]}
           padding="30px"
         >
-          <Typography
+          {/* <Typography
             variant="h5"
             fontWeight="600"
             sx={{ marginBottom: "15px" }}
           >
             Geography Based Traffic
-          </Typography>
+          </Typography> */}
           <Box height="200px">
             {/* <GeographyChart isDashboard={true} /> */}
           </Box>

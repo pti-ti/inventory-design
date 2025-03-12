@@ -1,33 +1,22 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import LaptopOutlinedIcon from "@mui/icons-material/LaptopOutlined";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
-import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined";
-import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 import DevicesOtherOutlinedIcon from "@mui/icons-material/DevicesOtherOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import HandymanOutlinedIcon from "@mui/icons-material/HandymanOutlined";
-import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-
-
-import userImage from "../../assets/user.jpg";
+import { AuthContext } from "../../context/AuthContext";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   return (
     <MenuItem
       active={selected === title}
-      style={{
-        color: colors.grey[100],
-      }}
       onClick={() => setSelected(title)}
       icon={icon}
     >
@@ -42,6 +31,24 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  console.log("Usuario en Sidebar:", user);
+
+  const cleanRole = (role) => role?.replace("ROLE_", "");
+
+  const roleLabels = {
+    ADMIN: "Administrador",
+    USER: "Usuario",
+    TECHNICIAN: "Técnico",
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  }
 
   return (
     <Box
@@ -63,9 +70,10 @@ const Sidebar = () => {
         },
       }}
     >
+
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
-          {/* LOGO AND MENU ICON */}
+          {/* Botón de colapsar menú */}
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
@@ -75,13 +83,7 @@ const Sidebar = () => {
             }}
           >
             {!isCollapsed && (
-              <Box
-                display="flex"
-                justifyContent="center"  
-                alignItems="center"      
-                textAlign="center"       
-                width="100%"         
-              >
+              <Box display="flex" justifyContent="center" textAlign="center">
                 <Typography variant="h2" color={colors.grey[100]}>
                   {/* Admin */}
                 </Typography>
@@ -92,29 +94,22 @@ const Sidebar = () => {
             )}
           </MenuItem>
 
-          {!isCollapsed && (
+          {/* Datos del usuario */}
+          {!isCollapsed && user && (
             <Box mb="25px">
-              <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={userImage}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
-              </Box>
               <Box textAlign="center">
                 <Typography
-                  variant="h2"
+                  variant="h7"
                   color={colors.grey[100]}
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Christian
+                  {user.username}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  Administrador
+                  {roleLabels[cleanRole(user?.userType)] || cleanRole(user?.userType) || "Sin rol"}
                 </Typography>
+
               </Box>
             </Box>
           )}
@@ -122,19 +117,22 @@ const Sidebar = () => {
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to="/"
+              to="/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Datos
-            </Typography>
+            {!isCollapsed && (
+              <Typography
+                variant="h2"
+                color={colors.grey[300]}
+                sx={{ m: "50px 0 5px 20px" }}
+              >
+                Datos
+              </Typography>
+            )}
+
             <Item
               title="Dispositivos"
               to="/dispositivos"
@@ -142,13 +140,18 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="Usuarios"
-              to="/usuarios"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+
+            {/* Mostrar solo si es ADMIN */}
+            {user?.userType === "ADMIN" && (
+              <Item
+                title="Usuarios"
+                to="/usuarios"
+                icon={<PersonOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            )}
+
             <Item
               title="Bitácoras"
               to="/bitacoras"
@@ -165,36 +168,26 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Ingresos
-            </Typography>
-            
-            <Item
-              title="Crear Mantenimiento"
-              to="/registrar-mantenimiento"
-              icon={<BuildOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "20px 0 20px 20px" }}
-            >
-              Sesión
-            </Typography>
-            
-            <Item
-              title="Cerrar Sesión"
-              to="/"
+
+            {!isCollapsed && (
+              <Typography
+                variant="h2"
+                color={colors.grey[300]}
+                sx={{ m: "100px 0 10px 20px" }}
+              >
+                Sesión
+              </Typography>
+            )}
+
+            {user && (
+              <MenuItem
+              onClick={handleLogout} // Usar la nueva función con navegación
               icon={<LogoutOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+              style={{ color: "red" }}
+            >
+              <Typography>Cerrar Sesión</Typography>
+            </MenuItem>
+            )}
           </Box>
         </Menu>
       </ProSidebar>
