@@ -268,22 +268,22 @@ export const mockDataInvoices = [
 
 export const mockTransactions = [
   {
-    txId: "01e4dsa",
-    user: "johndoe",
-    date: "2021-09-01",
-    cost: "43.95",
+    txId: "Monitor Samsung Borderless",
+    user: "Monitores",
+    date: "2025-03-13",
+    cost: "430.000",
   },
   {
-    txId: "0315dsaa",
-    user: "jackdower",
-    date: "2022-04-01",
-    cost: "133.45",
+    txId: "Zbook Hp Laptop",
+    user: "Portátiles",
+    date: "2024-12-01",
+    cost: "7.800.000",
   },
   {
-    txId: "01e4dsa",
-    user: "aberdohnny",
-    date: "2021-09-01",
-    cost: "43.95",
+    txId: "Pro Hp books",
+    user: "Portátiles",
+    date: "2024-10-05",
+    cost: "4.300.000",
   },
   {
     txId: "51034szv",
@@ -320,13 +320,13 @@ export const mockTransactions = [
 export const mockBarData = [
   {
     country: "AD",
-    "hot dog": 137,
-    "hot dogColor": "hsl(229, 70%, 50%)",
-    burger: 96,
+    "Portátil": 137,
+    "Portátil": "hsl(229, 70%, 50%)",
+    Portátil: 96,
     burgerColor: "hsl(296, 70%, 50%)",
     kebab: 72,
     kebabColor: "hsl(97, 70%, 50%)",
-    donut: 140,
+    Portátil: 140,
     donutColor: "hsl(340, 70%, 50%)",
   },
   {
@@ -337,7 +337,7 @@ export const mockBarData = [
     burgerColor: "hsl(111, 70%, 50%)",
     kebab: 58,
     kebabColor: "hsl(273, 70%, 50%)",
-    donut: 29,
+    Portátil: 29,
     donutColor: "hsl(275, 70%, 50%)",
   },
   {
@@ -348,18 +348,18 @@ export const mockBarData = [
     burgerColor: "hsl(96, 70%, 50%)",
     kebab: 34,
     kebabColor: "hsl(106, 70%, 50%)",
-    donut: 152,
+    Portátil: 152,
     donutColor: "hsl(256, 70%, 50%)",
   },
   {
     country: "AG",
-    "hot dog": 133,
-    "hot dogColor": "hsl(257, 70%, 50%)",
+    "Portátil": 133,
+    "Portátil": "hsl(257, 70%, 50%)",
     burger: 52,
     burgerColor: "hsl(326, 70%, 50%)",
     kebab: 43,
     kebabColor: "hsl(110, 70%, 50%)",
-    donut: 83,
+    Portátil: 83,
     donutColor: "hsl(9, 70%, 50%)",
   },
   {
@@ -370,7 +370,7 @@ export const mockBarData = [
     burgerColor: "hsl(325, 70%, 50%)",
     kebab: 112,
     kebabColor: "hsl(54, 70%, 50%)",
-    donut: 35,
+    Portátil: 35,
     donutColor: "hsl(285, 70%, 50%)",
   },
   {
@@ -381,7 +381,7 @@ export const mockBarData = [
     burgerColor: "hsl(334, 70%, 50%)",
     kebab: 167,
     kebabColor: "hsl(182, 70%, 50%)",
-    donut: 18,
+    Portátil: 18,
     donutColor: "hsl(76, 70%, 50%)",
   },
   {
@@ -392,7 +392,7 @@ export const mockBarData = [
     burgerColor: "hsl(141, 70%, 50%)",
     kebab: 158,
     kebabColor: "hsl(224, 70%, 50%)",
-    donut: 49,
+    Portátil: 49,
     donutColor: "hsl(274, 70%, 50%)",
   },
 ];
@@ -436,47 +436,47 @@ export const mockLineData = [
     color: tokens("dark").greenAccent[500],
     data: [
       {
-        x: "plane",
+        x: "mouse",
         y: 101,
       },
       {
-        x: "helicopter",
+        x: "laptop",
         y: 75,
       },
       {
-        x: "boat",
+        x: "monitores",
         y: 36,
       },
       {
-        x: "train",
+        x: "teclados",
         y: 216,
       },
       {
-        x: "subway",
+        x: "ipad",
         y: 35,
       },
       {
-        x: "bus",
+        x: "auriculares",
         y: 236,
       },
       {
-        x: "car",
+        x: "",
         y: 88,
       },
       {
-        x: "moto",
+        x: "",
         y: 232,
       },
       {
-        x: "bicycle",
+        x: "",
         y: 281,
       },
       {
-        x: "horse",
+        x: "",
         y: 1,
       },
       {
-        x: "skateboard",
+        x: "",
         y: 35,
       },
       {
@@ -486,55 +486,55 @@ export const mockLineData = [
     ],
   },
   {
-    id: "france",
+    id: "Popayán",
     color: tokens("dark").blueAccent[300],
     data: [
       {
-        x: "plane",
+        x: "",
         y: 212,
       },
       {
-        x: "helicopter",
+        x: "",
         y: 190,
       },
       {
-        x: "boat",
+        x: "",
         y: 270,
       },
       {
-        x: "train",
+        x: "",
         y: 9,
       },
       {
-        x: "subway",
+        x: "",
         y: 75,
       },
       {
-        x: "bus",
+        x: "",
         y: 175,
       },
       {
-        x: "car",
+        x: "",
         y: 33,
       },
       {
-        x: "moto",
+        x: "",
         y: 189,
       },
       {
-        x: "bicycle",
+        x: "",
         y: 97,
       },
       {
-        x: "horse",
+        x: "",
         y: 87,
       },
       {
-        x: "skateboard",
+        x: "",
         y: 299,
       },
       {
-        x: "others",
+        x: "",
         y: 251,
       },
     ],
@@ -544,51 +544,51 @@ export const mockLineData = [
     color: tokens("dark").redAccent[200],
     data: [
       {
-        x: "plane",
+        x: "",
         y: 191,
       },
       {
-        x: "helicopter",
+        x: "",
         y: 136,
       },
       {
-        x: "boat",
+        x: "",
         y: 91,
       },
       {
-        x: "train",
+        x: "",
         y: 190,
       },
       {
-        x: "subway",
+        x: "",
         y: 211,
       },
       {
-        x: "bus",
+        x: "",
         y: 152,
       },
       {
-        x: "car",
+        x: "",
         y: 189,
       },
       {
-        x: "moto",
+        x: "",
         y: 152,
       },
       {
-        x: "bicycle",
+        x: "",
         y: 8,
       },
       {
-        x: "horse",
+        x: "",
         y: 197,
       },
       {
-        x: "skateboard",
+        x: "",
         y: 107,
       },
       {
-        x: "others",
+        x: "",
         y: 170,
       },
     ],
