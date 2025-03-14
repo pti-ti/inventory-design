@@ -1,12 +1,14 @@
 import { 
-    Box, Button, Modal, TextField, Typography, Dialog, DialogActions, 
-    DialogContent, Snackbar, Alert, DialogTitle 
+    Box, Button, Modal, TextField, Typography,
+    Snackbar, Alert, Select, MenuItem, InputLabel,
+    FormControl 
 } from "@mui/material";
+import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { useState, useEffect } from "react";
 import axios from "axios";
 
 const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances }) => {
-    const isEditing = Boolean(maintenance?.id); // Determina si es edición o registro
+    const isEditing = Boolean(maintenance?.id);
 
     const initialMaintenanceState = {
         id: "",
@@ -17,26 +19,31 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
         userEmail: "",
         maintenanceType: "",
         maintenanceDate: "",
-        comment: ""
+        comment: "",
+        items: []
     };
-    
-    const [editedMaintenance, setEditedMaintenance] = useState(initialMaintenanceState);
-    const [openConfirm, setOpenConfirm] = useState(false);
-    const [openSuccess, setOpenSuccess] = useState(false);
-    const [openSnackbar, setOpenSnackbar] = useState(false);
 
+    const [editedMaintenance, setEditedMaintenance] = useState(initialMaintenanceState);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [itemsList, setItemsList] = useState([]);
+
+    const itemMap = {
+        "Verificación de seriales y etiquetas": 1,
+        "Verificación de funcionamiento de equipos": 2,
+        "Limpieza física superficial (parte externa)": 3,
+        "Limpieza interna de equipos": 4,
+        "Verificación de cableado": 5,
+        "Verificación de puntos de red, revisión de etiquetado en mapa red": 6,
+        "Verificación de rendimiento de equipo y espacio": 7,
+        "Verificación de malware y addware": 8,
+        "Mantenimiento de software (actualización de software)": 9,
+        "Cambio de partes y/o suministros": 10,
+        "Verificación de niveles de tinta": 11,
+        "Otras acciones": 12
+    };
 
     useEffect(() => {
         if (open && maintenance) {
-            console.log("Datos recibidos del backend:", maintenance);
-
-            const formatDate = (dateString) => {
-                if (!dateString) return "";
-                if (dateString.includes("-")) return dateString;
-                const [day, month, year] = dateString.split("/");
-                return `${year}-${month}-${day}`;
-            };
-
             setEditedMaintenance({
                 id: maintenance.id ?? "",
                 deviceId: maintenance.deviceId ?? "",
@@ -46,12 +53,27 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                 userEmail: maintenance.userEmail ?? "",
                 maintenanceType: maintenance.maintenanceType ?? "",
                 comment: maintenance.comment ?? "",
-                maintenanceDate: formatDate(maintenance.maintenanceDate)
+                maintenanceDate: maintenance.maintenanceDate ?? "",
+                items: maintenance.items?.map(item => item.id) ?? []
             });
         } else {
             setEditedMaintenance(initialMaintenanceState);
         }
     }, [maintenance, open]);
+
+    useEffect(() => {
+        if (open) {
+            const token = localStorage.getItem("token");
+    
+            axios.get("http://localhost:8085/api/v1/admin/items", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then(response => setItemsList(response.data))
+            .catch(error => console.error("Error al obtener ítems:", error));
+        }
+    }, [open]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -61,53 +83,47 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
         }));
     };
 
+    const handleItemsChange = (event) => {
+        setEditedMaintenance((prev) => ({
+            ...prev,
+            items: event.target.value  // Guarda los IDs de los ítems seleccionados
+        }));
+    };
+
     const handleCreate = async () => {
         try {
-            console.log("📌 Datos actuales de editedMaintenance:", editedMaintenance);
-    
             const newMaintenance = {
                 device: { id: Number(editedMaintenance.deviceId) },
-                user: { id: Number(editedMaintenance.userId) }, // Asegurar que se usa editedMaintenance.userId
+                user: { id: Number(editedMaintenance.userId) },
                 maintenanceType: editedMaintenance.maintenanceType,
                 maintenanceDate: editedMaintenance.maintenanceDate,
                 comment: editedMaintenance.comment,
             };
-    
-            console.log("Datos enviados para crear mantenimiento:", newMaintenance);
-    
+
             const token = localStorage.getItem("token");
             await axios.post(
                 "http://localhost:8085/api/v1/admin/maintenances/register",
                 newMaintenance,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-    
+
             refreshMaintenances();
-            setOpenSuccess(true);
-            setTimeout(() => setOpenSuccess(false), 2000);
             setOpenSnackbar(true);
             handleClose();
         } catch (error) {
-            console.error("🚨 Error al crear el mantenimiento:", error);
+            console.error("Error al crear el mantenimiento:", error);
         }
     };
-    
-    
 
     const handleUpdate = async () => {
-        console.log("Datos enviados al backend:", editedMaintenance);
-        
         try {
             const token = localStorage.getItem("token");
-
             const updateMaintenance = {
                 maintenanceType: editedMaintenance.maintenanceType,
                 maintenanceDate: editedMaintenance.maintenanceDate,
                 comment: editedMaintenance.comment,
             };
 
-            console.log("Datos enviados para actualizar:", updateMaintenance);
-            
             await axios.put(
                 `http://localhost:8085/api/v1/admin/maintenances/${editedMaintenance.id}`, 
                 updateMaintenance, 
@@ -115,32 +131,11 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
             );
 
             refreshMaintenances();
-            setOpenSuccess(true);
-            setTimeout(() => setOpenSuccess(false), 2000);
             setOpenSnackbar(true);
             handleClose();
         } catch (error) {
             console.error("Error al actualizar el mantenimiento", error);
         }
-    };
-
-    const confirmDelete = () => {
-        setOpenConfirm(true);
-    };
-
-    const handleDelete = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            await axios.delete(
-                `http://localhost:8085/api/v1/admin/maintenances/${editedMaintenance.id}`, 
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            refreshMaintenances();
-            handleClose();
-        } catch (error) {
-            console.error("Error al eliminar el mantenimiento", error);
-        }
-        setOpenConfirm(false);
     };
 
     return (
@@ -161,25 +156,65 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                         {isEditing ? "Editar Mantenimiento" : "Registrar Mantenimiento"}
                     </Typography>
 
-                    {/* Campos para Registro */}
                     {!isEditing && (
                         <>
                             <TextField fullWidth margin="normal" label="ID del dispositivo" name="deviceId" value={editedMaintenance.deviceId} onChange={handleChange} required />
                             <TextField fullWidth margin="normal" label="ID del usuario" name="userId" value={editedMaintenance.userId} onChange={handleChange} required />
-                            
                         </>
                     )}
 
-                    {/* Campos para Edición */}
                     {isEditing && (
                         <>
-                            <TextField fullWidth margin="normal" label="Código dispositivo" name="deviceCode" value={editedMaintenance.deviceCode} onChange={handleChange} disabled />
-                            <TextField fullWidth margin="normal" label="Nombre del dispositivo" name="deviceName" value={editedMaintenance.deviceName} onChange={handleChange} disabled />
-                            <TextField fullWidth margin="normal" label="Email del usuario" name="userEmail" value={editedMaintenance.userEmail} onChange={handleChange} disabled />
+                            <TextField fullWidth margin="normal" label="Código dispositivo" name="deviceCode" value={editedMaintenance.deviceCode} disabled />
+                            <TextField fullWidth margin="normal" label="Nombre del dispositivo" name="deviceName" value={editedMaintenance.deviceName} disabled />
+                            <TextField fullWidth margin="normal" label="Email del usuario" name="userEmail" value={editedMaintenance.userEmail} disabled />
                         </>
                     )}
 
-                    <TextField fullWidth margin="normal" label="Tipo de mantenimiento" name="maintenanceType" value={editedMaintenance.maintenanceType} onChange={handleChange} />
+                    {/* Lista desplegable para Tipo de Mantenimiento */}
+                    <Select
+                        fullWidth
+                        // margin="normal"
+                        name="maintenanceType"
+                        value={editedMaintenance.maintenanceType}
+                        onChange={handleChange}
+                        displayEmpty
+                    >
+                        <MenuItem value="" disabled>Selecciona un tipo de mantenimiento</MenuItem>
+                        <MenuItem value="Preventivo">Preventivo</MenuItem>
+                        <MenuItem value="Correctivo">Correctivo</MenuItem>
+                        <MenuItem value="Garantía">Garantía</MenuItem>
+                    </Select>
+
+                    {/* Selector múltiple de ítems */}
+                    <FormControl fullWidth margin="normal">
+                    <InputLabel id="items-label">Selecciona Ítems</InputLabel>
+                    <Select
+                        labelId="items-label"
+                        multiple
+                        value={editedMaintenance.items}
+                        onChange={handleItemsChange}
+                        renderValue={() => null} // Evita mostrar los valores dentro del Select
+                    >
+                        {itemsList.map((item) => (
+                            <MenuItem key={item.id} value={item.id}>
+                                {item.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                {/* Textarea para mostrar los ítems seleccionados */}
+                <TextareaAutosize
+                    minRows={3} // Controla la altura del textarea
+                    value={editedMaintenance.items
+                        .map(id => itemsList.find(item => item.id === id)?.name)
+                        .join(", ")}
+                    readOnly
+                    className="w-full border rounded p-2 mt-2"
+                />
+
+
                     <TextField fullWidth margin="normal" label="Comentarios" name="comment" value={editedMaintenance.comment} onChange={handleChange} />
                     <TextField 
                         fullWidth 
@@ -198,12 +233,6 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                             {isEditing ? "Guardar Cambios" : "Registrar"}
                         </Button>
                     </Box>
-
-                    {/* {isEditing && (
-                        <Button variant="contained" color="error" onClick={confirmDelete} sx={{ mt: 2, ml: 2 }}>
-                            Eliminar
-                        </Button>
-                    )} */}
                 </Box>
             </Modal>
 

@@ -107,6 +107,7 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                     >
+                                        <MenuItem value="" disabled>Selecciona una ubicación</MenuItem>
                                         <MenuItem value={1}>Cali</MenuItem>
                                         <MenuItem value={2}>Barranquilla</MenuItem>
                                         <MenuItem value={3}>Bogotá</MenuItem>
