@@ -96,6 +96,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                 device: { id: Number(editedMaintenance.deviceId) },
                 user: { id: Number(editedMaintenance.userId) },
                 maintenanceType: editedMaintenance.maintenanceType,
+                items: editedMaintenance.items.map(id => ({ id: Number(id) })),
                 maintenanceDate: editedMaintenance.maintenanceDate,
                 comment: editedMaintenance.comment,
             };
