@@ -33,6 +33,8 @@ const Maintenance = () => {
       });
   
       console.log("Mantenimientos obtenidos:", response.data);
+
+      
       
       // Formatear datos correctamente
       const formattedMaintenances = response.data.map(maintenance => ({
@@ -102,6 +104,15 @@ const Maintenance = () => {
     { field: "userEmail", headerName: "Email del usuario", flex: 1, cellClassName: "name-column--cell" },
     { field: "maintenanceType", headerName: "Tipo de mantenimiento", flex: 1, cellClassName: "name-column--cell" },
     { field: "comment", headerName: "Comentarios", flex: 1, cellClassName: "name-column--cell" },
+    {
+      field: "items",
+      headerName: "Ítems utilizados",
+      flex: 2,
+      cellClassName: "name-column--cell",
+      renderCell: (params) => (
+        <span>{params.value.map(item => item.name).join(", ")}</span>
+      ),
+    },
     { 
       field: "maintenanceDate", 
       headerName: "Fecha de mantenimiento", 
