@@ -100,7 +100,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                 maintenanceDate: editedMaintenance.maintenanceDate,
                 comment: editedMaintenance.comment,
             };
-
+    
             if (isEditing) {
                 await axios.put(
                     `http://localhost:8085/api/v1/admin/maintenances/${editedMaintenance.id}`,
@@ -114,7 +114,25 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             }
-
+    
+            // Llamar al endpoint que genera el Excel
+            const response = await axios.get("http://localhost:8085/api/v1/admin/excel/update", {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: "blob", // Importante para manejar archivos
+            });
+    
+            // Crear un enlace para descargar el archivo
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "Mantenimiento.xlsx"); // Nombre del archivo
+            document.body.appendChild(link);
+            link.click();
+    
+            // Limpiar recursos
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(link);
+    
             refreshMaintenances();
             setOpenSnackbar(true);
             handleClose();
@@ -123,6 +141,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
             setErrorMessage("Ocurrió un error al guardar los cambios.");
         }
     };
+    
 
     return (
         <>

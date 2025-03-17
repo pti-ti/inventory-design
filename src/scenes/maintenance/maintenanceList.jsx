@@ -9,6 +9,54 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined";
 import MaintenanceModal from "./maintenanceModal";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
+import * as XLSX from "xlsx";
+
+const filePath = "";
+
+const updateMaintenanceExcel = async () => {
+  try {
+    // 1. Obtener datos de la API
+    const token = "tu_token"; // Reemplaza con el token real
+    const response = await axios.get("http://localhost:8085/api/v1/admin/maintenances", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.data || response.data.length === 0) {
+      console.error("No hay datos de mantenimiento.");
+      return;
+    }
+
+    // Obtener la fecha de mantenimiento
+    const maintenanceDate = response.data[0]?.maintenanceDate;
+    if (!maintenanceDate) {
+      console.error("No se encontró la fecha.");
+      return;
+    }
+
+    // 2. Leer el archivo Excel existente
+    if (!fs.existsSync(filePath)) {
+      console.error("El archivo de mantenimiento no existe.");
+      return;
+    }
+
+    const workbook = XLSX.readFile(filePath);
+    const sheetName = workbook.SheetNames[0]; // Primera hoja
+    const worksheet = workbook.Sheets[sheetName];
+
+    // 3. Modificar la celda J6 con la nueva fecha
+    worksheet["J6"] = { t: "s", v: new Date(maintenanceDate).toLocaleDateString("es-ES") };
+
+    // 4. Guardar los cambios en el mismo archivo
+    XLSX.writeFile(workbook, filePath);
+
+    console.log("Archivo de mantenimiento actualizado correctamente. ✅");
+  } catch (error) {
+    console.error("Error al actualizar el archivo Excel:", error);
+  }
+};
+
+// Ejecutar la función
+updateMaintenanceExcel();
 
 const Maintenance = () => {
   const theme = useTheme();
