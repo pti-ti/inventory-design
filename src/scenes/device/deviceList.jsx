@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme, Button, IconButton } from "@mui/material";
+import { Box, useTheme, Button, IconButton } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import axios from "axios";

@@ -6,6 +6,8 @@ import Layout from "./components/Layout";
 import Dashboard from "./scenes/dashboard";
 import Device from "./scenes/device/deviceList";
 import User from "./scenes/user/userList";
+import Location from "./scenes/location/locationList";
+import Status from "./scenes/status/statusList";
 import Logbook from "./scenes/logbook/logbookList";
 import Maintenance from "./scenes/maintenance/maintenanceList";
 import UserRegister from "./scenes/form/UserRegister";
@@ -34,6 +36,8 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="dispositivos" element={<Device />} />
             <Route path="usuarios" element={<User />} />
+            <Route path="ubicaciones" element={<Location />} />
+            <Route path="estados" element={<Status />} />
             <Route path="bitacoras" element={<Logbook />} />
             <Route path="mantenimientos" element={<Maintenance />} />
             <Route path="registrar-usuario" element={<UserRegister />} />

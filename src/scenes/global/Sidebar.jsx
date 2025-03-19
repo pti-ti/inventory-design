@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
 import DevicesOtherOutlinedIcon from "@mui/icons-material/DevicesOtherOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
@@ -12,6 +14,7 @@ import HandymanOutlinedIcon from "@mui/icons-material/HandymanOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { AuthContext } from "../../context/AuthContext";
+
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   return (
@@ -159,8 +162,23 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            
 
+            <Item
+              title="Ubicación"
+              to="/ubicaciones"
+              icon={<LocationOnOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+
+            <Item
+              title="Estado"
+              to="/estados"
+              icon={<CheckCircleOutlineIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            
             <Item
               title="Bitácoras"
               to="/bitacoras"

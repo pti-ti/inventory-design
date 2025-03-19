@@ -35,7 +35,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     ];
 
     const locations = [
-        { id: 1, name: "Cali" },
+        { id: 1, name: "Recursos Humanos" },
         { id: 2, name: "Barranquilla" },
         { id: 3, name: "Bogotá" },
         { id: 4, name: "Popayán" }
