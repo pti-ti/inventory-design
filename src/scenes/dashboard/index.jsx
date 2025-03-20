@@ -24,6 +24,8 @@ const Dashboard = () => {
   const [totalInventoryValue, setTotalInventoryValue] = useState(null);
   const [deviceStatus, setDeviceStatus] = useState({});
   const [deviceTypeCounts, setDeviceTypeCounts] = useState({});
+  const [deviceLocationCounts, setTotalLocationValue] = useState({});
+  const [deviceLocationTypeCounts, setDeviceLocationTypeCounts] = useState({});
 
   // Función para formatear moneda COP
   const formatCurrencyCOP = (value) => {
@@ -51,15 +53,59 @@ const Dashboard = () => {
       const typeRes = await fetch("http://localhost:8085/api/v1/admin/devices/count-by-type");
       const typeData = await typeRes.json();
       setDeviceTypeCounts(typeData);
+
+      //Obtener dispositivos organizados por ubicación 
+      const locationRes = await fetch("http://localhost:8085/api/v1/admin/locations/device-location-count");
+      const locationData = await locationRes.json();
+      setTotalLocationValue(locationData);
+
+      //Obtener dispositivos organizado por tipo y ubicación
+      const locationTypeRes = await fetch("http://localhost:8085/api/v1/admin/locations/device-location-type-count");
+      const locationTypeData = await locationTypeRes.json();
+      setDeviceLocationTypeCounts(locationTypeData);
+
     } catch (error) {
       console.error("Error al obtener datos:", error);
     }
   };
 
+
+  const chartData = Object.entries(deviceLocationTypeCounts).map(([location, devices]) => ({
+    location,
+    ...devices,
+  }));
+
+  const transformLocationData = (data) => {
+    if (!data || Object.keys(data).length === 0) return [];
+  
+    // Obtener todos los tipos de dispositivos únicos
+    const deviceTypes = new Set();
+    Object.values(data).forEach((devices) => {
+      Object.keys(devices).forEach((type) => deviceTypes.add(type));
+    });
+  
+    // Transformar los datos en el formato adecuado
+    return Object.entries(data).map(([location, devices]) => {
+      const transformedEntry = { location };
+  
+      // Asegurar que todos los tipos de dispositivos estén presentes
+      deviceTypes.forEach((type) => {
+        transformedEntry[type] = devices[type] || 0; // Si no hay datos, poner 0
+      });
+  
+      return transformedEntry;
+    });
+  };
+  
+
   // Cargar datos al montar el componente
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    console.log("Ubicaciones obtenidas:", deviceLocationCounts);
+  }, [deviceLocationCounts]);
 
   return (
     <Box m="20px">
@@ -123,10 +169,10 @@ const Dashboard = () => {
               p="5px"
               borderRadius="8px"
             >
-              {status === "Disponible" && <CheckCircleIcon sx={{ fontSize: 30, color: colors.primary[100], mb: 1 }} />}
-              {status === "Entregado" && <VolunteerActivismIcon sx={{ fontSize: 30, color: colors.primary[100], mb: 1 }} />}
-              {status === "Mantenimiento" && <BuildIcon sx={{ fontSize: 30, color: colors.primary[100], mb: 1 }} />}
-              {status === "No disponible" && <BlockIcon sx={{ fontSize: 30, color: colors.primary[100], mb: 1 }} />}
+              {status === "Disponible" && <CheckCircleIcon sx={{ fontSize: 20, color: colors.primary[100], mb: 1 }} />}
+              {status === "Entregado" && <VolunteerActivismIcon sx={{ fontSize: 20, color: colors.primary[100], mb: 1 }} />}
+              {status === "Mantenimiento" && <BuildIcon sx={{ fontSize: 20, color: colors.primary[100], mb: 1 }} />}
+              {status === "No disponible" && <BlockIcon sx={{ fontSize: 20, color: colors.primary[100], mb: 1 }} />}
 
               <StatBox title={count.toString()} subtitle={status} />
             </Box>
@@ -156,12 +202,12 @@ const Dashboard = () => {
               borderRadius="8px"
 
             >
-              {type === "Laptop" && <LaptopMacIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
-              {type === "Monitor" && <MonitorIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
-              {type === "Teclado" && <KeyboardIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
-              {type === "Mouse" && <MouseIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
-              {type === "Auriculares" && <HeadsetIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
-              {type === "Impresora" && <PrintIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
+              {type === "Laptop" && <LaptopMacIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
+              {type === "Monitor" && <MonitorIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
+              {type === "Teclado" && <KeyboardIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
+              {type === "Mouse" && <MouseIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
+              {type === "Auriculares" && <HeadsetIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
+              {type === "Impresora" && <PrintIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
               <StatBox title={count.toString()} subtitle={type} />
             </Box>
           ))
@@ -175,12 +221,13 @@ const Dashboard = () => {
             Dispositivos organizados por ubicación 
           </Typography>
           <Box height="250px">
-            {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
+            {deviceLocationCounts && Object.keys(deviceLocationCounts).length > 0 ? (
               <BarChart
                 isDashboard={true}
-                data={Object.entries(deviceTypeCounts).map(([type, count]) => ({
-                  name: type,
+                data={Object.entries(deviceLocationCounts).map(([location, count]) => ({
+                  name: location,
                   value: count,
+                  Typography
                 }))}
               />
             ) : (
