@@ -1,17 +1,8 @@
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
-import { mockTransactions } from "../../data/mockData";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import LaptopChromebookIcon from "@mui/icons-material/LaptopChromebook";
-import HeadphonesIcon from "@mui/icons-material/Headphones";
-import KeyboardIcon from "@mui/icons-material/Keyboard";
-import MouseIcon from "@mui/icons-material/Mouse";
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import TrafficIcon from "@mui/icons-material/Traffic";
 import Header from "../../components/Header";
-import LineChart from "../../components/LineChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 
@@ -19,12 +10,49 @@ const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  // Estado para el valor total del inventario
+  const [totalInventoryValue, setTotalInventoryValue] = useState(0);
+
+  // Estado para dispositivos por estado
+  const [deviceStatus, setDeviceStatus] = useState({});
+
+  // Estado para dispositivos por tipo
+  const [deviceTypeCounts, setDeviceTypeCounts] = useState({});
+
+  // Formatear número en COP
+  const formatCurrencyCOP = (value) => {
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+    }).format(value);
+  };
+
+  useEffect(() => {
+    // Obtener el valor total del inventario
+    fetch("http://localhost:8085/api/v1/admin/devices/total-inventory-value")
+      .then((res) => res.json())
+      .then((data) => setTotalInventoryValue(data))
+      .catch((err) => console.error("Error al obtener datos:", err));
+
+    // Obtener dispositivos organizados por estado (EXCLUYENDO BORRADOS)
+    fetch("http://localhost:8085/api/v1/admin/status/device-status-count")
+      .then((res) => res.json())
+      .then((data) => setDeviceStatus(data))
+      .catch((err) => console.error("Error al obtener datos:", err));
+
+    // Obtener dispositivos organizados por tipo
+    fetch("http://localhost:8085/api/v1/admin/devices/count-by-type")
+      .then((res) => res.json())
+      .then((data) => setDeviceTypeCounts(data))
+      .catch((err) => console.error("Error al obtener datos:", err));
+  }, []);
+
   return (
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="DASHBOARD" subtitle="Bienvenido al Inventario de TI" />
-
         <Box>
           <Button
             sx={{
@@ -45,237 +73,105 @@ const Dashboard = () => {
       <Box
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="140px"
-        gap="20px"
+        gridAutoRows="auto"
+        gap="15px"
       >
-        {/* ROW 1 */}
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="164"
-            subtitle="Portátiles"
-            progress="0.75"
-            increase="+14%"
-            icon={
-              <LaptopChromebookIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="60"
-            subtitle="Monitores"
-            progress="0.50"
-            increase="+21%"
-            icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="100"
-            subtitle="Teclados"
-            progress="0.30"
-            increase="+5%"
-            icon={
-              <KeyboardIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="100"
-            subtitle="Mouse"
-            progress="0.80"
-            increase="+43%"
-            icon={
-              <MouseIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
+        {/* VALOR TOTAL DEL INVENTARIO */}
+        <Box gridColumn="span 12">
+          <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+            Valor Total del Inventario de TI
+          </Typography>
         </Box>
 
-        {/* ROW 2 */}
+        <Box
+          gridColumn="span 12"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          p="20px"
+          borderRadius="8px"
+          sx={{ boxShadow: 3 }}
+        >
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            color={colors.greenAccent[500]}
+            sx={{ textAlign: "center" }}
+          >
+            {totalInventoryValue > 0
+              ? formatCurrencyCOP(totalInventoryValue)
+              : "No disponible"}
+          </Typography>
+        </Box>
+
+        {/* DISPOSITIVOS POR ESTADO */}
+        <Box gridColumn="span 12">
+          <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+            Dispositivos organizados por estado
+          </Typography>
+        </Box>
+
+        {Object.entries(deviceStatus).map(([status, count], index) => (
+          <Box
+            key={index}
+            gridColumn="span 2"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            p="5px"
+            borderRadius="8px"
+          >
+            <StatBox title={count.toString()} subtitle={status} />
+          </Box>
+        ))}
+
+        {/* DISPOSITIVOS POR TIPO */}
+        <Box gridColumn="span 12">
+          <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+            Dispositivos organizados por tipo
+          </Typography>
+        </Box>
+
+        {Object.entries(deviceTypeCounts).map(([type, count], index) => (
+          <Box
+            key={index}
+            gridColumn="span 2"
+            backgroundColor={colors.primary[400]}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            p="5px"
+            borderRadius="8px"
+          >
+            <StatBox title={count.toString()} subtitle={type} />
+          </Box>
+        ))}
+
+        {/* BARCHART */}
         <Box
           gridColumn="span 8"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
-        >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex "
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                Valor total del inventario de TI
-              </Typography>
-              <Typography
-                variant="h3"
-                fontWeight="bold"
-                color={colors.greenAccent[500]}
-              >
-                $489.342.432,32 
-              </Typography>
-            </Box>
-            <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-                />
-              </IconButton>
-            </Box>
-          </Box>
-          <Box height="250px" m="-20px 0 0 0">
-            <LineChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          overflow="auto"
-        >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            borderBottom={`4px solid ${colors.primary[500]}`}
-            colors={colors.grey[100]}
-            p="15px"
-          >
-            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Ultimos dispositivos agregados al inventario
-            </Typography>
-          </Box>
-          {mockTransactions.map((transaction, i) => (
-            <Box
-              key={`${transaction.txId}-${i}`}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
-              p="15px"
-            >
-              <Box>
-                <Typography
-                  color={colors.greenAccent[500]}
-                  variant="h5"
-                  fontWeight="600"
-                >
-                  {transaction.txId}
-                </Typography>
-                <Typography color={colors.grey[100]}>
-                  {transaction.user}
-                </Typography>
-              </Box>
-              <Box color={colors.grey[100]}>{transaction.date}</Box>
-              <Box
-                backgroundColor={colors.greenAccent[500]}
-                p="5px 10px"
-                borderRadius="4px"
-              >
-                ${transaction.cost}
-              </Box>
-            </Box>
-          ))}
-        </Box>
-
-        {/* ROW 3 */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          p="30px"
-        >
-          <Typography variant="h5" fontWeight="600">
-            
-          </Typography>
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            mt="25px"
-          >
-            {/* <ProgressCircle size="125" /> */}
-            <Typography
-              variant="h5"
-              color={colors.greenAccent[500]}
-              sx={{ mt: "15px" }}
-            >
-              Espacio para graficar la cantidad de mantenimientos
-            </Typography>
-            <Typography>Registro de Bitácoras</Typography>
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ padding: "30px 30px 0 30px" }}
-          >
-            Cantidad de equipos ingresados al area TI
-          </Typography>
-          <Box height="250px" mt="-20px">
-            <BarChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          padding="30px"
+          p="20px"
+          borderRadius="8px"
         >
           <Typography
             variant="h5"
             fontWeight="600"
             sx={{ marginBottom: "15px" }}
           >
-            
+            Dispositivos por Tipo
           </Typography>
-          <Box height="200px">
-            {/* <GeographyChart isDashboard={true} /> */}
+          <Box height="250px">
+            <BarChart
+              isDashboard={true}
+              data={Object.entries(deviceTypeCounts).map(([type, count]) => ({
+                name: type,
+                value: count,
+              }))}
+            />
           </Box>
         </Box>
       </Box>
