@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
+import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
+import BlockIcon from "@mui/icons-material/Block";
+import BuildIcon from "@mui/icons-material/Build";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
+import LaptopMacIcon from "@mui/icons-material/LaptopMac";
+import MonitorIcon from "@mui/icons-material/Monitor";
+import KeyboardIcon from "@mui/icons-material/Keyboard";
+import MouseIcon from "@mui/icons-material/Mouse";
+import HeadsetIcon from "@mui/icons-material/Headset";
+import PrintIcon from "@mui/icons-material/Print";
 import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
@@ -10,16 +20,12 @@ const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Estado para el valor total del inventario
-  const [totalInventoryValue, setTotalInventoryValue] = useState(0);
-
-  // Estado para dispositivos por estado
+  // Estados
+  const [totalInventoryValue, setTotalInventoryValue] = useState(null);
   const [deviceStatus, setDeviceStatus] = useState({});
-
-  // Estado para dispositivos por tipo
   const [deviceTypeCounts, setDeviceTypeCounts] = useState({});
 
-  // Formatear número en COP
+  // Función para formatear moneda COP
   const formatCurrencyCOP = (value) => {
     return new Intl.NumberFormat("es-CO", {
       style: "currency",
@@ -28,24 +34,31 @@ const Dashboard = () => {
     }).format(value);
   };
 
+  // Función para obtener datos
+  const fetchData = async () => {
+    try {
+      // Obtener el valor total del inventario
+      const inventoryRes = await fetch("http://localhost:8085/api/v1/admin/devices/total-inventory-value");
+      const inventoryData = await inventoryRes.json();
+      setTotalInventoryValue(inventoryData);
+
+      // Obtener dispositivos organizados por estado
+      const statusRes = await fetch("http://localhost:8085/api/v1/admin/status/device-status-count");
+      const statusData = await statusRes.json();
+      setDeviceStatus(statusData);
+
+      // Obtener dispositivos organizados por tipo
+      const typeRes = await fetch("http://localhost:8085/api/v1/admin/devices/count-by-type");
+      const typeData = await typeRes.json();
+      setDeviceTypeCounts(typeData);
+    } catch (error) {
+      console.error("Error al obtener datos:", error);
+    }
+  };
+
+  // Cargar datos al montar el componente
   useEffect(() => {
-    // Obtener el valor total del inventario
-    fetch("http://localhost:8085/api/v1/admin/devices/total-inventory-value")
-      .then((res) => res.json())
-      .then((data) => setTotalInventoryValue(data))
-      .catch((err) => console.error("Error al obtener datos:", err));
-
-    // Obtener dispositivos organizados por estado (EXCLUYENDO BORRADOS)
-    fetch("http://localhost:8085/api/v1/admin/status/device-status-count")
-      .then((res) => res.json())
-      .then((data) => setDeviceStatus(data))
-      .catch((err) => console.error("Error al obtener datos:", err));
-
-    // Obtener dispositivos organizados por tipo
-    fetch("http://localhost:8085/api/v1/admin/devices/count-by-type")
-      .then((res) => res.json())
-      .then((data) => setDeviceTypeCounts(data))
-      .catch((err) => console.error("Error al obtener datos:", err));
+    fetchData();
   }, []);
 
   return (
@@ -53,29 +66,22 @@ const Dashboard = () => {
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="DASHBOARD" subtitle="Bienvenido al Inventario de TI" />
-        <Box>
-          <Button
-            sx={{
-              backgroundColor: colors.blueAccent[700],
-              color: colors.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-            Descargar Reportes
-          </Button>
-        </Box>
+        <Button
+          sx={{
+            backgroundColor: colors.blueAccent[700],
+            color: colors.grey[100],
+            fontSize: "14px",
+            fontWeight: "bold",
+            padding: "10px 20px",
+          }}
+        >
+          <DownloadOutlinedIcon sx={{ mr: "10px" }} />
+          Descargar Reportes
+        </Button>
       </Box>
 
       {/* GRID & CHARTS */}
-      <Box
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="auto"
-        gap="15px"
-      >
+      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="auto" gap="15px">
         {/* VALOR TOTAL DEL INVENTARIO */}
         <Box gridColumn="span 12">
           <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
@@ -93,15 +99,8 @@ const Dashboard = () => {
           borderRadius="8px"
           sx={{ boxShadow: 3 }}
         >
-          <Typography
-            variant="h4"
-            fontWeight="bold"
-            color={colors.greenAccent[500]}
-            sx={{ textAlign: "center" }}
-          >
-            {totalInventoryValue > 0
-              ? formatCurrencyCOP(totalInventoryValue)
-              : "No disponible"}
+          <Typography variant="h4" fontWeight="bold" color={colors.greenAccent[500]} sx={{ textAlign: "center" }}>
+            {totalInventoryValue !== null ? formatCurrencyCOP(totalInventoryValue) : "Cargando..."}
           </Typography>
         </Box>
 
@@ -112,20 +111,29 @@ const Dashboard = () => {
           </Typography>
         </Box>
 
-        {Object.entries(deviceStatus).map(([status, count], index) => (
-          <Box
-            key={index}
-            gridColumn="span 2"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            p="5px"
-            borderRadius="8px"
-          >
-            <StatBox title={count.toString()} subtitle={status} />
-          </Box>
-        ))}
+        {deviceStatus && Object.keys(deviceStatus).length > 0 ? (
+          Object.entries(deviceStatus).map(([status, count], index) => (
+            <Box
+              key={index}
+              gridColumn="span 1"
+              backgroundColor={colors.primary[400]}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              p="5px"
+              borderRadius="8px"
+            >
+              {status === "Disponible" && <CheckCircleIcon sx={{ fontSize: 30, color: colors.primary[100], mb: 1 }} />}
+              {status === "Entregado" && <VolunteerActivismIcon sx={{ fontSize: 30, color: colors.primary[100], mb: 1 }} />}
+              {status === "Mantenimiento" && <BuildIcon sx={{ fontSize: 30, color: colors.primary[100], mb: 1 }} />}
+              {status === "No disponible" && <BlockIcon sx={{ fontSize: 30, color: colors.primary[100], mb: 1 }} />}
+
+              <StatBox title={count.toString()} subtitle={status} />
+            </Box>
+          ))
+        ) : (
+          <Typography color="red">No hay datos disponibles</Typography>
+        )}
 
         {/* DISPOSITIVOS POR TIPO */}
         <Box gridColumn="span 12">
@@ -134,44 +142,50 @@ const Dashboard = () => {
           </Typography>
         </Box>
 
-        {Object.entries(deviceTypeCounts).map(([type, count], index) => (
-          <Box
-            key={index}
-            gridColumn="span 2"
-            backgroundColor={colors.primary[400]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            p="5px"
-            borderRadius="8px"
-          >
-            <StatBox title={count.toString()} subtitle={type} />
-          </Box>
-        ))}
+        {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
+          Object.entries(deviceTypeCounts).map(([type, count], index) => (
+            <Box
+              key={index}
+              gridColumn="span 1"
+              backgroundColor={colors.primary[400]}
+              display="flex"
+              //flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              p="10px"
+              borderRadius="8px"
+
+            >
+              {type === "Laptop" && <LaptopMacIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
+              {type === "Monitor" && <MonitorIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
+              {type === "Teclado" && <KeyboardIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
+              {type === "Mouse" && <MouseIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
+              {type === "Auriculares" && <HeadsetIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
+              {type === "Impresora" && <PrintIcon sx={{ fontSize: 30, color: colors.grey[100], mb: 1 }} />}
+              <StatBox title={count.toString()} subtitle={type} />
+            </Box>
+          ))
+        ) : (
+          <Typography color="red">No hay datos disponibles</Typography>
+        )}
 
         {/* BARCHART */}
-        <Box
-          gridColumn="span 8"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          p="20px"
-          borderRadius="8px"
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ marginBottom: "15px" }}
-          >
-            Dispositivos por Tipo
+        <Box gridColumn="span 8" gridRow="span 2" backgroundColor={colors.primary[400]} p="20px" borderRadius="8px">
+          <Typography variant="h5" fontWeight="600" sx={{ marginBottom: "15px" }}>
+            Dispositivos organizados por ubicación 
           </Typography>
           <Box height="250px">
-            <BarChart
-              isDashboard={true}
-              data={Object.entries(deviceTypeCounts).map(([type, count]) => ({
-                name: type,
-                value: count,
-              }))}
-            />
+            {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
+              <BarChart
+                isDashboard={true}
+                data={Object.entries(deviceTypeCounts).map(([type, count]) => ({
+                  name: type,
+                  value: count,
+                }))}
+              />
+            ) : (
+              <Typography color="red">No hay datos para el gráfico</Typography>
+            )}
           </Box>
         </Box>
       </Box>
