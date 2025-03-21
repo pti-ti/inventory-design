@@ -12,9 +12,11 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
         specification: "",
         type: "",
         status: "",
-        price: ""
+        price: "",
+        locationId: ""
     });
-    const [openConfirm, setOpenConfirm] = useState(false);
+    const [locations, setLocations] = useState([]);
+    const [statuses, setStatuses] = useState([]);
     const [openSuccess, setOpenSuccess] = useState(false);
 
     const statusMap = {
@@ -35,7 +37,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     specification: device.specification || "",
                     type: device.type || "",
                     status: statusMap[device.status] || "",
-                    price: device.price || ""
+                    price: device.price || "",
+                    locationId: locations.find(loc => loc.name === device.location)?.id || ""
                 });
             } else {
                 setEditedDevice({
@@ -45,9 +48,38 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     specification: "",
                     type: "",
                     status: "",
-                    price: ""
+                    price: "",
+                    locationId: ""
                 });
             }
+
+            const fetchLocations = async () => {
+                try {
+                    const token = localStorage.getItem("token");
+                    const response = await axios.get("http://localhost:8085/api/v1/admin/locations", {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    setLocations(response.data);
+                } catch (error) {
+                    console.error("Error al obtener localizaciones", error);
+                }
+            };
+
+            fetchLocations();
+
+            const fetchStatuses = async () => {
+                try {
+                    const token = localStorage.getItem("token");
+                    const response = await axios.get("http://localhost:8085/api/v1/admin/status", {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    setStatuses(response.data);
+                } catch (error) {
+                    console.error("Error al obtener los estatus", error);
+                }
+            };
+    
+            fetchStatuses();
         }
     }, [device, open, isEditing]);
 
@@ -55,23 +87,23 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
         setEditedDevice({ ...editedDevice, [e.target.name]: e.target.value });
     };
 
-    // Nuevo handle para registrar un dispositivo
     const handleRegisterDevice = async () => {
         try {
             const token = localStorage.getItem("token");
             const apiUrl = "http://localhost:8085/api/v1/admin/devices/register";
-    
+
             const deviceData = {
                 ...editedDevice,
-                status: { id: editedDevice.status }
+                status: { id: editedDevice.status },
+                location: { id: editedDevice.locationId }
             };
-    
+
             console.log("Registrando dispositivo:", JSON.stringify(deviceData, null, 2));
-    
+
             await axios.post(apiUrl, deviceData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-    
+
             refreshDevices();
             setOpenSuccess(true);
             setTimeout(() => setOpenSuccess(false), 2000);
@@ -80,24 +112,26 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
             console.error("Error al registrar el dispositivo", error);
         }
     };
-    
-    // Nuevo handle para actualizar un dispositivo
+
     const handleUpdateDevice = async () => {
         try {
             const token = localStorage.getItem("token");
             const apiUrl = `http://localhost:8085/api/v1/admin/devices/${device.id}`;
-    
+
             const deviceData = {
                 ...editedDevice,
-                status: { id: editedDevice.status }
+                status: { id: editedDevice.status },
+                location: { id: editedDevice.locationId }
             };
-    
+
+            delete deviceData.locationId;
+
             console.log("Actualizando dispositivo:", JSON.stringify(deviceData, null, 2));
-    
+
             await axios.put(apiUrl, deviceData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-    
+
             refreshDevices();
             setOpenSuccess(true);
             setTimeout(() => setOpenSuccess(false), 2000);
@@ -136,17 +170,47 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                             value={editedDevice.status}
                             onChange={handleChange}
                         >
-                            <MenuItem value={1}>Entregado</MenuItem>
-                            <MenuItem value={2}>Dañado</MenuItem>
-                            <MenuItem value={3}>Mantenimiento</MenuItem>
-                            <MenuItem value={4}>Disponible</MenuItem>
-                            <MenuItem value={5}>No disponible</MenuItem>
+                            {statuses.map((status) => (
+                                <MenuItem key={status.id} value={status.id}>
+                                    {status.name}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
 
+
+                    {!isEditing ? (
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="location-label">Localización</InputLabel>
+                        <Select
+                            labelId="location-label"
+                            name="locationId"
+                            value={editedDevice.locationId || ""}
+                            onChange={handleChange}
+                        >
+                            {locations.map((location) => (
+                                <MenuItem key={location.id} value={location.id}>
+                                    {location.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                ) : (
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Localización"
+                        value={
+                            locations.find(loc => loc.id === editedDevice.locationId)?.name || "No disponible"
+                        }
+                        disabled={isEditing}
+                    />
+                )}
+
+
+
                     <TextField fullWidth margin="normal" label="Precio" name="price" value={editedDevice.price} onChange={handleChange} />
-                    
-                    {/* Se modificó el onClick del botón */}
+
                     <Button 
                         variant="contained" 
                         color="primary" 

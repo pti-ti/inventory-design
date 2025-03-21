@@ -42,27 +42,38 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     ];
 
     useEffect(() => {
-        console.log("Recibiendo logbook en modal:", logbook);
-        if (open && logbook) {
-            const updatedLogbook = {
-                id: logbook.id ?? "",
-                deviceId: logbook.deviceId ? logbook.deviceId.toString() : "", 
-                deviceName: logbook.deviceName ?? "",
-                userId: logbook.userId ? logbook.userId.toString() : "", 
-                userEmail: logbook.userEmail ?? "",
-                statusId: statuses.find(s => s.name === logbook.statusName)?.id || "", 
-                locationId: locations.find(l => l.name === logbook.locationName)?.id || "", 
-                note: logbook.note ?? ""
-            };
-            console.log("Actualizando editedLogbook en modal:", updatedLogbook);
-            setEditedLogbook(updatedLogbook);
-        } else {
-            setEditedLogbook(initialLogbookState);
+        const fetchLocations = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get("http://localhost:8085/api/v1/admin/locations", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setLocations(response.data);
+            } catch (error) {
+                console.error("Error al obtener localizaciones", error);
+            }
+        };
+
+        if (open) {
+            fetchLocations();
+
+            if (logbook) {
+                setEditedLogbook({
+                    id: logbook.id ?? "",
+                    deviceId: logbook.deviceId ? logbook.deviceId.toString() : "",
+                    deviceName: logbook.deviceName ?? "",
+                    userEmail: logbook.userEmail ?? "",
+                    statusId: statuses.find(s => s.name === logbook.status)?.id || "",
+                    locationId: locations.find(loc => loc.name === logbook.location)?.id || "",
+                    note: logbook.note ?? "",
+                    createdAt: logbook.createdAt ?? ""
+                });
+            } else {
+                setEditedLogbook(initialLogbookState);
+            }
         }
     }, [logbook, open]);
     
-    
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setEditedLogbook((prev) => ({ ...prev, [name]: value }));

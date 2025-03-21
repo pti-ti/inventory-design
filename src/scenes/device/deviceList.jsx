@@ -37,7 +37,8 @@ const Device = () => {
       const formattedDevices = response.data.map(device => ({
         ...device,
         id: device.id,
-        status: device.status?.name || "Desconocido"
+        status: device.status?.name || "Desconocido",
+        location: device.location?.name || "No especificado",
       }));
 
       setRows(formattedDevices);
@@ -70,6 +71,7 @@ const Device = () => {
   };
 
   const handleUpdateDevice = async (deviceData) => {
+    
     try {
       const token = localStorage.getItem("token");
       const apiUrl = `http://localhost:8085/api/v1/admin/devices/${deviceData.id}`;
@@ -88,6 +90,7 @@ const Device = () => {
   };
 
   const handleEdit = (device) => {
+    console.log("Editando dispositivo:", device);
     setSelectedDevice(device);
     setIsEditing(true);
     setOpenModal(true);
@@ -135,6 +138,7 @@ const Device = () => {
     },
     //{ field: "price", headerName: "Precio", flex: 1, cellClassName: "name-column--cell" },
     { field: "status", headerName: "Estado", flex: 1, cellClassName: "name-column--cell" },
+    { field: "location", headerName: "Ubicación", flex: 1, cellClassName: "name-column--cell" },
     {
       field: "actions",
       headerName: "Acciones",
