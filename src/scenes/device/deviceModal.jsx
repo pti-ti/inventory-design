@@ -198,6 +198,7 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     <TextField fullWidth margin="normal" label="Precio" name="price" value={editedDevice.price} onChange={handleChange} />
     
                     <Button 
+                        fullWidth
                         variant="contained" 
                         color="primary" 
                         onClick={isEditing ? handleUpdateDevice : handleRegisterDevice} 

@@ -50,23 +50,22 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     }, [open]);
     
     useEffect(() => {
-        if (logbook && open) {
+        if (logbook && open && statuses.length > 0 && locations.length > 0) {
             console.log("Datos del logbook:", logbook);
             setEditedLogbook({
                 id: logbook.id ?? "",
                 deviceId: logbook.deviceId ? logbook.deviceId.toString() : "",
                 deviceName: logbook.deviceName ?? "",
                 userEmail: logbook.userEmail ?? "",
-                statusId: statuses.find(s => s.name === logbook.statusName)?.id || "",  // 🔹 Buscar el ID a partir del nombre
-                locationId: locations.find(l => l.name === logbook.locationName)?.id || "",  // 🔹 Buscar el ID a partir del nombre
+                statusId: statuses.find(s => s.name === logbook.statusName)?.id || "",  
+                locationId: locations.find(l => l.name === logbook.locationName)?.id || "",  
                 note: logbook.note ?? "",
                 createdAt: logbook.createdAt ?? ""
             });
-            
-        } else {
+        } else if (!logbook) {
             setEditedLogbook(initialLogbookState);
         }
-    }, [logbook, open]);
+    }, [logbook, open, statuses, locations]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -216,6 +215,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     <TextField fullWidth margin="normal" label="Notas" name="note" value={editedLogbook.note || ""} onChange={handleChange} />
                             
                     <Button
+                        fullWidth
                         variant="contained"
                         color="primary"
                         onClick={isEditing ? handleUpdateLogbook : handleCreate}

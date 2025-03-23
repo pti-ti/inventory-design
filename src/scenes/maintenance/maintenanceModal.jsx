@@ -218,7 +218,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                     />
 
                     <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-                        <Button variant="contained" color="info" onClick={handleCreateOrUpdate}>
+                        <Button fullWidth variant="contained" color="primary" onClick={handleCreateOrUpdate}>
                             {isEditing ? "Guardar Cambios" : "Registrar"}
                         </Button>
                     </Box>
