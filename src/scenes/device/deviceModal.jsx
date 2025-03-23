@@ -19,27 +19,20 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
     const [statuses, setStatuses] = useState([]);
     const [openSuccess, setOpenSuccess] = useState(false);
 
-    const statusMap = {
-        "Entregado": 1,
-        "Dañado": 2,
-        "Mantenimiento": 3,
-        "Disponible": 4,
-        "No disponible": 5
-    };
-
     useEffect(() => {
         if (open) {
             if (isEditing) {
-                setEditedDevice({
+                setEditedDevice(prevDevice => ({
+                    ...prevDevice,
                     code: device.code || "",
                     name: device.name || "",
                     serial: device.serial || "",
                     specification: device.specification || "",
                     type: device.type || "",
-                    status: statusMap[device.status] || "",
+                    status: statuses.find(status => status.name === device.status)?.id || "",
                     price: device.price || "",
                     locationId: locations.find(loc => loc.name === device.location)?.id || ""
-                });
+                }));
             } else {
                 setEditedDevice({
                     code: "",
@@ -52,7 +45,11 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     locationId: ""
                 });
             }
-
+        }
+    }, [device, open, isEditing]);
+    
+    useEffect(() => {
+        if (open) {
             const fetchLocations = async () => {
                 try {
                     const token = localStorage.getItem("token");
@@ -64,9 +61,7 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     console.error("Error al obtener localizaciones", error);
                 }
             };
-
-            fetchLocations();
-
+    
             const fetchStatuses = async () => {
                 try {
                     const token = localStorage.getItem("token");
@@ -79,9 +74,11 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                 }
             };
     
+            fetchLocations();
             fetchStatuses();
         }
-    }, [device, open, isEditing]);
+    }, [open]);
+    
 
     const handleChange = (e) => {
         setEditedDevice({ ...editedDevice, [e.target.name]: e.target.value });
@@ -161,14 +158,16 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     <TextField fullWidth margin="normal" label="Serial" name="serial" value={editedDevice.serial} onChange={handleChange} />
                     <TextField fullWidth margin="normal" label="Especificaciones" name="specification" value={editedDevice.specification} onChange={handleChange} />
                     <TextField fullWidth margin="normal" label="Tipo" name="type" value={editedDevice.type} onChange={handleChange} />
-
+    
+                    {/* Campo de Estado (Status) - Deshabilitado si se está editando */}
                     <FormControl fullWidth margin="normal">
-                        <InputLabel id="status-label">Estatus</InputLabel>
+                        <InputLabel id="status-label">Estado</InputLabel>
                         <Select
                             labelId="status-label"
                             name="status"
                             value={editedDevice.status}
                             onChange={handleChange}
+                            disabled={isEditing} // Deshabilitado en modo edición
                         >
                             {statuses.map((status) => (
                                 <MenuItem key={status.id} value={status.id}>
@@ -177,9 +176,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                             ))}
                         </Select>
                     </FormControl>
-
-
-                    {!isEditing ? (
+    
+                    {/* Campo de Localización (Location) - Deshabilitado si se está editando */}
                     <FormControl fullWidth margin="normal">
                         <InputLabel id="location-label">Localización</InputLabel>
                         <Select
@@ -187,6 +185,7 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                             name="locationId"
                             value={editedDevice.locationId || ""}
                             onChange={handleChange}
+                            disabled={isEditing} // Deshabilitado en modo edición
                         >
                             {locations.map((location) => (
                                 <MenuItem key={location.id} value={location.id}>
@@ -195,22 +194,9 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                             ))}
                         </Select>
                     </FormControl>
-                ) : (
-                    <TextField
-                        fullWidth
-                        margin="normal"
-                        label="Localización"
-                        value={
-                            locations.find(loc => loc.id === editedDevice.locationId)?.name || "No disponible"
-                        }
-                        disabled={isEditing}
-                    />
-                )}
-
-
-
+    
                     <TextField fullWidth margin="normal" label="Precio" name="price" value={editedDevice.price} onChange={handleChange} />
-
+    
                     <Button 
                         variant="contained" 
                         color="primary" 
@@ -221,6 +207,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     </Button>
                 </Box>
             </Modal>
+    
+            {/* Diálogo de Éxito */}
             <Dialog open={openSuccess} onClose={() => setOpenSuccess(false)}>
                 <DialogTitle>¡{isEditing ? "Dispositivo actualizado" : "Dispositivo registrado"}!</DialogTitle>
                 <DialogContent>
@@ -232,6 +220,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
             </Dialog>
         </>
     );
+    
+    
 };
 
 export default DeviceModal;

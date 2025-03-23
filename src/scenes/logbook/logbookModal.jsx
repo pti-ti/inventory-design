@@ -18,44 +18,40 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
         note: "",
         createdAt: ""
     };
-    
 
     const [editedLogbook, setEditedLogbook] = useState(initialLogbookState);
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    
+    const [statuses, setStatuses] = useState([]);
+    const [locations, setLocations] = useState([]);
+
     const isEditing = Boolean(editedLogbook.id);
 
-    const statuses = [
-        { id: 1, name: "Entregado" },
-        { id: 2, name: "Dañado" },
-        { id: 3, name: "Mantenimiento" },
-        { id: 4, name: "Disponible" },
-        { id: 5, name: "No disponible" }
-    ];
-
-    const locations = [
-        { id: 1, name: "Recursos Humanos" },
-        { id: 2, name: "Compras" },
-        { id: 3, name: "Investigacion" },
-        { id: 4, name: "Laboratorio" }
-    ];
-
+    // 🔹 Obtener estados y ubicaciones dinámicamente desde el backend
     useEffect(() => {
-        const fetchLocations = async () => {
+        const fetchStatusesAndLocations = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get("http://localhost:8085/api/v1/admin/locations", {
+
+                // 🔸 Obtener estados (statuses)
+                const statusResponse = await axios.get("http://localhost:8085/api/v1/admin/status", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                setLocations(response.data);
+
+                // 🔸 Obtener ubicaciones (locations)
+                const locationResponse = await axios.get("http://localhost:8085/api/v1/admin/locations", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                setStatuses(statusResponse.data);
+                setLocations(locationResponse.data);
             } catch (error) {
-                console.error("Error al obtener localizaciones", error);
+                console.error("Error al obtener estados y ubicaciones", error);
             }
         };
 
         if (open) {
-            fetchLocations();
+            fetchStatusesAndLocations();
 
             if (logbook) {
                 setEditedLogbook({
@@ -63,8 +59,8 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     deviceId: logbook.deviceId ? logbook.deviceId.toString() : "",
                     deviceName: logbook.deviceName ?? "",
                     userEmail: logbook.userEmail ?? "",
-                    statusId: statuses.find(s => s.name === logbook.status)?.id || "",
-                    locationId: locations.find(loc => loc.name === logbook.location)?.id || "",
+                    status: logbook.status?.id || "", 
+                    location: logbook.location?.id || "",
                     note: logbook.note ?? "",
                     createdAt: logbook.createdAt ?? ""
                 });
@@ -73,7 +69,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             }
         }
     }, [logbook, open]);
-    
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setEditedLogbook((prev) => ({ ...prev, [name]: value }));
@@ -82,72 +78,70 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const handleCreate = async () => {
         try {
             const token = localStorage.getItem("token");
-    
-            if (!editedLogbook.deviceId?.toString().trim() || 
-                !editedLogbook.userId?.toString().trim() || 
+
+            if (!editedLogbook.deviceId?.trim() || 
+                !editedLogbook.userId?.trim() || 
                 !editedLogbook.statusId || 
                 !editedLogbook.locationId) {
-                setErrorMessage("Todos los campos son obligatorios para registrar una nueva bitácora.");
+                setErrorMessage("Todos los campos son obligatorios.");
                 return;
             }
-    
+
             const logbookData = {
                 device: { id: editedLogbook.deviceId },
                 user: { id: editedLogbook.userId },
                 status: { id: editedLogbook.statusId },
                 location: { id: editedLogbook.locationId },
-                note: editedLogbook.note || "" // Evitar undefined
+                note: editedLogbook.note || ""
             };
-    
+
             await axios.post("http://localhost:8085/api/v1/admin/logbooks/register", logbookData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-    
+
             setSuccessMessage("Bitácora registrada correctamente.");
             refreshLogbooks();
             handleClose();
         } catch (error) {
             console.error("Error al guardar la bitácora", error.response?.data || error.message);
-            setErrorMessage(error.response?.data?.message || "No se pudo procesar la solicitud.");
+            setErrorMessage("No se pudo procesar la solicitud.");
         }
     };
 
     const handleUpdateLogbook = async () => {
         try {
             const token = localStorage.getItem("token");
-    
+
             if (!editedLogbook.id) {
                 setErrorMessage("No se puede actualizar la bitácora sin un ID.");
                 return;
             }
-    
+
             if (!editedLogbook.statusId || !editedLogbook.locationId) {
-                setErrorMessage("Estado y Ubicación son obligatorios para actualizar la bitácora.");
+                setErrorMessage("Estado y Ubicación son obligatorios.");
                 return;
             }
-    
+
             const updateData = {
                 status: { id: editedLogbook.statusId },
                 location: { id: editedLogbook.locationId },
-                note: editedLogbook.note || "" // Asegurar que no sea undefined
+                note: editedLogbook.note || ""
             };
-    
+
             await axios.put(
                 `http://localhost:8085/api/v1/admin/logbooks/${editedLogbook.id}`,
                 updateData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-    
+
             setSuccessMessage("Bitácora actualizada correctamente.");
-            refreshLogbooks(); // Actualiza la lista de bitácoras
-            handleClose(); // Cierra el modal o formulario
+            refreshLogbooks();
+            handleClose();
         } catch (error) {
             console.error("Error al actualizar la bitácora", error.response?.data || error.message);
-            setErrorMessage(error.response?.data?.message || "No se pudo actualizar la bitácora.");
+            setErrorMessage("No se pudo actualizar la bitácora.");
         }
     };
-    
-    
 
     return (
         <>
@@ -177,7 +171,6 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                                 name="userId" value={editedLogbook.userId || ""}
                                 onChange={handleChange}
                             />
-                            
                         </>
                     )}
                     
@@ -195,7 +188,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                             />
                         </>
                     )}
-    
+
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Ubicación</InputLabel>
                         <Select
@@ -208,7 +201,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                             ))}
                         </Select>
                     </FormControl>
-    
+
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Estado</InputLabel>
                         <Select
@@ -221,7 +214,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                             ))}
                         </Select>
                     </FormControl>
-    
+
                     <TextField fullWidth margin="normal" label="Notas" name="note" value={editedLogbook.note || ""} onChange={handleChange} />
                             
                     <Button
@@ -234,21 +227,8 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     </Button>
                 </Box>
             </Modal>
-    
-            {/* Notificación de éxito */}
-            <Snackbar open={Boolean(successMessage)} autoHideDuration={3000} onClose={() => setSuccessMessage("")}
-            >
-                <Alert severity="success" onClose={() => setSuccessMessage("")}>{successMessage}</Alert>
-            </Snackbar>
-    
-            {/* Notificación de error */}
-            <Snackbar open={Boolean(errorMessage)} autoHideDuration={3000} onClose={() => setErrorMessage("")}
-            >
-                <Alert severity="error" onClose={() => setErrorMessage("")}>{errorMessage}</Alert>
-            </Snackbar>
         </>
     );
-    
 };
 
 export default LogbookModal;
