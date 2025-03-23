@@ -27,46 +27,44 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
     const isEditing = Boolean(editedLogbook.id);
 
-    // 🔹 Obtener estados y ubicaciones dinámicamente desde el backend
     useEffect(() => {
-        const fetchStatusesAndLocations = async () => {
-            try {
-                const token = localStorage.getItem("token");
-
-                // 🔸 Obtener estados (statuses)
-                const statusResponse = await axios.get("http://localhost:8085/api/v1/admin/status", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-
-                // 🔸 Obtener ubicaciones (locations)
-                const locationResponse = await axios.get("http://localhost:8085/api/v1/admin/locations", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-
-                setStatuses(statusResponse.data);
-                setLocations(locationResponse.data);
-            } catch (error) {
-                console.error("Error al obtener estados y ubicaciones", error);
-            }
-        };
-
         if (open) {
+            const fetchStatusesAndLocations = async () => {
+                try {
+                    const token = localStorage.getItem("token");
+    
+                    const [statusResponse, locationResponse] = await Promise.all([
+                        axios.get("http://localhost:8085/api/v1/admin/status", { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get("http://localhost:8085/api/v1/admin/locations", { headers: { Authorization: `Bearer ${token}` } })
+                    ]);
+    
+                    setStatuses(statusResponse.data);
+                    setLocations(locationResponse.data);
+                } catch (error) {
+                    console.error("Error al obtener estados y ubicaciones", error);
+                }
+            };
+    
             fetchStatusesAndLocations();
-
-            if (logbook) {
-                setEditedLogbook({
-                    id: logbook.id ?? "",
-                    deviceId: logbook.deviceId ? logbook.deviceId.toString() : "",
-                    deviceName: logbook.deviceName ?? "",
-                    userEmail: logbook.userEmail ?? "",
-                    status: logbook.status?.id || "", 
-                    location: logbook.location?.id || "",
-                    note: logbook.note ?? "",
-                    createdAt: logbook.createdAt ?? ""
-                });
-            } else {
-                setEditedLogbook(initialLogbookState);
-            }
+        }
+    }, [open]);
+    
+    useEffect(() => {
+        if (logbook && open) {
+            console.log("Datos del logbook:", logbook);
+            setEditedLogbook({
+                id: logbook.id ?? "",
+                deviceId: logbook.deviceId ? logbook.deviceId.toString() : "",
+                deviceName: logbook.deviceName ?? "",
+                userEmail: logbook.userEmail ?? "",
+                statusId: statuses.find(s => s.name === logbook.statusName)?.id || "",  // 🔹 Buscar el ID a partir del nombre
+                locationId: locations.find(l => l.name === logbook.locationName)?.id || "",  // 🔹 Buscar el ID a partir del nombre
+                note: logbook.note ?? "",
+                createdAt: logbook.createdAt ?? ""
+            });
+            
+        } else {
+            setEditedLogbook(initialLogbookState);
         }
     }, [logbook, open]);
 
