@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme, Button, IconButton } from "@mui/material";
+import { Box, Typography, useTheme, Button, IconButton, Snackbar, Alert } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import axios from "axios";
@@ -67,6 +67,9 @@ const Maintenance = () => {
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [maintenanceToDelete, setMaintenanceToDelete] = useState(null);
   const currentUserId = localStorage.getItem("userId");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const fetchData = async () => {
     try {
@@ -137,12 +140,20 @@ const Maintenance = () => {
       await axios.delete(`http://localhost:8085/api/v1/admin/maintenances/${maintenanceToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchData();
+  
+      setSnackbarMessage("Mantenimiento eliminado correctamente.");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
+      fetchData(); // Recargar la lista de mantenimientos
     } catch (error) {
       console.error("Error al eliminar el mantenimiento:", error);
+      setSnackbarMessage("Error al eliminar el mantenimiento.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
     setOpenConfirmModal(false);
   };
+  
 
   const columns = [
     { field: "id", headerName: "ID", width: 90 },
@@ -228,6 +239,18 @@ const Maintenance = () => {
           <Button onClick={handleDelete} color="error">Eliminar</Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: "100%" }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

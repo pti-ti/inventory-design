@@ -1,4 +1,4 @@
-import { Box, useTheme, Button, IconButton } from "@mui/material";
+import { Box, useTheme, Button, IconButton, Snackbar, Alert } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import axios from "axios";
@@ -19,6 +19,10 @@ const Device = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [deviceToDelete, setDeviceToDelete] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // Puede ser "success", "error", "warning", etc.
+
 
   const fetchData = async () => {
     try {
@@ -107,12 +111,20 @@ const Device = () => {
       await axios.delete(`http://localhost:8085/api/v1/admin/devices/${deviceToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+  
+      setSnackbarMessage("Dispositivo eliminado correctamente");
+      setSnackbarSeverity("success");
       fetchData();
     } catch (error) {
       console.error("Error al eliminar el dispositivo:", error);
+      setSnackbarMessage("Error al eliminar el dispositivo");
+      setSnackbarSeverity("error");
     }
+  
+    setSnackbarOpen(true);
     setOpenConfirmModal(false);
   };
+  
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("es-CO", {
@@ -206,6 +218,18 @@ const Device = () => {
           <Button onClick={handleDelete} color="error">Eliminar</Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: "100%" }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+
     </Box>
   );
 };

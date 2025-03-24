@@ -165,7 +165,9 @@ const LocationList = () => {
           </Dialog>
 
           {/* Notificación Snackbar */}
-          <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}>
+          <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
               <Alert severity={snackbarSeverity} onClose={() => setSnackbarOpen(false)}>
                   {snackbarMessage}
               </Alert>

@@ -1,4 +1,4 @@
-import { Box, Button, Modal, TextField, Typography, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { Box, Button, Modal, TextField, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Alert } from "@mui/material";
 import { useState, useEffect } from "react";
 import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import axios from "axios";
@@ -18,6 +18,10 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
     const [locations, setLocations] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [openSuccess, setOpenSuccess] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // "success" o "error"
+
 
     useEffect(() => {
         if (open) {
@@ -88,55 +92,60 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
         try {
             const token = localStorage.getItem("token");
             const apiUrl = "http://localhost:8085/api/v1/admin/devices/register";
-
+    
             const deviceData = {
                 ...editedDevice,
                 status: { id: editedDevice.status },
                 location: { id: editedDevice.locationId }
             };
-
-            console.log("Registrando dispositivo:", JSON.stringify(deviceData, null, 2));
-
+    
             await axios.post(apiUrl, deviceData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-
+    
             refreshDevices();
-            setOpenSuccess(true);
-            setTimeout(() => setOpenSuccess(false), 2000);
+            setSnackbarMessage("Dispositivo registrado con éxito");
+            setSnackbarSeverity("success");
+            setOpenSnackbar(true);
             handleClose();
         } catch (error) {
             console.error("Error al registrar el dispositivo", error);
+            setSnackbarMessage("Error al registrar el dispositivo");
+            setSnackbarSeverity("error");
+            setOpenSnackbar(true);
         }
     };
-
+    
     const handleUpdateDevice = async () => {
         try {
             const token = localStorage.getItem("token");
             const apiUrl = `http://localhost:8085/api/v1/admin/devices/${device.id}`;
-
+    
             const deviceData = {
                 ...editedDevice,
                 status: { id: editedDevice.status },
                 location: { id: editedDevice.locationId }
             };
-
+    
             delete deviceData.locationId;
-
-            console.log("Actualizando dispositivo:", JSON.stringify(deviceData, null, 2));
-
+    
             await axios.put(apiUrl, deviceData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-
+    
             refreshDevices();
-            setOpenSuccess(true);
-            setTimeout(() => setOpenSuccess(false), 2000);
+            setSnackbarMessage("Dispositivo actualizado con éxito");
+            setSnackbarSeverity("success");
+            setOpenSnackbar(true);
             handleClose();
         } catch (error) {
             console.error("Error al actualizar el dispositivo", error);
+            setSnackbarMessage("Error al actualizar el dispositivo");
+            setSnackbarSeverity("error");
+            setOpenSnackbar(true);
         }
     };
+    
 
     return (
         <>
@@ -210,15 +219,17 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
             </Modal>
     
             {/* Diálogo de Éxito */}
-            <Dialog open={openSuccess} onClose={() => setOpenSuccess(false)}>
-                <DialogTitle>¡{isEditing ? "Dispositivo actualizado" : "Dispositivo registrado"}!</DialogTitle>
-                <DialogContent>
-                    {isEditing ? "Los cambios se guardaron correctamente." : "El dispositivo ha sido registrado con éxito."}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenSuccess(false)} color="primary" autoFocus>Cerrar</Button>
-                </DialogActions>
-            </Dialog>
+            <Snackbar 
+                open={openSnackbar} 
+                autoHideDuration={3000} 
+                onClose={() => setOpenSnackbar(false)}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+                <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
+
         </>
     );
     

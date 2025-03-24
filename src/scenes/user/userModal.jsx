@@ -1,4 +1,4 @@
-import { Box, Button, Modal, Typography, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { Box, Button, Modal, Typography, Snackbar, Alert } from "@mui/material";
 import { useState, useEffect } from "react";
 import { MenuItem, Select, InputLabel, FormControl, TextField } from "@mui/material";
 import { Formik } from "formik";
@@ -7,6 +7,7 @@ import axios from "axios";
 
 const UserModal = ({ open, handleClose, user, refreshUsers }) => {
     const [openSuccess, setOpenSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
     const [locations, setLocations] = useState([]);
 
     useEffect(() => {
@@ -16,7 +17,7 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
                 const response = await axios.get("http://localhost:8085/api/v1/admin/locations", {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                setLocations(response.data); // Suponiendo que response.data es un array de ubicaciones con id y nombre
+                setLocations(response.data);
             } catch (error) {
                 console.error("Error al obtener las ubicaciones", error);
             }
@@ -43,11 +44,12 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
     const handleSubmit = async (values, { resetForm }) => {
         try {
             const token = localStorage.getItem("token");
-            const url = user?.id
+            const isEditing = Boolean(user?.id);
+            const url = isEditing
                 ? `http://localhost:8085/api/v1/admin/users/${user.id}`
                 : "http://localhost:8085/api/v1/admin/users/register";
 
-            const method = user?.id ? "put" : "post";
+            const method = isEditing ? "put" : "post";
 
             await axios[method](url, {
                 email: values.email,
@@ -57,6 +59,7 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
             });
 
             refreshUsers();
+            setSuccessMessage(isEditing ? "Usuario actualizado exitosamente" : "Usuario creado exitosamente");
             setOpenSuccess(true);
             resetForm();
             handleClose();
@@ -120,22 +123,23 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
                                 >
                                     {user ? "Guardar Cambios" : "Agregar Usuario"}
                                 </Button>
-
                             </form>
                         )}
                     </Formik>
                 </Box>
             </Modal>
 
-            <Dialog open={openSuccess} onClose={() => setOpenSuccess(false)}>
-                <DialogTitle>¡Usuario Creado!</DialogTitle>
-                <DialogContent>
-                    Los cambios se guardaron correctamente.
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenSuccess(false)} color="primary" autoFocus>Cerrar</Button>
-                </DialogActions>
-            </Dialog>
+            {/* Snackbar para mostrar mensajes de éxito */}
+            <Snackbar
+                open={openSuccess}
+                autoHideDuration={4000}
+                onClose={() => setOpenSuccess(false)}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+                <Alert severity="success" onClose={() => setOpenSuccess(false)}>
+                    {successMessage}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

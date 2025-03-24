@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme, Button, IconButton } from "@mui/material";
+import { Box, Typography, useTheme, Button, IconButton, Snackbar, Alert } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import axios from "axios";
@@ -19,6 +19,9 @@ const Logbook = () => {
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [logbookToDelete, setLogbookToDelete] = useState(null);
   const currentUserId = localStorage.getItem("userId");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const fetchData = async () => {
     try {
@@ -107,25 +110,31 @@ const Logbook = () => {
 
   const handleDelete = async () => {
     if (!logbookToDelete) {
-        console.error("No se ha seleccionado ninguna bitácora para eliminar.");
-        return;
+      console.error("No se ha seleccionado ninguna bitácora para eliminar.");
+      return;
     }
-
+  
     try {
-        console.log("Intentando eliminar bitácora con ID:", logbookToDelete);
-        const token = localStorage.getItem("token");
-        const response = await axios.delete(`http://localhost:8085/api/v1/admin/logbooks/${logbookToDelete}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        console.log("Respuesta del backend al eliminar:", response);
-        fetchData(); // Recargar la lista después de eliminar
+      console.log("Intentando eliminar bitácora con ID:", logbookToDelete.id);
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:8085/api/v1/admin/logbooks/${logbookToDelete.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      setSnackbarMessage("Bitácora eliminada exitosamente.");
+      setSnackbarSeverity("success"); // Color verde de éxito
+      fetchData(); // Recargar la lista después de eliminar
     } catch (error) {
-        console.error("Error al eliminar la bitácora:", error);
+      console.error("Error al eliminar la bitácora:", error);
+      setSnackbarMessage("Error al eliminar la bitácora. Inténtalo nuevamente.");
+      setSnackbarSeverity("error"); // Color rojo de error
     }
-
-    setOpenConfirmModal(false);
+  
+    setSnackbarOpen(true); // Mostrar el mensaje
+    setOpenConfirmModal(false); // Cerrar el modal de confirmación
     setLogbookToDelete(null); // Limpiar la variable de estado
-};
+  };
+  
 
 
   const columns = [
@@ -208,6 +217,18 @@ const Logbook = () => {
           <Button onClick={handleDelete} color="error">Eliminar</Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000} // Cierra automáticamente en 4 segundos
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: "100%" }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+
     </Box>
   );
 };

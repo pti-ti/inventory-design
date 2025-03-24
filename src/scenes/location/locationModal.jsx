@@ -130,6 +130,7 @@ const LocationModal = ({ open, handleClose, location, refreshLocations }) => {
                 open={snackbarOpen} 
                 autoHideDuration={3000} 
                 onClose={() => setSnackbarOpen(false)}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
             >
                 <Alert severity={snackbarSeverity} onClose={() => setSnackbarOpen(false)}>
                     {snackbarMessage}

@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme, Button, IconButton } from "@mui/material";
+import { Box, Typography, useTheme, Button, IconButton, Snackbar, Alert } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import axios from "axios";
@@ -19,6 +19,9 @@ const User = () => {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
 
   const fetchData = async () => {
     try {
@@ -70,12 +73,18 @@ const User = () => {
       await axios.delete(`http://localhost:8085/api/v1/admin/users/${userToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchData();
+      
+      fetchData(); // Refresca la lista de usuarios
+      setSnackbarMessage("Usuario eliminado correctamente"); 
+      setOpenSnackbar(true);
     } catch (error) {
       console.error("Error al eliminar el usuario:", error);
+      setSnackbarMessage("Error al eliminar el usuario");
+      setOpenSnackbar(true);
     }
     setOpenConfirmModal(false);
   };
+  
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
@@ -134,6 +143,16 @@ const User = () => {
           <Button onClick={handleDelete} color="error">Eliminar</Button>
         </DialogActions>
       </Dialog>
+      <Snackbar 
+        open={openSnackbar} 
+        autoHideDuration={3000} 
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

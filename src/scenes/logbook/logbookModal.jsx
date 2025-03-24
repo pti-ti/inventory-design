@@ -1,7 +1,6 @@
 import { 
     Box, Button, Modal, TextField, Typography, MenuItem, 
-    Select, FormControl, InputLabel, Dialog, DialogTitle,
-    DialogContent, DialogActions, Snackbar, Alert 
+    Select, FormControl, InputLabel, Snackbar, Alert 
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -10,7 +9,6 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const initialLogbookState = {
         id: "",
         deviceId: "",
-        deviceCode: "",
         deviceName: "",
         userEmail: "",
         statusId: "",
@@ -32,26 +30,24 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             const fetchStatusesAndLocations = async () => {
                 try {
                     const token = localStorage.getItem("token");
-    
                     const [statusResponse, locationResponse] = await Promise.all([
                         axios.get("http://localhost:8085/api/v1/admin/status", { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get("http://localhost:8085/api/v1/admin/locations", { headers: { Authorization: `Bearer ${token}` } })
                     ]);
-    
+
                     setStatuses(statusResponse.data);
                     setLocations(locationResponse.data);
                 } catch (error) {
                     console.error("Error al obtener estados y ubicaciones", error);
                 }
             };
-    
+
             fetchStatusesAndLocations();
         }
     }, [open]);
-    
+
     useEffect(() => {
         if (logbook && open && statuses.length > 0 && locations.length > 0) {
-            console.log("Datos del logbook:", logbook);
             setEditedLogbook({
                 id: logbook.id ?? "",
                 deviceId: logbook.deviceId ? logbook.deviceId.toString() : "",
@@ -70,6 +66,11 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setEditedLogbook((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleCloseSnackbar = () => {
+        setSuccessMessage("");
+        setErrorMessage("");
     };
 
     const handleCreate = async () => {
@@ -214,17 +215,19 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
                     <TextField fullWidth margin="normal" label="Notas" name="note" value={editedLogbook.note || ""} onChange={handleChange} />
                             
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        onClick={isEditing ? handleUpdateLogbook : handleCreate}
-                        sx={{ mt: 2 }}
-                    >
+                    <Button fullWidth variant="contained" color="primary" onClick={isEditing ? handleUpdateLogbook : handleCreate} sx={{ mt: 2 }}>
                         {isEditing ? "Guardar Cambios" : "Registrar"}
                     </Button>
                 </Box>
             </Modal>
+
+            <Snackbar open={!!successMessage || !!errorMessage} autoHideDuration={4000} onClose={handleCloseSnackbar}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={successMessage ? "success" : "error"}>
+                    {successMessage || errorMessage}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

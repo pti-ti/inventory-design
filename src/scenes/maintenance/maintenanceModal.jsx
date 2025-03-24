@@ -27,6 +27,10 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [itemsList, setItemsList] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // Puede ser "success" o "error"
+
 
     useEffect(() => {
         if (open && maintenance) {
@@ -45,7 +49,6 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                 deviceId: maintenance.deviceId ?? "",
                 deviceCode: maintenance.deviceCode ?? "",
                 deviceName: maintenance.deviceName ?? "",
-                userId: maintenance.userId ?? "",
                 userEmail: maintenance.userEmail ?? "",
                 maintenanceType: maintenance.maintenanceType ?? "",
                 comment: maintenance.comment ?? "",
@@ -92,13 +95,17 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
     const handleCreateOrUpdate = async () => {
         try {
             const token = localStorage.getItem("token");
+    
+            // Asegurar que el objeto tenga la estructura correcta
             const maintenanceData = {
+                id: isEditing ? editedMaintenance.id : undefined, // Solo si es edición
                 device: { id: Number(editedMaintenance.deviceId) },
                 user: { id: Number(editedMaintenance.userId) },
                 maintenanceType: editedMaintenance.maintenanceType,
-                items: editedMaintenance.items.map(id => ({ id: Number(id) })),
                 maintenanceDate: editedMaintenance.maintenanceDate,
                 comment: editedMaintenance.comment,
+                items: editedMaintenance.items.map(id => ({ id: Number(id) })),
+                updatedBy: 3, // Aquí deberías reemplazar con el ID del usuario autenticado si aplica
             };
     
             if (isEditing) {
@@ -107,40 +114,52 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                     maintenanceData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
+                setSnackbarMessage("Mantenimiento actualizado exitosamente.");
             } else {
                 await axios.post(
                     "http://localhost:8085/api/v1/admin/maintenances/register",
                     maintenanceData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
+                setSnackbarMessage("Mantenimiento registrado exitosamente.");
             }
     
-            // Llamar al endpoint que genera el Excel
-            const response = await axios.get("http://localhost:8085/api/v1/admin/excel/update", {
-                headers: { Authorization: `Bearer ${token}` },
-                responseType: "blob", // Importante para manejar archivos
-            });
+            setSnackbarSeverity("success");
+            setSnackbarOpen(true);
     
-            // Crear un enlace para descargar el archivo
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", "Mantenimiento.xlsx"); // Nombre del archivo
-            document.body.appendChild(link);
-            link.click();
+            // Descargar Excel solo si la petición fue exitosa
+            try {
+                const response = await axios.get("http://localhost:8085/api/v1/admin/excel/update", {
+                    headers: { Authorization: `Bearer ${token}` },
+                    responseType: "blob",
+                });
     
-            // Limpiar recursos
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(link);
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", "Mantenimiento.xlsx");
+                document.body.appendChild(link);
+                link.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(link);
+            } catch (excelError) {
+                console.error("Error al descargar el Excel:", excelError);
+                setSnackbarMessage("Mantenimiento guardado, pero ocurrió un error al descargar el Excel.");
+                setSnackbarSeverity("warning"); // Color amarillo
+                setSnackbarOpen(true);
+            }
     
             refreshMaintenances();
-            setOpenSnackbar(true);
             handleClose();
         } catch (error) {
             console.error("Error al guardar mantenimiento:", error);
-            setErrorMessage("Ocurrió un error al guardar los cambios.");
+            setSnackbarMessage("Error al guardar el mantenimiento. Inténtalo de nuevo.");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
         }
     };
+    
+    
     
 
     return (
@@ -225,9 +244,17 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                 </Box>
             </Modal>
 
-            <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={() => setOpenSnackbar(false)}>
-                <Alert severity="success">{isEditing ? "Mantenimiento actualizado" : "Mantenimiento creado"}</Alert>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={4000} // Se cierra en 4 segundos
+                onClose={() => setSnackbarOpen(false)}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+                <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: "100%" }}>
+                    {snackbarMessage}
+                </Alert>
             </Snackbar>
+
         </>
     );
 };
