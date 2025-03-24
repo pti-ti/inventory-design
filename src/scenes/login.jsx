@@ -40,7 +40,7 @@ const Login = () => {
       setSnackbar({ open: true, message: "¡Login exitoso!", severity: "success" });
 
       setTimeout(() => {
-        window.location.href = "/dispositivos";
+        window.location.href = "/dashboard";
       }, 1500);
       
     } catch (err) {
