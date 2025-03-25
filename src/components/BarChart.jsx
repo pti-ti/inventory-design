@@ -18,9 +18,9 @@ const BarChart = ({ isDashboard = false }) => {
         const result = await response.json();
 
         // Transformamos el objeto en un array compatible con Nivo Bar
-        const transformedData = Object.keys(result).map(city => ({
-          city,  // Nombre de la ciudad
-          count: result[city] // Cantidad de dispositivos en esa ciudad
+        const transformedData = Object.keys(result).map((city) => ({
+          city,
+          count: result[city],
         }));
 
         setData(transformedData);
@@ -33,8 +33,15 @@ const BarChart = ({ isDashboard = false }) => {
     fetchData();
   }, []);
 
+  // 🎨 Paleta de colores oscuros
+  const darkColors = [
+    "#1F77B4", "#D62728", "#2CA02C", "#FF7F0E",
+    "#9467BD", "#8C564B", "#E377C2", "#7F7F7F",
+    "#BCBD22", "#17BECF"
+  ];
+
   return (
-    <>
+    <div style={{ maxWidth: "800px", height: "400px", margin: "0 auto" }}>
       {data.length === 0 ? (
         <p>Cargando datos...</p>
       ) : (
@@ -51,13 +58,13 @@ const BarChart = ({ isDashboard = false }) => {
             },
             legends: { text: { fill: colors.grey[100] } },
           }}
-          keys={["count"]} // Usa "count" porque transformamos los datos
-          indexBy="city" // Usa "city" como clave
-          margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+          keys={["count"]}
+          indexBy="city"
+          margin={{ top: 50, right: 50, bottom: 50, left: 60 }}
           padding={0.3}
           valueScale={{ type: "linear" }}
           indexScale={{ type: "band", round: true }}
-          colors={{ scheme: "nivo" }}
+          colors={(bar) => darkColors[bar.index % darkColors.length]}
           borderColor={{ from: "color", modifiers: [["darker", "1.6"]] }}
           axisTop={null}
           axisRight={null}
@@ -65,7 +72,7 @@ const BarChart = ({ isDashboard = false }) => {
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
-            legend: isDashboard ? undefined : "Ciudad",
+            legend: isDashboard ? undefined : "Ubicación",
             legendPosition: "middle",
             legendOffset: 32,
           }}
@@ -76,6 +83,10 @@ const BarChart = ({ isDashboard = false }) => {
             legend: isDashboard ? undefined : "Cantidad",
             legendPosition: "middle",
             legendOffset: -40,
+            tickValues: data.length > 0
+              ? [...Array(Math.max(...data.map((d) => d.count)) + 1).keys()]
+              : undefined,
+            format: (value) => Math.round(value),
           }}
           enableLabel={false}
           labelSkipWidth={12}
@@ -87,7 +98,7 @@ const BarChart = ({ isDashboard = false }) => {
               anchor: "bottom-right",
               direction: "column",
               justify: false,
-              translateX: 120,
+              translateX: 50,
               translateY: 0,
               itemsSpacing: 2,
               itemWidth: 100,
@@ -99,10 +110,12 @@ const BarChart = ({ isDashboard = false }) => {
             },
           ]}
           role="application"
-          barAriaLabel={(e) => `${e.id}: ${e.formattedValue} en ciudad: ${e.indexValue}`}
+          barAriaLabel={(e) =>
+            `${e.id}: ${e.formattedValue} en ubicación: ${e.indexValue}`
+          }
         />
       )}
-    </>
+    </div>
   );
 };
 
