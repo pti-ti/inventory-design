@@ -61,7 +61,7 @@ const BarChart = ({ isDashboard = false }) => {
           keys={["count"]}
           indexBy="city"
           margin={{ top: 50, right: 50, bottom: 50, left: 60 }}
-          padding={0.3}
+          padding={0.6}
           valueScale={{ type: "linear" }}
           indexScale={{ type: "band", round: true }}
           colors={(bar) => darkColors[bar.index % darkColors.length]}
@@ -105,7 +105,7 @@ const BarChart = ({ isDashboard = false }) => {
               itemHeight: 20,
               itemDirection: "left-to-right",
               itemOpacity: 0.85,
-              symbolSize: 20,
+              symbolSize: 10,
               effects: [{ on: "hover", style: { itemOpacity: 1 } }],
             },
           ]}

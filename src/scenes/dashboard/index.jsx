@@ -15,6 +15,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
+import DonutChart from "../../components/DonutChart";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -107,6 +108,14 @@ const Dashboard = () => {
     console.log("Ubicaciones obtenidas:", deviceLocationCounts);
   }, [deviceLocationCounts]);
 
+  const transformDataForDonutChart = (data) => {
+    return Object.entries(data).map(([type, count]) => ({
+      label: type, 
+      value: count, 
+    }));
+  };
+  
+
   return (
     <Box m="20px">
       {/* HEADER */}
@@ -151,94 +160,113 @@ const Dashboard = () => {
         </Box>
 
         {/* DISPOSITIVOS POR ESTADO */}
-        <Box gridColumn="span 12">
-          <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
-            Dispositivos organizados por estado
+        <Box 
+          gridColumn="span 6" 
+          backgroundColor={colors.primary[400]} 
+          p="20px" 
+          borderRadius="8px"
+          sx={{
+            width: "700px",
+            height: "350px", 
+            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
+          }}
+        >
+          <Typography 
+                variant="h5" 
+                fontWeight="600" 
+                color={colors.grey[100]} 
+                sx={{ 
+                  alignSelf: "flex-start",
+                  textAlign: "left",
+                  marginLeft: "190px",
+                  marginBottom: "5px"
+                }}
+              >
+                Dispositivos organizados por estado
+              </Typography> 
+          <Typography variant="h5" fontWeight="600" sx={{ marginBottom: "5px" }}>
+           
           </Typography>
+          {deviceStatus && Object.keys(deviceStatus).length > 0 ? (
+            <DonutChart data={deviceStatus} />
+          ) : (
+            <Typography color="red">No hay datos disponibles</Typography>
+          )}
         </Box>
 
-        {deviceStatus && Object.keys(deviceStatus).length > 0 ? (
-          Object.entries(deviceStatus).map(([status, count], index) => (
-            <Box
-              key={index}
-              gridColumn="span 1"
-              backgroundColor={colors.primary[400]}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              p="5px"
-              borderRadius="8px"
-            >
-              {status === "Disponible" && <CheckCircleIcon sx={{ fontSize: 20, color: colors.primary[100], mb: 1 }} />}
-              {status === "Entregado" && <VolunteerActivismIcon sx={{ fontSize: 20, color: colors.primary[100], mb: 1 }} />}
-              {status === "Mantenimiento" && <BuildIcon sx={{ fontSize: 20, color: colors.primary[100], mb: 1 }} />}
-              {status === "No disponible" && <BlockIcon sx={{ fontSize: 20, color: colors.primary[100], mb: 1 }} />}
-
-              <StatBox title={count.toString()} subtitle={status} />
-            </Box>
-          ))
-        ) : (
-          <Typography color="red">No hay datos disponibles</Typography>
-        )}
 
         {/* DISPOSITIVOS POR TIPO */}
-        <Box gridColumn="span 12">
-          <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
-            Dispositivos organizados por tipo
+        <Box 
+          gridColumn="span 6" 
+          backgroundColor={colors.primary[400]} 
+          p="20px" 
+          borderRadius="8px"
+          sx={{
+            width: "700px",
+            height: "350px", 
+            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
+          }}
+        >
+          <Typography 
+                variant="h5" 
+                fontWeight="600" 
+                color={colors.grey[100]} 
+                sx={{ 
+                  alignSelf: "flex-start",
+                  textAlign: "left",
+                  marginLeft: "190px",
+                  marginBottom: "5px"
+                }}
+              >
+                Dispositivos organizados por tipo
+              </Typography> 
+          <Typography variant="h5" fontWeight="600" sx={{ marginBottom: "5px" }}>
           </Typography>
+          {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
+            <DonutChart data={deviceTypeCounts} />
+          ) : (
+            <Typography color="red">No hay datos disponibles</Typography>
+          )}
         </Box>
 
-        {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
-          Object.entries(deviceTypeCounts).map(([type, count], index) => (
-            <Box
-              key={index}
-              gridColumn="span 1"
-              backgroundColor={colors.primary[400]}
-              display="flex"
-              //flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              p="10px"
-              borderRadius="8px"
-
-            >
-              {type === "Laptop" && <LaptopMacIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
-              {type === "Monitor" && <MonitorIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
-              {type === "Teclado" && <KeyboardIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
-              {type === "Mouse" && <MouseIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
-              {type === "Auriculares" && <HeadsetIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
-              {type === "Impresora" && <PrintIcon sx={{ fontSize: 20, color: colors.grey[100], mb: 1 }} />}
-              <StatBox title={count.toString()} subtitle={type} />
-            </Box>
-          ))
-        ) : (
-          <Typography color="red">No hay datos disponibles</Typography>
-        )}
 
         {/* BARCHART */}
-        {/* Sección envolvente para forzar nueva línea */}
         <Box gridColumn="span 12">
           <Box
             gridColumn="span 8"
             gridRow="span 2"
-            backgroundColor={colors.primary[400]}
-            p="20px"
-            borderRadius="8px"
-            mt="20px" // Margen superior para separación
+            sx={{
+              backgroundColor: colors.primary[400],
+              padding: "20px",
+              borderRadius: "8px",
+              width: "700px",
+              height: "450px",
+              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
+              marginTop: "20px", // Separación superior
+            }}
           >
-            <Typography variant="h5" fontWeight="600" sx={{ marginBottom: "15px" }}>
-              Dispositivos organizados por ubicación
+            <Typography 
+                variant="h5" 
+                fontWeight="600" 
+                color={colors.grey[100]} 
+                sx={{ 
+                  alignSelf: "flex-start",
+                  textAlign: "left",
+                  marginLeft: "190px",
+                  marginBottom: "5px"
+                }}
+              >
+                Dispositivos organizados por tipo y ubicación
             </Typography>
-            <Box height="370px">
-              {deviceLocationCounts && Object.keys(deviceLocationCounts).length > 0 ? (
-                <BarChart data={transformLocationData(deviceLocationCounts)} />
-              ) : (
-                <Typography color="red">No hay datos disponibles</Typography>
-              )}
-            </Box>
+              <Box height="370px">
+                {deviceLocationTypeCounts && Object.keys(deviceLocationTypeCounts).length > 0 ? (
+                  <BarChart data={transformLocationData(deviceLocationTypeCounts)} />
+                ) : (
+                  <Typography color="red">No hay datos disponibles</Typography>
+                )}
+              </Box>
           </Box>
         </Box>
-
       </Box>
     </Box>
   );
