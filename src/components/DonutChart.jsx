@@ -1,21 +1,60 @@
 import React from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
-// Colores personalizados para cada estado
-const COLORS = ["#FF5733", "#FFC300", "#28B463", "#3498DB"];
+// Colores predefinidos para ciertos estados específicos
+const STATUS_COLORS = {
+  disponible: "#34a853", // Verde
+  laptop: "#4285f4",  // Azul
+};
+
+// Lista de colores primarios suaves
+const PRIMARY_COLORS = [
+  "#ea4335",
+  "#fbbc05", 
+  "#0fd9f1", "#705b96", "#ff914d", 
+];
+
+// Función para generar un color aleatorio si se acaban los colores primarios
+const getRandomColor = () => {
+  const letters = "89ABCDEF"; // Usamos tonos más suaves (evitando 0-7)
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * letters.length)];
+  }
+  return color;
+};
+
+// Función para asignar colores sin repetir
+const assignUniqueColors = (data) => {
+  let availableColors = [...PRIMARY_COLORS]; // Copia de colores disponibles
+  let colorMap = {}; // Mapa para rastrear colores asignados
+
+  return data.map(([name, value]) => {
+    const lowerName = name.toLowerCase();
+
+    // Si el estado ya tiene un color asignado, usarlo
+    if (colorMap[lowerName]) {
+      return { name, value, color: colorMap[lowerName] };
+    }
+
+    // Si el estado tiene un color predefinido, usarlo
+    let color = STATUS_COLORS[lowerName] || availableColors.shift() || getRandomColor();
+
+    // Asignar el color al estado y guardarlo en el mapa
+    colorMap[lowerName] = color;
+
+    return { name, value, color };
+  });
+};
 
 const DonutChart = ({ data }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Convertir el JSON en un array para el gráfico
-  const chartData = Object.entries(data).map(([name, value], index) => ({
-    name,
-    value,
-    color: COLORS[index % COLORS.length], // Asigna un color cíclicamente
-  }));
+  // Convertir JSON en array y asignar colores sin repetición
+  const chartData = assignUniqueColors(Object.entries(data));
 
   return (
     <Box

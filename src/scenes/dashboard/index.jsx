@@ -14,9 +14,10 @@ import HeadsetIcon from "@mui/icons-material/Headset";
 import PrintIcon from "@mui/icons-material/Print";
 import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
+import BarChartTypeLocation from "../../components/BarChartTypeLocation";
 import StatBox from "../../components/StatBox";
 import DonutChart from "../../components/DonutChart";
-import BarChartComponent from "../../components/PieChartComponent";
+import BarChartComponent from "../../components/BarChartTypeLocation";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -109,12 +110,7 @@ const Dashboard = () => {
     console.log("Ubicaciones obtenidas:", deviceLocationCounts);
   }, [deviceLocationCounts]);
 
-  const transformDataForDonutChart = (data) => {
-    return Object.entries(data).map(([type, count]) => ({
-      label: type,
-      value: count,
-    }));
-  };
+  
 
 
   return (
@@ -206,6 +202,7 @@ const Dashboard = () => {
             width: "700px",
             height: "350px",
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
+            marginLeft: "center"
           }}
         >
           <Typography
@@ -232,8 +229,6 @@ const Dashboard = () => {
 
 
         {/* GRÁFICOS DE DISPOSITIVOS POR UBICACIÓN Y POR TIPO Y UBICACIÓN */}
-        <Box gridColumn="span 12" display="flex" gap="15px">
-
           {/* DISPOSITIVOS POR UBICACIÓN */}
           <Box
             gridColumn="span 6"
@@ -241,7 +236,7 @@ const Dashboard = () => {
               backgroundColor: colors.primary[400],
               padding: "20px",
               borderRadius: "8px",
-              width: "50%",  // Ocupa la mitad del espacio disponible
+              width: "700px",
               height: "450px",
               boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
             }}
@@ -271,13 +266,14 @@ const Dashboard = () => {
           {/* DISPOSITIVOS POR TIPO Y UBICACIÓN */}
           <Box
             gridColumn="span 6"
+            backgroundColor={colors.primary[400]}
+            p="20px"
+            borderRadius="8px"
             sx={{
-              backgroundColor: colors.primary[400],
-              padding: "20px",
-              borderRadius: "8px",
-              width: "50%",  // Ocupa la otra mitad del espacio disponible
+              width: "700px",
               height: "450px",
-              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
+              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
+              
             }}
           >
             <Typography
@@ -301,10 +297,6 @@ const Dashboard = () => {
               )}
             </Box>
           </Box>
-
-        </Box>
-
-
       </Box>
     </Box>
   );
