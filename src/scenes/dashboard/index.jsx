@@ -16,6 +16,7 @@ import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import DonutChart from "../../components/DonutChart";
+import BarChartComponent from "../../components/PieChartComponent";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -78,26 +79,26 @@ const Dashboard = () => {
 
   const transformLocationData = (data) => {
     if (!data || Object.keys(data).length === 0) return [];
-  
+
     // Obtener todos los tipos de dispositivos únicos
     const deviceTypes = new Set();
     Object.values(data).forEach((devices) => {
       Object.keys(devices).forEach((type) => deviceTypes.add(type));
     });
-  
+
     // Transformar los datos en el formato adecuado
     return Object.entries(data).map(([location, devices]) => {
       const transformedEntry = { location };
-  
+
       // Asegurar que todos los tipos de dispositivos estén presentes
       deviceTypes.forEach((type) => {
         transformedEntry[type] = devices[type] || 0; // Si no hay datos, poner 0
       });
-  
+
       return transformedEntry;
     });
   };
-  
+
 
   // Cargar datos al montar el componente
   useEffect(() => {
@@ -110,11 +111,11 @@ const Dashboard = () => {
 
   const transformDataForDonutChart = (data) => {
     return Object.entries(data).map(([type, count]) => ({
-      label: type, 
-      value: count, 
+      label: type,
+      value: count,
     }));
   };
-  
+
 
   return (
     <Box m="20px">
@@ -160,32 +161,32 @@ const Dashboard = () => {
         </Box>
 
         {/* DISPOSITIVOS POR ESTADO */}
-        <Box 
-          gridColumn="span 6" 
-          backgroundColor={colors.primary[400]} 
-          p="20px" 
+        <Box
+          gridColumn="span 6"
+          backgroundColor={colors.primary[400]}
+          p="20px"
           borderRadius="8px"
           sx={{
             width: "700px",
-            height: "350px", 
+            height: "350px",
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
           }}
         >
-          <Typography 
-                variant="h5" 
-                fontWeight="600" 
-                color={colors.grey[100]} 
-                sx={{ 
-                  alignSelf: "flex-start",
-                  textAlign: "left",
-                  marginLeft: "190px",
-                  marginBottom: "5px"
-                }}
-              >
-                Dispositivos organizados por estado
-              </Typography> 
+          <Typography
+            variant="h5"
+            fontWeight="600"
+            color={colors.grey[100]}
+            sx={{
+              alignSelf: "flex-start",
+              textAlign: "left",
+              marginLeft: "190px",
+              marginBottom: "5px"
+            }}
+          >
+            Dispositivos organizados por estado
+          </Typography>
           <Typography variant="h5" fontWeight="600" sx={{ marginBottom: "5px" }}>
-           
+
           </Typography>
           {deviceStatus && Object.keys(deviceStatus).length > 0 ? (
             <DonutChart data={deviceStatus} />
@@ -196,30 +197,30 @@ const Dashboard = () => {
 
 
         {/* DISPOSITIVOS POR TIPO */}
-        <Box 
-          gridColumn="span 6" 
-          backgroundColor={colors.primary[400]} 
-          p="20px" 
+        <Box
+          gridColumn="span 6"
+          backgroundColor={colors.primary[400]}
+          p="20px"
           borderRadius="8px"
           sx={{
             width: "700px",
-            height: "350px", 
+            height: "350px",
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
           }}
         >
-          <Typography 
-                variant="h5" 
-                fontWeight="600" 
-                color={colors.grey[100]} 
-                sx={{ 
-                  alignSelf: "flex-start",
-                  textAlign: "left",
-                  marginLeft: "190px",
-                  marginBottom: "5px"
-                }}
-              >
-                Dispositivos organizados por tipo
-              </Typography> 
+          <Typography
+            variant="h5"
+            fontWeight="600"
+            color={colors.grey[100]}
+            sx={{
+              alignSelf: "flex-start",
+              textAlign: "left",
+              marginLeft: "190px",
+              marginBottom: "5px"
+            }}
+          >
+            Dispositivos organizados por tipo
+          </Typography>
           <Typography variant="h5" fontWeight="600" sx={{ marginBottom: "5px" }}>
           </Typography>
           {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
@@ -230,43 +231,80 @@ const Dashboard = () => {
         </Box>
 
 
-        {/* BARCHART */}
-        <Box gridColumn="span 12">
+        {/* GRÁFICOS DE DISPOSITIVOS POR UBICACIÓN Y POR TIPO Y UBICACIÓN */}
+        <Box gridColumn="span 12" display="flex" gap="15px">
+
+          {/* DISPOSITIVOS POR UBICACIÓN */}
           <Box
-            gridColumn="span 8"
-            gridRow="span 2"
+            gridColumn="span 6"
             sx={{
               backgroundColor: colors.primary[400],
               padding: "20px",
               borderRadius: "8px",
-              width: "700px",
+              width: "50%",  // Ocupa la mitad del espacio disponible
               height: "450px",
-              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
-              marginTop: "20px", // Separación superior
+              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
             }}
           >
-            <Typography 
-                variant="h5" 
-                fontWeight="600" 
-                color={colors.grey[100]} 
-                sx={{ 
-                  alignSelf: "flex-start",
-                  textAlign: "left",
-                  marginLeft: "190px",
-                  marginBottom: "5px"
-                }}
-              >
-                Dispositivos organizados por tipo y ubicación
+            <Typography
+              variant="h5"
+              fontWeight="600"
+              color={colors.grey[100]}
+              sx={{
+                alignSelf: "flex-start",
+                textAlign: "left",
+                marginLeft: "190px",
+                marginBottom: "5px"
+              }}
+            >
+              Dispositivos organizados por ubicación
             </Typography>
-              <Box height="370px">
-                {deviceLocationTypeCounts && Object.keys(deviceLocationTypeCounts).length > 0 ? (
-                  <BarChart data={transformLocationData(deviceLocationTypeCounts)} />
-                ) : (
-                  <Typography color="red">No hay datos disponibles</Typography>
-                )}
-              </Box>
+            <Box height="370px">
+              {deviceLocationTypeCounts && Object.keys(deviceLocationTypeCounts).length > 0 ? (
+                <BarChart data={transformLocationData(deviceLocationTypeCounts)} />
+              ) : (
+                <Typography color="red">No hay datos disponibles</Typography>
+              )}
+            </Box>
           </Box>
+
+          {/* DISPOSITIVOS POR TIPO Y UBICACIÓN */}
+          <Box
+            gridColumn="span 6"
+            sx={{
+              backgroundColor: colors.primary[400],
+              padding: "20px",
+              borderRadius: "8px",
+              width: "50%",  // Ocupa la otra mitad del espacio disponible
+              height: "450px",
+              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
+            }}
+          >
+            <Typography
+              variant="h5"
+              fontWeight="600"
+              color={colors.grey[100]}
+              sx={{
+                alignSelf: "flex-start",
+                textAlign: "left",
+                marginLeft: "190px",
+                marginBottom: "5px"
+              }}
+            >
+              Dispositivos organizados por ubicación y tipo
+            </Typography>
+            <Box height="370px">
+              {deviceLocationTypeCounts && Object.keys(deviceLocationTypeCounts).length > 0 ? (
+                <BarChartComponent data={transformLocationData(deviceLocationTypeCounts)} />
+              ) : (
+                <Typography color="red">No hay datos disponibles</Typography>
+              )}
+            </Box>
+          </Box>
+
         </Box>
+
+
       </Box>
     </Box>
   );
