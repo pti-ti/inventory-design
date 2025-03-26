@@ -8,14 +8,14 @@ const BarChartTypeLocation = ({ data }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Extraer todos los tipos de dispositivos únicos para las claves del gráfico
+  // Extraer todos los tipos de dispositivos únicos
   const deviceTypes = [...new Set(Object.values(data).flatMap((devices) => Object.keys(devices)))];
 
-  // Convertir el JSON en un array adecuado para @nivo/bar
+  // Transformar datos
   const chartData = Object.entries(data).map(([location, devices]) => {
-    const entry = { location }; // Se agrega la ubicación como clave
+    const entry = { location };
     deviceTypes.forEach((type) => {
-      entry[type] = devices[type] || 0; // Si no tiene ese dispositivo, se asigna 0
+      entry[type] = devices[type] || 0;
     });
     return entry;
   });
@@ -62,11 +62,10 @@ const BarChartTypeLocation = ({ data }) => {
           tickValues: Array.from(
             { length: Math.max(5, Math.ceil(Math.max(...chartData.flatMap(d => deviceTypes.map(type => d[type] || 0))))) },
             (_, i) => i + 1
-          ), // Solo valores enteros
+          ),
           tickLine: true,
         }}
 
-        // Asegurar líneas del grid y ejes
         enableGridX={true}
         enableGridY={true}
         gridYValues={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
@@ -84,41 +83,45 @@ const BarChartTypeLocation = ({ data }) => {
             translateX: 140,
             itemWidth: 120,
             itemHeight: 20,
-            itemTextColor: "#999",
+            itemTextColor: theme.palette.text.primary, // Usa el color del tema
             symbolSize: 20,
             symbolShape: "circle",
           },
         ]}
 
-        // Forzar visibilidad de ejes y grid
+        // Adaptar el estilo al tema
         theme={{
           axis: {
             domain: {
               line: {
-                stroke: "#777", // Color del eje
+                stroke: theme.palette.text.primary, // Color del eje
                 strokeWidth: 1,
               },
             },
             ticks: {
               line: {
-                stroke: "#777", // Color de las líneas de ticks
+                stroke: theme.palette.text.primary, // Color de las líneas de ticks
                 strokeWidth: 1,
               },
               text: {
-                fill: "#333", // Color del texto de los ticks
+                fill: theme.palette.text.primary, // Color del texto de los ticks
               },
             },
           },
           grid: {
             line: {
-              stroke: "#ddd", // Color de las líneas del grid
+              stroke: theme.palette.divider, // Color de las líneas del grid
               strokeWidth: 1,
-              strokeDasharray: "4 4", // Líneas punteadas para mayor visibilidad
+              strokeDasharray: "4 4",
+            },
+          },
+          labels: {
+            text: {
+              fill: theme.palette.text.primary, // Color del texto dentro del gráfico
             },
           },
         }}
       />
-
     </Box>
   );
 };
@@ -134,10 +137,8 @@ const Dashboard = () => {
           throw new Error("Error al obtener los datos");
         }
         const result = await response.json();
-
         console.log("Datos recibidos de la API:", result);
-
-        setData(result); // Guarda los datos sin transformar para el gráfico de barras
+        setData(result);
       } catch (error) {
         console.error("Error al cargar los datos:", error);
         setData(null);
@@ -149,12 +150,7 @@ const Dashboard = () => {
 
   return (
     <div>
-
-      {data ? (
-        <BarChartTypeLocation data={data} />
-      ) : (
-        <p>Cargando datos...</p>
-      )}
+      {data ? <BarChartTypeLocation data={data} /> : <p>Cargando datos...</p>}
     </div>
   );
 };

@@ -12,6 +12,7 @@ import KeyboardIcon from "@mui/icons-material/Keyboard";
 import MouseIcon from "@mui/icons-material/Mouse";
 import HeadsetIcon from "@mui/icons-material/Headset";
 import PrintIcon from "@mui/icons-material/Print";
+import TabletMacIcon from "@mui/icons-material/TabletMac";
 import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
 import BarChartTypeLocation from "../../components/BarChartTypeLocation";
@@ -37,6 +38,17 @@ const Dashboard = () => {
       currency: "COP",
       minimumFractionDigits: 0,
     }).format(value);
+  };
+
+  // Mapeo de dispositivos con su respectivo icono
+  const deviceIcons = {
+    Laptop: <LaptopMacIcon fontSize="large" />,
+    Monitor: <MonitorIcon fontSize="large" />,
+    Mouse: <MouseIcon fontSize="large" />,
+    Impresora: <PrintIcon fontSize="large" />,
+    Auriculares: <HeadsetIcon fontSize="large" />,
+    Teclado: <KeyboardIcon fontSize="large" />,
+    Ipad: <TabletMacIcon fontSize="large" />,
   };
 
   // Función para obtener datos
@@ -110,7 +122,7 @@ const Dashboard = () => {
     console.log("Ubicaciones obtenidas:", deviceLocationCounts);
   }, [deviceLocationCounts]);
 
-  
+
 
 
   return (
@@ -132,29 +144,98 @@ const Dashboard = () => {
         </Button>
       </Box>
 
-      {/* GRID & CHARTS */}
-      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="auto" gap="15px">
-        {/* VALOR TOTAL DEL INVENTARIO */}
-        <Box gridColumn="span 12">
-          <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
-            Valor Total del Inventario de TI
-          </Typography>
-        </Box>
+      {/* BOX - Dispositivos por tipo con icono */}
+      <Box
+        gridColumn="span 12"
+        backgroundColor={colors.primary[400]}
+        p="10px"
+        borderRadius="8px"
+        margin="auto"
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        sx={{
+          width: "100%",
+          height: "150px",
+          boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
+          marginBottom: "10px",
+        }}
+      >
+        <Typography
+          variant="h5"
+          fontWeight="600"
+          color={colors.grey[100]}
+          textAlign="center"
+          marginBottom="10px"
+        >
+          Dispositivos
+        </Typography>
 
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          gap="15px" /* Mayor espacio entre elementos */
+          width="100%"
+        >
+          {Object.entries(deviceTypeCounts).map(([type, count]) => (
+            <Box
+              key={type}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              p="10px"
+              width="100px"
+              height="100px"
+              backgroundColor={colors.blueAccent[700]}
+              borderRadius="8px"
+              sx={{ boxShadow: 2 }}
+            >
+              {/* Ajustar el tamaño del icono */}
+              {(deviceIcons[type] || <BlockIcon />)}
+              <Typography color={colors.grey[100]} sx={{ fontSize: 16 }}>
+                {type}
+              </Typography>
+              <Typography fontWeight="bold" color={colors[500]} sx={{ fontSize: 18 }}>
+                {count}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+
+
+      {/* GRID & CHARTS */}
+      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="auto" gap="13px">
+        {/* VALOR TOTAL DEL INVENTARIO */}
         <Box
           gridColumn="span 12"
           backgroundColor={colors.primary[400]}
           display="flex"
+          flexDirection="column"
           alignItems="center"
           justifyContent="center"
           p="20px"
           borderRadius="8px"
           sx={{ boxShadow: 3 }}
         >
-          <Typography variant="h4" fontWeight="bold" color={colors.greenAccent[500]} sx={{ textAlign: "center" }}>
+          {/* TÍTULO DENTRO DEL BOX */}
+          <Typography variant="h5" fontWeight="600" color={colors.grey[100]} sx={{ marginBottom: "10px" }}>
+            Valor Total del Inventario de TI
+          </Typography>
+
+          {/* VALOR DEL INVENTARIO */}
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            sx={{ textAlign: "center", color: (theme) => theme.palette.text.primary }}
+          >
             {totalInventoryValue !== null ? formatCurrencyCOP(totalInventoryValue) : "Cargando..."}
           </Typography>
         </Box>
+
 
         {/* DISPOSITIVOS POR ESTADO */}
         <Box
@@ -229,74 +310,74 @@ const Dashboard = () => {
 
 
         {/* GRÁFICOS DE DISPOSITIVOS POR UBICACIÓN Y POR TIPO Y UBICACIÓN */}
-          {/* DISPOSITIVOS POR UBICACIÓN */}
-          <Box
-            gridColumn="span 6"
+        {/* DISPOSITIVOS POR UBICACIÓN */}
+        <Box
+          gridColumn="span 6"
+          sx={{
+            backgroundColor: colors.primary[400],
+            padding: "20px",
+            borderRadius: "8px",
+            width: "700px",
+            height: "450px",
+            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
+          }}
+        >
+          <Typography
+            variant="h5"
+            fontWeight="600"
+            color={colors.grey[100]}
             sx={{
-              backgroundColor: colors.primary[400],
-              padding: "20px",
-              borderRadius: "8px",
-              width: "700px",
-              height: "450px",
-              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
+              alignSelf: "flex-start",
+              textAlign: "left",
+              marginLeft: "190px",
+              marginBottom: "5px"
             }}
           >
-            <Typography
-              variant="h5"
-              fontWeight="600"
-              color={colors.grey[100]}
-              sx={{
-                alignSelf: "flex-start",
-                textAlign: "left",
-                marginLeft: "190px",
-                marginBottom: "5px"
-              }}
-            >
-              Dispositivos organizados por ubicación
-            </Typography>
-            <Box height="370px">
-              {deviceLocationTypeCounts && Object.keys(deviceLocationTypeCounts).length > 0 ? (
-                <BarChart data={transformLocationData(deviceLocationTypeCounts)} />
-              ) : (
-                <Typography color="red">No hay datos disponibles</Typography>
-              )}
-            </Box>
+            Dispositivos organizados por ubicación
+          </Typography>
+          <Box height="370px">
+            {deviceLocationTypeCounts && Object.keys(deviceLocationTypeCounts).length > 0 ? (
+              <BarChart data={transformLocationData(deviceLocationTypeCounts)} />
+            ) : (
+              <Typography color="red">No hay datos disponibles</Typography>
+            )}
           </Box>
+        </Box>
 
-          {/* DISPOSITIVOS POR TIPO Y UBICACIÓN */}
-          <Box
-            gridColumn="span 6"
-            backgroundColor={colors.primary[400]}
-            p="20px"
-            borderRadius="8px"
+        {/* DISPOSITIVOS POR TIPO Y UBICACIÓN */}
+        <Box
+          gridColumn="span 6"
+          backgroundColor={colors.primary[400]}
+          p="20px"
+          borderRadius="8px"
+          sx={{
+            width: "700px",
+            height: "450px",
+            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
+
+          }}
+        >
+          <Typography
+            variant="h5"
+            fontWeight="600"
+            color={colors.grey[100]}
             sx={{
-              width: "700px",
-              height: "450px",
-              boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
-              
+              alignSelf: "flex-start",
+              textAlign: "left",
+              marginLeft: "190px",
+              marginBottom: "5px"
             }}
           >
-            <Typography
-              variant="h5"
-              fontWeight="600"
-              color={colors.grey[100]}
-              sx={{
-                alignSelf: "flex-start",
-                textAlign: "left",
-                marginLeft: "190px",
-                marginBottom: "5px"
-              }}
-            >
-              Dispositivos organizados por ubicación y tipo
-            </Typography>
-            <Box height="370px">
-              {deviceLocationTypeCounts && Object.keys(deviceLocationTypeCounts).length > 0 ? (
-                <BarChartComponent data={transformLocationData(deviceLocationTypeCounts)} />
-              ) : (
-                <Typography color="red">No hay datos disponibles</Typography>
-              )}
-            </Box>
+            Dispositivos organizados por ubicación y tipo
+          </Typography>
+          <Box height="370px">
+            {deviceLocationTypeCounts && Object.keys(deviceLocationTypeCounts).length > 0 ? (
+              <BarChartComponent data={transformLocationData(deviceLocationTypeCounts)} />
+            ) : (
+              <Typography color="red">No hay datos disponibles</Typography>
+            )}
           </Box>
+        </Box>
       </Box>
     </Box>
   );
