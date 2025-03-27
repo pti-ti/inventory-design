@@ -1,48 +1,45 @@
 import { Box, IconButton, useTheme } from "@mui/material";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import logoClaro from "../../assets/logoClaro.png";
 import logoOscuro from "../../assets/logoOscuro.png";
 
-const Topbar = ({ onSearch }) => {
+const Topbar = ({ isSidebarOpen }) => {
     const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
     const colorMode = useContext(ColorModeContext);
-    const [searchTerm, setSearchTerm] = useState("");
 
     const logo = theme.palette.mode === "dark" ? logoClaro : logoOscuro;
-
-    const handleSearch = () => {
-        if (onSearch) {
-            onSearch(searchTerm);
-        }
-    };
 
     return (
         <Box
             display="flex"
             alignItems="center"
-            justifyContent="space-between" // Distribuye los elementos a los extremos
-            flexDirection={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
             p={{ xs: 1, sm: 2 }}
             sx={{
-                maxWidth: "1920px",
-                maxHeight: "1080px",
-                transform: {
-                    xs: "scale(1)", // Normal en móviles
-                    sm: "scale(1)", // Normal en pantallas pequeñas
-                    md: "scale(0.95)", // Se encoge en laptops 1920x1200
-                    lg: "scale(0.9)", // Se reduce en pantallas más grandes
-                },
-                transformOrigin: "top",
-                overflow: "hidden",
+                width: "100%",
+                position: "fixed", // 🔹 Fijo en la parte superior
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: 1100, // 🔹 Debajo del Sidebar para no superponerse
+                boxShadow: "none", // 🔹 Sin sombra
+                backgroundColor: "transparent", // 🔹 Fondo completamente transparente
             }}
         >
-            {/* ICONO DEL TEMA (A LA IZQUIERDA) */}
-            <Box>
-                <IconButton onClick={colorMode.toggleColorMode} sx={{ ml: "-5px" }}>
+            {/* ICONO DEL TEMA */}
+            <Box
+                sx={{
+                    position: "fixed",
+                    top: "15px",
+                    left: isSidebarOpen ? "220px" : "90px", // 🔹 Se ajusta con el sidebar
+                    transition: "left 0.3s ease-in-out",
+                    zIndex: 1200,
+                }}
+            >
+                <IconButton onClick={colorMode.toggleColorMode}>
                     {theme.palette.mode === "dark" ? (
                         <DarkModeOutlinedIcon />
                     ) : (
@@ -50,16 +47,24 @@ const Topbar = ({ onSearch }) => {
                     )}
                 </IconButton>
             </Box>
-    
-            {/* LOGO (A LA DERECHA) */}
-            <Box ml="auto">
+
+            {/* LOGO */}
+            <Box
+                sx={{
+                    position: "fixed",
+                    top: "10px",
+                    right: "20px", // 🔹 Se mantiene en la esquina derecha
+                    transition: "right 0.3s ease-in-out",
+                    zIndex: 1200,
+                }}
+            >
                 <img
                     src={logo}
                     alt="Logo"
                     style={{
                         height: "auto",
                         width: "100%",
-                        maxWidth: "150px",
+                        maxWidth: "100px",
                     }}
                 />
             </Box>
