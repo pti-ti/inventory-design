@@ -122,28 +122,54 @@ const Dashboard = () => {
     console.log("Ubicaciones obtenidas:", deviceLocationCounts);
   }, [deviceLocationCounts]);
 
-
-
-
   return (
     <Box m="20px">
       {/* HEADER */}
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DASHBOARD" subtitle="Bienvenido al Inventario de TI" />
-        <Button
+      <Box m="20px">
+        {/* HEADER */}
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          flexDirection={{ xs: "column", sm: "row" }}
+          gap={{ xs: 2, sm: 0 }}
           sx={{
-            backgroundColor: colors.blueAccent[700],
-            color: colors.grey[100],
-            fontSize: "14px",
-            fontWeight: "bold",
-            padding: "10px 20px",
+            maxWidth: "85%",
+            maxHeight: "1080px",
+            transform: {
+              xs: "scale(1)",
+              sm: "scale(1)",
+              md: "scale(0.95)",
+              lg: "scale(0.9)",
+            },
+            transformOrigin: "top",
+            overflow: "hidden",
           }}
         >
-          <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-          Descargar Reportes
-        </Button>
-      </Box>
+          {/* El Header ocupa todo el espacio disponible */}
+          <Box flexGrow={1}>
+            <Header title="DASHBOARD" subtitle="Bienvenido al Inventario de TI" />
+          </Box>
 
+          {/* Contenedor del botón alineado a la derecha */}
+          <Box display="flex" justifyContent="flex-end">
+            <Button
+              sx={{
+                backgroundColor: colors.blueAccent[700],
+                color: colors.grey[100],
+                fontSize: { xs: "12px", sm: "14px" },
+                fontWeight: "bold",
+                padding: { xs: "8px 16px", sm: "10px 20px" },
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <DownloadOutlinedIcon sx={{ mr: { xs: "5px", sm: "10px" } }} />
+              Descargar Reportes
+            </Button>
+          </Box>
+        </Box>
+      </Box>
       {/* BOX - Dispositivos por tipo con icono */}
       <Box
         gridColumn="span 12"
@@ -175,7 +201,7 @@ const Dashboard = () => {
           display="flex"
           justifyContent="center"
           alignItems="center"
-          gap="15px" /* Mayor espacio entre elementos */
+          gap="10px"
           width="100%"
         >
           {Object.entries(deviceTypeCounts).map(([type, count]) => (
@@ -192,12 +218,12 @@ const Dashboard = () => {
               borderRadius="8px"
               sx={{ boxShadow: 2 }}
             >
-              {/* Ajustar el tamaño del icono */}
-              {(deviceIcons[type] || <BlockIcon />)}
-              <Typography color={colors.grey[100]} sx={{ fontSize: 16 }}>
+              {/* Corregido: Verificación de íconos */}
+              {deviceIcons[type] ? deviceIcons[type] : <BlockIcon fontSize="large" />}
+              <Typography color={colors.grey[100]} sx={{ fontSize: 12 }}>
                 {type}
               </Typography>
-              <Typography fontWeight="bold" color={colors[500]} sx={{ fontSize: 18 }}>
+              <Typography fontWeight="bold" color={colors.grey[100]} sx={{ fontSize: 14 }}>
                 {count}
               </Typography>
             </Box>
@@ -207,8 +233,9 @@ const Dashboard = () => {
 
 
 
+
       {/* GRID & CHARTS */}
-      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="auto" gap="13px">
+      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="auto" gap="10px">
         {/* VALOR TOTAL DEL INVENTARIO */}
         <Box
           gridColumn="span 12"
@@ -219,22 +246,28 @@ const Dashboard = () => {
           justifyContent="center"
           p="20px"
           borderRadius="8px"
-          sx={{ boxShadow: 3 }}
+          sx={{
+            width: "100%",
+            height: "150px",
+            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
+            marginBottom: "10px", // Eliminado marginLeft innecesario
+          }}
         >
-          {/* TÍTULO DENTRO DEL BOX */}
           <Typography variant="h5" fontWeight="600" color={colors.grey[100]} sx={{ marginBottom: "10px" }}>
             Valor Total del Inventario de TI
           </Typography>
 
-          {/* VALOR DEL INVENTARIO */}
           <Typography
             variant="h4"
             fontWeight="bold"
-            sx={{ textAlign: "center", color: (theme) => theme.palette.text.primary }}
+            color={colors.grey[100]}
+            sx={{ textAlign: "center" }}
           >
-            {totalInventoryValue !== null ? formatCurrencyCOP(totalInventoryValue) : "Cargando..."}
+            {totalInventoryValue ? formatCurrencyCOP(totalInventoryValue) : "Cargando..."}
           </Typography>
         </Box>
+
+
 
 
         {/* DISPOSITIVOS POR ESTADO */}
@@ -244,7 +277,7 @@ const Dashboard = () => {
           p="20px"
           borderRadius="8px"
           sx={{
-            width: "700px",
+            width: "600px",
             height: "350px",
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
           }}
@@ -280,7 +313,7 @@ const Dashboard = () => {
           p="20px"
           borderRadius="8px"
           sx={{
-            width: "700px",
+            width: "600px",
             height: "350px",
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
             marginLeft: "center"
@@ -317,7 +350,7 @@ const Dashboard = () => {
             backgroundColor: colors.primary[400],
             padding: "20px",
             borderRadius: "8px",
-            width: "700px",
+            width: "600px",
             height: "450px",
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
           }}
@@ -351,7 +384,7 @@ const Dashboard = () => {
           p="20px"
           borderRadius="8px"
           sx={{
-            width: "700px",
+            width: "600px",
             height: "450px",
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
 

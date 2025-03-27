@@ -5,7 +5,6 @@ import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import logoClaro from "../../assets/logoClaro.png";
 import logoOscuro from "../../assets/logoOscuro.png";
-//import SearchIcon from "@mui/icons-material/Search";
 
 const Topbar = ({ onSearch }) => {
     const theme = useTheme();
@@ -13,8 +12,7 @@ const Topbar = ({ onSearch }) => {
     const colorMode = useContext(ColorModeContext);
     const [searchTerm, setSearchTerm] = useState("");
 
-    const logo = theme.palette.mode === "dark" ? logoClaro :logoOscuro;
-
+    const logo = theme.palette.mode === "dark" ? logoClaro : logoOscuro;
 
     const handleSearch = () => {
         if (onSearch) {
@@ -23,10 +21,28 @@ const Topbar = ({ onSearch }) => {
     };
 
     return (
-        <Box display="flex" justifyContent="space-between" alignItems="center" p={2}>
-            {/* ICONOS */}
-            <Box display="flex" alignItems="center">
-                <IconButton onClick={colorMode.toggleColorMode}>
+        <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between" // Distribuye los elementos a los extremos
+            flexDirection={{ xs: "column", sm: "row" }}
+            p={{ xs: 1, sm: 2 }}
+            sx={{
+                maxWidth: "1920px",
+                maxHeight: "1080px",
+                transform: {
+                    xs: "scale(1)", // Normal en móviles
+                    sm: "scale(1)", // Normal en pantallas pequeñas
+                    md: "scale(0.95)", // Se encoge en laptops 1920x1200
+                    lg: "scale(0.9)", // Se reduce en pantallas más grandes
+                },
+                transformOrigin: "top",
+                overflow: "hidden",
+            }}
+        >
+            {/* ICONO DEL TEMA (A LA IZQUIERDA) */}
+            <Box>
+                <IconButton onClick={colorMode.toggleColorMode} sx={{ ml: "-5px" }}>
                     {theme.palette.mode === "dark" ? (
                         <DarkModeOutlinedIcon />
                     ) : (
@@ -34,10 +50,18 @@ const Topbar = ({ onSearch }) => {
                     )}
                 </IconButton>
             </Box>
-
-            {/* LOGO EN LA ESQUINA SUPERIOR DERECHA */}
-            <Box>
-            <img src={logo} alt="Logo" style={{ height: 50, width: "auto" }} />
+    
+            {/* LOGO (A LA DERECHA) */}
+            <Box ml="auto">
+                <img
+                    src={logo}
+                    alt="Logo"
+                    style={{
+                        height: "auto",
+                        width: "100%",
+                        maxWidth: "150px",
+                    }}
+                />
             </Box>
         </Box>
     );
