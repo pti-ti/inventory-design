@@ -18,8 +18,10 @@ import {
 import { AuthContext } from "../../context/AuthContext";
 
 const SidebarItem = ({ title, to, icon, isSidebarOpen }) => (
-  <MenuItem icon={icon} component={Link} to={to}>
-    {isSidebarOpen && <Typography>{title}</Typography>}
+  <MenuItem icon={icon}>
+    <Link to={to} style={{ textDecoration: "none", color: "inherit" }}>
+      {isSidebarOpen && <Typography>{title}</Typography>}
+    </Link>
   </MenuItem>
 );
 

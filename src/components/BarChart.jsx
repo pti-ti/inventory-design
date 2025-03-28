@@ -41,7 +41,7 @@ const BarChart = ({ isDashboard = false }) => {
   ];
 
   return (
-    <div style={{ maxWidth: "800px", height: "400px", margin: "0 auto" }}>
+    <div style={{ maxWidth: "600px", height: "350px", margin: "0 auto" }}>
       {data.length === 0 ? (
         <p>Cargando datos...</p>
       ) : (
@@ -57,6 +57,15 @@ const BarChart = ({ isDashboard = false }) => {
               },
             },
             legends: { text: { fill: colors.grey[100] } },
+            tooltip: {
+              container: {
+                background: colors.grey[100], // Mantiene un fondo oscuro en modo oscuro
+                color: colors.grey[900], // Mantiene el texto en color oscuro SIEMPRE
+                borderRadius: "4px",
+                border: `1px solid ${colors.grey[300]}`,
+                boxShadow: "0px 4px 10px rgba(0,0,0,0.2)",
+              }
+            }
           }}
           keys={["count"]}
           indexBy="city"
@@ -71,7 +80,7 @@ const BarChart = ({ isDashboard = false }) => {
           axisBottom={{
             tickSize: 5,
             tickPadding: 5,
-            tickRotation: 0,
+            tickRotation: -20,
             legend: isDashboard ? undefined : "",
             legendPosition: "middle",
             legendOffset: 32,
@@ -114,6 +123,7 @@ const BarChart = ({ isDashboard = false }) => {
             `${e.id}: ${e.formattedValue} en ubicación: ${e.indexValue}`
           }
         />
+
       )}
     </div>
   );

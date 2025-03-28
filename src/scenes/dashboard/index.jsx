@@ -112,6 +112,8 @@ const Dashboard = () => {
     });
   };
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
 
   // Cargar datos al montar el componente
   useEffect(() => {
@@ -164,7 +166,7 @@ const Dashboard = () => {
                 alignItems: "center",
               }}
             >
-              <DownloadOutlinedIcon sx={{ mr: { xs: "5px", sm: "10px" } }} />
+              <DownloadOutlinedIcon sx={{ mr: { xs: "15px", sm: "10px" } }} />
               Descargar Reportes
             </Button>
           </Box>
@@ -181,7 +183,8 @@ const Dashboard = () => {
         flexDirection="column"
         justifyContent="center"
         sx={{
-          width: "100%",
+          width: isSidebarOpen ? "calc(100% - 260px)" : "calc(100% - 70px)",
+          transition: "width 0.3s ease-in-out",
           height: "150px",
           boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
           marginBottom: "10px",
@@ -247,10 +250,11 @@ const Dashboard = () => {
           p="20px"
           borderRadius="8px"
           sx={{
-            width: "100%",
-            height: "150px",
+            width: isSidebarOpen ? "1150px" : "1700px",
+            height: "100px",
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
             marginBottom: "10px", // Eliminado marginLeft innecesario
+            margin: "0 auto", // Centrado automático horizontalmente
           }}
         >
           <Typography variant="h5" fontWeight="600" color={colors.grey[100]} sx={{ marginBottom: "10px" }}>
@@ -279,7 +283,8 @@ const Dashboard = () => {
           sx={{
             width: "600px",
             height: "350px",
-            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
+            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
+            margin: "0 auto", // Centrado horizontal
           }}
         >
           <Typography
@@ -287,24 +292,20 @@ const Dashboard = () => {
             fontWeight="600"
             color={colors.grey[100]}
             sx={{
-              alignSelf: "flex-start",
-              textAlign: "left",
-              marginLeft: "190px",
-              marginBottom: "5px"
+              alignSelf: "center", // Centrar título
+              textAlign: "center",
+              marginBottom: "5px",
             }}
           >
             Dispositivos organizados por estado
           </Typography>
-          <Typography variant="h5" fontWeight="600" sx={{ marginBottom: "5px" }}>
 
-          </Typography>
           {deviceStatus && Object.keys(deviceStatus).length > 0 ? (
             <DonutChart data={deviceStatus} />
           ) : (
             <Typography color="red">No hay datos disponibles</Typography>
           )}
         </Box>
-
 
         {/* DISPOSITIVOS POR TIPO */}
         <Box
@@ -315,8 +316,8 @@ const Dashboard = () => {
           sx={{
             width: "600px",
             height: "350px",
-            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
-            marginLeft: "center"
+            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
+            margin: "0 auto", // Centrado horizontal
           }}
         >
           <Typography
@@ -324,16 +325,14 @@ const Dashboard = () => {
             fontWeight="600"
             color={colors.grey[100]}
             sx={{
-              alignSelf: "flex-start",
-              textAlign: "left",
-              marginLeft: "190px",
-              marginBottom: "5px"
+              alignSelf: "center", // Centrar título
+              textAlign: "center",
+              marginBottom: "5px",
             }}
           >
             Dispositivos organizados por tipo
           </Typography>
-          <Typography variant="h5" fontWeight="600" sx={{ marginBottom: "5px" }}>
-          </Typography>
+
           {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
             <DonutChart data={deviceTypeCounts} />
           ) : (
@@ -341,9 +340,7 @@ const Dashboard = () => {
           )}
         </Box>
 
-
         {/* GRÁFICOS DE DISPOSITIVOS POR UBICACIÓN Y POR TIPO Y UBICACIÓN */}
-        {/* DISPOSITIVOS POR UBICACIÓN */}
         <Box
           gridColumn="span 6"
           sx={{
@@ -351,8 +348,9 @@ const Dashboard = () => {
             padding: "20px",
             borderRadius: "8px",
             width: "600px",
-            height: "450px",
+            height: "400px",
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
+            margin: "0 auto", // Centrado horizontal
           }}
         >
           <Typography
@@ -360,9 +358,9 @@ const Dashboard = () => {
             fontWeight="600"
             color={colors.grey[100]}
             sx={{
-              alignSelf: "flex-start",
+              alignSelf: "center",
               textAlign: "left",
-              marginLeft: "190px",
+              marginLeft: "150px",
               marginBottom: "5px"
             }}
           >
@@ -385,8 +383,9 @@ const Dashboard = () => {
           borderRadius="8px"
           sx={{
             width: "600px",
-            height: "450px",
+            height: "400px",
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
+            margin: "0 auto", // Centrado horizontal
 
           }}
         >
@@ -395,9 +394,9 @@ const Dashboard = () => {
             fontWeight="600"
             color={colors.grey[100]}
             sx={{
-              alignSelf: "flex-start",
+              alignSelf: "center",
               textAlign: "left",
-              marginLeft: "190px",
+              marginLeft: "150px",
               marginBottom: "5px"
             }}
           >

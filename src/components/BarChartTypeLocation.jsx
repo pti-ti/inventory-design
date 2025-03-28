@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ResponsiveBar } from "@nivo/bar";
-import { Box, useTheme } from "@mui/material";
-import axios from "axios";
+import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
 const BarChartTypeLocation = ({ data }) => {
@@ -21,16 +20,7 @@ const BarChartTypeLocation = ({ data }) => {
   });
 
   return (
-    <Box
-      p="16px"
-      backgroundColor={colors.primary[400]}
-      borderRadius="8px"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      width="100%"
-      height="400px"
-    >
+    <div style={{ width: "100%", height: "380px" }}>
       <ResponsiveBar
         data={chartData}
         keys={deviceTypes}
@@ -39,12 +29,26 @@ const BarChartTypeLocation = ({ data }) => {
         padding={0.3}
         colors={{ scheme: "category10" }}
         borderColor={{ from: "color", modifiers: [["darker", 1.6]] }}
-
+        tooltip={({ id, value, indexValue }) => (
+          <div
+            style={{
+              background: colors.grey[100],
+              color: colors.grey[900],
+              padding: "8px",
+              borderRadius: "4px",
+              boxShadow: "0px 4px 10px rgba(0,0,0,0.2)",
+              border: `1px solid ${colors.grey[300]}`,
+            }}
+          >
+            <strong>{id}</strong>: {value} en <strong>{indexValue}</strong>
+          </div>
+        )}
+        
         // Eje X (Ubicación)
         axisBottom={{
           tickSize: 5,
           tickPadding: 5,
-          tickRotation: -25,
+          tickRotation: -20,
           legend: "",
           legendPosition: "middle",
           legendOffset: 40,
@@ -59,17 +63,13 @@ const BarChartTypeLocation = ({ data }) => {
           legend: "Cantidad de Dispositivos",
           legendPosition: "middle",
           legendOffset: -50,
-          tickValues: Array.from(
-            { length: Math.max(5, Math.ceil(Math.max(...chartData.flatMap(d => deviceTypes.map(type => d[type] || 0))))) },
-            (_, i) => i + 1
-          ),
+          tickValues: 10,
           tickLine: true,
         }}
 
         enableGridX={true}
         enableGridY={true}
         gridYValues={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-
         enableLabel={true}
         labelSkipWidth={12}
         labelSkipHeight={12}
@@ -83,46 +83,45 @@ const BarChartTypeLocation = ({ data }) => {
             translateX: 140,
             itemWidth: 120,
             itemHeight: 20,
-            itemTextColor: theme.palette.text.primary, // Usa el color del tema
+            itemTextColor: theme.palette.text.primary,
             symbolSize: 20,
             symbolShape: "circle",
           },
         ]}
 
-        // Adaptar el estilo al tema
         theme={{
           axis: {
             domain: {
               line: {
-                stroke: theme.palette.text.primary, // Color del eje
+                stroke: theme.palette.text.primary,
                 strokeWidth: 1,
               },
             },
             ticks: {
               line: {
-                stroke: theme.palette.text.primary, // Color de las líneas de ticks
+                stroke: theme.palette.text.primary,
                 strokeWidth: 1,
               },
               text: {
-                fill: theme.palette.text.primary, // Color del texto de los ticks
+                fill: theme.palette.text.primary,
               },
             },
           },
           grid: {
             line: {
-              stroke: theme.palette.divider, // Color de las líneas del grid
+              stroke: theme.palette.divider,
               strokeWidth: 1,
               strokeDasharray: "4 4",
             },
           },
           labels: {
             text: {
-              fill: theme.palette.text.primary, // Color del texto dentro del gráfico
+              fill: theme.palette.text.primary,
             },
           },
         }}
       />
-    </Box>
+    </div>
   );
 };
 
@@ -148,11 +147,7 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  return (
-    <div>
-      {data ? <BarChartTypeLocation data={data} /> : <p>Cargando datos...</p>}
-    </div>
-  );
+  return <div>{data ? <BarChartTypeLocation data={data} /> : <p>Cargando datos...</p>}</div>;
 };
 
 export default Dashboard;
