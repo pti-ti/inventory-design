@@ -62,7 +62,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   return (
     <Box
       sx={{
-        width: isSidebarOpen ? "190px" : "70px", // Ajuste de las dimensiones del Sidebar
+        width: isSidebarOpen ? "195px" : "70px", // Ajuste de las dimensiones del Sidebar
         height: "150vh",
         transition: "width 0.3s ease-in-out",
         backgroundColor: colors.primary[1000],

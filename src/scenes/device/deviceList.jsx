@@ -9,6 +9,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import LaptopOutlinedIcon from "@mui/icons-material/LaptopOutlined";
 import DeviceModal from "./deviceModal";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
+import { exportDevices } from "../excel/exportDevices";
 
 const Device = () => {
   const theme = useTheme();
@@ -31,13 +32,13 @@ const Device = () => {
         console.error("No se encontró un token en localStorage");
         return;
       }
-      
+
       const response = await axios.get("http://localhost:8085/api/v1/admin/devices", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       console.log("Dispositivos obtenidos:", response.data);
-      
+
       const formattedDevices = response.data.map(device => ({
         ...device,
         id: device.id,
@@ -75,7 +76,7 @@ const Device = () => {
   };
 
   const handleUpdateDevice = async (deviceData) => {
-    
+
     try {
       const token = localStorage.getItem("token");
       const apiUrl = `http://localhost:8085/api/v1/admin/devices/${deviceData.id}`;
@@ -111,7 +112,7 @@ const Device = () => {
       await axios.delete(`http://localhost:8085/api/v1/admin/devices/${deviceToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       setSnackbarMessage("Dispositivo eliminado correctamente");
       setSnackbarSeverity("success");
       fetchData();
@@ -120,11 +121,11 @@ const Device = () => {
       setSnackbarMessage("Error al eliminar el dispositivo");
       setSnackbarSeverity("error");
     }
-  
+
     setSnackbarOpen(true);
     setOpenConfirmModal(false);
   };
-  
+
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("es-CO", {
@@ -141,10 +142,10 @@ const Device = () => {
     { field: "serial", headerName: "Serial", flex: 1, cellClassName: "name-column--cell" },
     { field: "specification", headerName: "Especificaciones", flex: 1, cellClassName: "name-column--cell" },
     { field: "type", headerName: "Tipo", flex: 1, cellClassName: "name-column--cell" },
-    { 
-      field: "price", 
-      headerName: "Precio", 
-      flex: 1, 
+    {
+      field: "price",
+      headerName: "Precio",
+      flex: 1,
       cellClassName: "name-column--cell",
       renderCell: (params) => formatPrice(params.value) // Aplicar formato a los precios
     },
@@ -171,7 +172,8 @@ const Device = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center"></Box>
-        <Header title="DISPOSITIVOS" subtitle="Búsqueda de los dispositivos de TI" />
+      <Header title="DISPOSITIVOS" subtitle="Búsqueda de los dispositivos de TI" />
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Button variant="contained" color="primary" onClick={() => {
           setSelectedDevice(null);
           setIsEditing(false);
@@ -179,7 +181,15 @@ const Device = () => {
         }} startIcon={<LaptopOutlinedIcon />}>
           Agregar Dispositivo
         </Button>
-        
+
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => exportDevices(rows)} // Pasa los datos como argumento
+        >
+          Exportar a Excel
+        </Button>
+      </Box>
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -197,11 +207,11 @@ const Device = () => {
       </Box>
 
       {/* Modal para registrar/editar dispositivo */}
-      <DeviceModal 
-        open={openModal} 
-        handleClose={() => setOpenModal(false)} 
-        device={selectedDevice} 
-        refreshDevices={fetchData} 
+      <DeviceModal
+        open={openModal}
+        handleClose={() => setOpenModal(false)}
+        device={selectedDevice}
+        refreshDevices={fetchData}
         handleRegister={handleRegisterDevice}
         handleUpdate={handleUpdateDevice}
         isEditing={isEditing}
