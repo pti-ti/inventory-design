@@ -52,13 +52,21 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
     navigate("/");
   };
 
+  // Función para extraer solo el nombre de usuario (antes del @)
+  const getUsername = (email) => {
+    if (!email) return "";
+    const [username] = email.split('@');  // Extrae el texto antes del '@'
+    return username;
+  };
+
   return (
     <Box
       sx={{
-        width: isSidebarOpen ? "260px" : "70px",
-        height: "100vh",
+        width: isSidebarOpen ? "190px" : "70px", // Ajuste de las dimensiones del Sidebar
+        height: "150vh",
         transition: "width 0.3s ease-in-out",
-        backgroundColor: colors.primary[400],
+        backgroundColor: colors.primary[1000],
+        boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
         display: "flex",
         flexDirection: "column",
         "& .pro-sidebar-inner": {
@@ -68,10 +76,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           backgroundColor: "transparent !important",
         },
         "& .pro-inner-item:hover": {
-          color: "#868dfb !important", // 🔹 Mantengo el hover en azul claro como antes
+          color: "#868dfb !important", // Mantengo el hover en azul claro como antes
         },
         "& .pro-menu-item.active": {
-          color: "#6870fa !important", // 🔹 Color del ítem activo en azul oscuro como lo tenías
+          color: "#6870fa !important", // Color del ítem activo en azul oscuro
         },
       }}
     >
@@ -81,18 +89,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           <MenuItem onClick={toggleSidebar} icon={<MenuIcon />} style={{ textAlign: "center" }}>
             {isSidebarOpen && <Typography variant="h6">Menú</Typography>}
           </MenuItem>
-
-          {/* Información del usuario */}
-          {user && isSidebarOpen && (
-            <Box mb="20px" textAlign="center">
-              <Typography variant="h6" color={colors.grey[100]} fontWeight="bold">
-                {user.username}
-              </Typography>
-              <Typography variant="body2" color={colors.greenAccent[500]}>
-                {roleLabels[user?.userType?.replace("ROLE_", "")] || "Sin rol"}
-              </Typography>
-            </Box>
-          )}
 
           {/* Sección de navegación */}
           {isSidebarOpen && (
@@ -112,6 +108,19 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             </Typography>
           )}
 
+          {/* Información del usuario debajo de Cerrar sesión */}
+          {user && isSidebarOpen && (
+            <Box mb="20px" textAlign="center" sx={{ padding: "10px" }}>
+              <Typography variant="h6" color={colors.grey[100]} fontWeight="bold">
+                {getUsername(user.username)} {/* Muestra solo la parte antes del '@' */}
+              </Typography>
+              <Typography variant="body2" color={colors.greenAccent[500]}>
+                {roleLabels[user?.userType?.replace("ROLE_", "")] || "Sin rol"}
+              </Typography>
+            </Box>
+          )}
+        
+          {/* Botón de cerrar sesión */}
           {user && (
             <MenuItem onClick={handleLogout} icon={<LogoutIcon />} style={{ color: "red" }}>
               {isSidebarOpen && <Typography>Cerrar Sesión</Typography>}

@@ -175,7 +175,7 @@ const Dashboard = () => {
       {/* BOX - Dispositivos por tipo con icono */}
       <Box
         gridColumn="span 12"
-        backgroundColor={colors.primary[400]}
+        backgroundColor={colors.primary[1000]}
         p="10px"
         borderRadius="8px"
         margin="auto"
@@ -242,7 +242,7 @@ const Dashboard = () => {
         {/* VALOR TOTAL DEL INVENTARIO */}
         <Box
           gridColumn="span 12"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[1000]}
           display="flex"
           flexDirection="column"
           alignItems="center"
@@ -277,7 +277,7 @@ const Dashboard = () => {
         {/* DISPOSITIVOS POR ESTADO */}
         <Box
           gridColumn="span 6"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[1000]}
           p="20px"
           borderRadius="8px"
           sx={{
@@ -310,7 +310,7 @@ const Dashboard = () => {
         {/* DISPOSITIVOS POR TIPO */}
         <Box
           gridColumn="span 6"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[1000]}
           p="20px"
           borderRadius="8px"
           sx={{
@@ -344,7 +344,7 @@ const Dashboard = () => {
         <Box
           gridColumn="span 6"
           sx={{
-            backgroundColor: colors.primary[400],
+            backgroundColor: colors.primary[1000],
             padding: "20px",
             borderRadius: "8px",
             width: "600px",
@@ -378,7 +378,7 @@ const Dashboard = () => {
         {/* DISPOSITIVOS POR TIPO Y UBICACIÓN */}
         <Box
           gridColumn="span 6"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[1000]}
           p="20px"
           borderRadius="8px"
           sx={{

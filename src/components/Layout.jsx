@@ -1,26 +1,31 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../scenes/global/Sidebar";
 import Topbar from "../scenes/global/Topbar";
-import { useState } from "react";
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Estado para abrir/cerrar el Sidebar
 
   return (
     <div className="app" style={{ display: "flex" }}>
-      {/* Sidebar con las dimensiones corregidas */}
-      <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      {/* Sidebar con dimensiones dinámicas */}
+      <Sidebar 
+        isSidebarOpen={isSidebarOpen} 
+        toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
+      />
 
       <main
         className="content"
         style={{
-          flex: 1, // 🔹 Para que el contenido ocupe todo el espacio restante
-          marginLeft: isSidebarOpen ? "1px" : "1px", // 🔹 Se ajusta el margen según el estado
-          transition: "margin-left 0.3s ease-in-out",
+          flex: 1, // Ocupa el resto del espacio disponible
+          marginLeft: isSidebarOpen ? "1px" : "1px", // Ajuste de margen según el estado del sidebar
+          transition: "margin-left 0.3s ease-in-out", // Transición suave para el cambio de margen
         }}
       >
-        {/* Topbar solo una vez */}
-        <Topbar isSidebarOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+        <Topbar
+          isSidebarOpen={isSidebarOpen}
+          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        />
         <Outlet />
       </main>
     </div>

@@ -59,7 +59,7 @@ const DonutChart = ({ data }) => {
   return (
     <Box
       p="px"
-      backgroundColor={colors.primary[400]}
+      backgroundColor={colors.primary[1000]}
       borderRadius="8px"
       display="flex"
       flexDirection="column"
