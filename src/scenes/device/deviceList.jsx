@@ -40,10 +40,16 @@ const Device = () => {
       console.log("Dispositivos obtenidos:", response.data);
 
       const formattedDevices = response.data.map(device => ({
-        ...device,
         id: device.id,
-        status: device.status?.name || "Desconocido",
-        location: device.location?.name || "No especificado",
+        code: device.code,
+        brand: device.brandName,  // Se cambia 'brand' por 'brandName'
+        model: device.modelName,  // Se cambia 'model' por 'modelName'
+        serial: device.serial,
+        type: device.type,
+        specification: device.specification,
+        location: device.locationName, // Se cambia 'location' por 'locationName'
+        status: device.statusName,  // Se cambia 'status' por 'statusName'
+        price: device.price
       }));
 
       setRows(formattedDevices);
@@ -138,7 +144,8 @@ const Device = () => {
   const columns = [
     { field: "id", headerName: "ID" },
     { field: "code", headerName: "Código", flex: 1, cellClassName: "name-column--cell" },
-    { field: "name", headerName: "Nombre", flex: 1, cellClassName: "name-column--cell" },
+    { field: "brand", headerName: "Marca", flex: 1, cellClassName: "name-column--cell" },
+    { field: "model", headerName: "Modelo", flex: 1, cellClassName: "name-column--cell" },
     { field: "serial", headerName: "Serial", flex: 1, cellClassName: "name-column--cell" },
     { field: "specification", headerName: "Especificaciones", flex: 1, cellClassName: "name-column--cell" },
     { field: "type", headerName: "Tipo", flex: 1, cellClassName: "name-column--cell" },

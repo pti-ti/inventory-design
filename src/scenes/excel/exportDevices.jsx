@@ -7,35 +7,31 @@ const exportDevices = (rows) => {
     return;
   }
 
+  // Formatear los datos para la exportación
   const exportData = rows.map((device) => ({
-    "ID": device.id,
-    "CÓDIGO": device.code,
-    "NOMBRE": device.name,
-    "SERIAL": device.serial,
-    "ESPECIFICACIONES": device.specification,
-    "TIPO": device.type,
-    "PRECIO": device.price,
-    "ESTADO": device.status,
-    "UBICACIÓN": device.location,
+    ID: device.id,
+    CÓDIGO: device.code,
+    NOMBRE: device.name,
+    SERIAL: device.serial,
+    ESPECIFICACIONES: device.specification,
+    TIPO: device.type,
+    PRECIO: new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+    }).format(device.price), // Formato de moneda
+    ESTADO: device.status,
+    UBICACIÓN: device.location,
   }));
 
-  const worksheet = XLSX.utils.json_to_sheet(exportData, { origin: "A2" });
-
-  // Agregar estilos a los encabezados (Cursiva)
-  const header = Object.keys(exportData[0]);
-  XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: "A1" });
-
-  // Aplicar estilos a los encabezados
-  header.forEach((col, index) => {
-    const cellRef = XLSX.utils.encode_cell({ r: 0, c: index });
-    if (!worksheet[cellRef]) worksheet[cellRef] = {};
-    worksheet[cellRef].s = { font: { italic: true } }; // Cursiva
-  });
-
-  // Crear libro de trabajo y exportar
+  // Crear hoja de cálculo
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+  
+  // Crear libro de trabajo y agregar la hoja de datos
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Dispositivos");
 
+  // Generar archivo Excel y descargarlo
   const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
   const data = new Blob([excelBuffer], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -43,3 +39,5 @@ const exportDevices = (rows) => {
 
   saveAs(data, "dispositivos.xlsx");
 };
+
+export { exportDevices };

@@ -7,9 +7,11 @@ import { tokens } from "../../theme";
 import {
   HomeOutlined as HomeIcon,
   CheckCircleOutline as CheckIcon,
+  LabelOutlined as LabelIcon,
   LocationOnOutlined as LocationIcon,
   MenuBookOutlined as BookIcon,
-  DevicesOtherOutlined as DevicesIcon,
+  DevicesOtherOutlined as DevicesOtherIcon,
+  Devices as DevicesIcon,
   PersonOutlined as PersonIcon,
   HandymanOutlined as ToolsIcon,
   LogoutOutlined as LogoutIcon,
@@ -39,7 +41,9 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
   const menuItems = [
     { title: "Dashboard", to: "/dashboard", icon: <HomeIcon /> },
-    { title: "Dispositivos", to: "/dispositivos", icon: <DevicesIcon /> },
+    { title: "Dispositivos", to: "/dispositivos", icon: <DevicesOtherIcon /> },
+    { title: "Marcas", to: "/marcas", icon: <LabelIcon /> },
+    { title: "Modelos", to: "/modelos", icon: <DevicesIcon /> },
     { title: "Usuarios", to: "/usuarios", icon: <PersonIcon /> },
     { title: "Ubicación", to: "/ubicaciones", icon: <LocationIcon /> },
     { title: "Estado", to: "/estados", icon: <CheckIcon /> },

@@ -8,6 +8,8 @@ import Device from "./scenes/device/deviceList";
 import User from "./scenes/user/userList";
 import Location from "./scenes/location/locationList";
 import Status from "./scenes/status/statusList";
+import Brand from "./scenes/brand/brandList";
+import Model from "./scenes/model/modelList";
 import Logbook from "./scenes/logbook/logbookList";
 import Maintenance from "./scenes/maintenance/maintenanceList";
 import UserRegister from "./scenes/form/UserRegister";
@@ -35,6 +37,8 @@ function App() {
           <Route path="/*" element={<Layout />}>
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="dispositivos" element={<Device />} />
+            <Route path="marcas" element={<Brand />} />
+            <Route path="modelos" element={<Model />} />
             <Route path="usuarios" element={<User />} />
             <Route path="ubicaciones" element={<Location />} />
             <Route path="estados" element={<Status />} />

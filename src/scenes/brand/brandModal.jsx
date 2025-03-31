@@ -6,22 +6,22 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import axios from "axios";
 
-const statusModal = ({ open, handleClose, status, refreshStatus }) => {
-    const isEditing = Boolean(status);
+const BrandModal = ({ open, handleClose, brand, refreshBrands }) => {
+    const isEditing = Boolean(brand);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
     // Valores iniciales del formulario
     const initialValues = {
-        name: status?.name || "",
+        name: brand?.name || "",
     };
 
     // Esquema de validación con Yup
     const validationSchema = yup.object().shape({
         name: yup.string()
             .required("Este campo es obligatorio")
-            .min(3, "El nombre debe tener al menos 3 caracteres")
+            .min(2, "El nombre debe tener al menos 2 caracteres")
             .matches(/^[a-zA-Z\s]+$/, "Solo se permiten letras y espacios"),
     });
 
@@ -32,41 +32,41 @@ const statusModal = ({ open, handleClose, status, refreshStatus }) => {
         setSnackbarOpen(true);
     };
 
-    // Crear un nuevo estado
-    const handleRegisterStatus = async (values, resetForm) => {
+    // Crear una nueva marca
+    const handleRegisterBrand = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.post("http://localhost:8085/api/v1/admin/status/create", 
+            await axios.post("http://localhost:8085/api/v1/admin/brands/create", 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            showSnackbar("Estado creado correctamente.");
-            refreshStatus();
+            showSnackbar("Marca creada correctamente.");
+            refreshBrands();
             resetForm();
             handleClose();
         } catch (error) {
-            console.error("Error al registrar el estado", error);
-            showSnackbar("Error al registrar el estado.", "error");
+            console.error("Error al registrar la marca", error);
+            showSnackbar("Error al registrar la marca.", "error");
         }
     };
 
-    // Actualizar un estado existente
-    const handleUpdateStatus = async (values, resetForm) => {
+    // Actualizar una marca existente
+    const handleUpdateBrand = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.put(`http://localhost:8085/api/v1/admin/status/${status.id}`, 
+            await axios.put(`http://localhost:8085/api/v1/admin/brands/${brand.id}`, 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            showSnackbar("Estado actualizado correctamente.");
-            refreshStatus();
+            showSnackbar("Marca actualizada correctamente.");
+            refreshBrands();
             resetForm();
             handleClose();
         } catch (error) {
-            console.error("Error al actualizar el estado", error);
-            showSnackbar("Error al actualizar el estado.", "error");
+            console.error("Error al actualizar la marca", error);
+            showSnackbar("Error al actualizar la marca.", "error");
         }
     };
 
@@ -85,7 +85,7 @@ const statusModal = ({ open, handleClose, status, refreshStatus }) => {
                     borderRadius: 2,
                 }}>
                     <Typography variant="h6">
-                        {isEditing ? "Editar Estado" : "Agregar Estado"}
+                        {isEditing ? "Editar Marca" : "Agregar Marca"}
                     </Typography>
 
                     <Formik 
@@ -93,8 +93,8 @@ const statusModal = ({ open, handleClose, status, refreshStatus }) => {
                         validationSchema={validationSchema} 
                         onSubmit={(values, { resetForm }) => {
                             isEditing 
-                                ? handleUpdateStatus(values, resetForm)
-                                : handleRegisterStatus(values, resetForm);
+                                ? handleUpdateBrand(values, resetForm)
+                                : handleRegisterBrand(values, resetForm);
                         }}
                     >
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
@@ -102,7 +102,7 @@ const statusModal = ({ open, handleClose, status, refreshStatus }) => {
                                 <TextField
                                     fullWidth
                                     margin="normal"
-                                    label="Nombre del Estado"
+                                    label="Nombre de la Marca"
                                     name="name"
                                     value={values.name}
                                     onChange={handleChange}
@@ -117,7 +117,7 @@ const statusModal = ({ open, handleClose, status, refreshStatus }) => {
                                     color="primary" 
                                     sx={{ mt: 2, width: "100%" }}
                                 >
-                                    {isEditing ? "Guardar Cambios" : "Agregar Estado"}
+                                    {isEditing ? "Guardar Cambios" : "Agregar Marca"}
                                 </Button>
                             </form>
                         )}
@@ -140,4 +140,4 @@ const statusModal = ({ open, handleClose, status, refreshStatus }) => {
     );
 };
 
-export default statusModal;
+export default BrandModal;

@@ -7,7 +7,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
     const isEditing = !!device;
     const [editedDevice, setEditedDevice] = useState({
         code: "",
-        name: "",
+        brand: "",
+        model: "",
         serial: "",
         specification: "",
         type: "",
@@ -29,7 +30,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                 setEditedDevice(prevDevice => ({
                     ...prevDevice,
                     code: device.code || "",
-                    name: device.name || "",
+                    name: device.brand || "",
+                    name: device.model || "",
                     serial: device.serial || "",
                     specification: device.specification || "",
                     type: device.type || "",
@@ -40,7 +42,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
             } else {
                 setEditedDevice({
                     code: "",
-                    name: "",
+                    brand: "",
+                    model: "",
                     serial: "",
                     specification: "",
                     type: "",
@@ -163,7 +166,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                 }}>
                     <Typography variant="h6">{isEditing ? "Editar Dispositivo" : "Registrar Dispositivo"}</Typography>
                     <TextField fullWidth margin="normal" label="Código" name="code" value={editedDevice.code} onChange={handleChange} disabled={isEditing} />
-                    <TextField fullWidth margin="normal" label="Nombre" name="name" value={editedDevice.name} onChange={handleChange} />
+                    <TextField fullWidth margin="normal" label="Marca" name="brand" value={editedDevice.name} onChange={handleChange} />
+                    <TextField fullWidth margin="normal" label="Modelo" name="model" value={editedDevice.name} onChange={handleChange} />
                     <TextField fullWidth margin="normal" label="Serial" name="serial" value={editedDevice.serial} onChange={handleChange} />
                     <TextField fullWidth margin="normal" label="Especificaciones" name="specification" value={editedDevice.specification} onChange={handleChange} />
                     <TextField fullWidth margin="normal" label="Tipo" name="type" value={editedDevice.type} onChange={handleChange} />
