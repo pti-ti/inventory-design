@@ -1,6 +1,6 @@
-import { 
-    Box, Button, Modal, TextField, Typography, MenuItem, 
-    Select, FormControl, InputLabel, Snackbar, Alert 
+import {
+    Box, Button, Modal, TextField, Typography, MenuItem,
+    Select, FormControl, InputLabel, Snackbar, Alert
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -9,7 +9,8 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const initialLogbookState = {
         id: "",
         deviceId: "",
-        deviceName: "",
+        deviceBrand: "",
+        deviceModel: "",
         userEmail: "",
         statusId: "",
         locationId: "",
@@ -21,6 +22,8 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [statuses, setStatuses] = useState([]);
+    const [brands, setBrands] = useState([]);
+    const [models, setModels] = useState([]);
     const [locations, setLocations] = useState([]);
 
     const isEditing = Boolean(editedLogbook.id);
@@ -30,13 +33,17 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             const fetchStatusesAndLocations = async () => {
                 try {
                     const token = localStorage.getItem("token");
-                    const [statusResponse, locationResponse] = await Promise.all([
+                    const [statusResponse, locationResponse, modelResponse, brandResponse] = await Promise.all([
                         axios.get("http://localhost:8085/api/v1/admin/status", { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get("http://localhost:8085/api/v1/admin/locations", { headers: { Authorization: `Bearer ${token}` } })
+                        axios.get("http://localhost:8085/api/v1/admin/locations", { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get("http://localhost:8085/api/v1/admin/brands", { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get("http://localhost:8085/api/v1/admin/models", { headers: { Authorization: `Bearer ${token}` } })
                     ]);
 
                     setStatuses(statusResponse.data);
                     setLocations(locationResponse.data);
+                    setBrands(brandResponse.data);
+                    setModels(modelResponse.data);
                 } catch (error) {
                     console.error("Error al obtener estados y ubicaciones", error);
                 }
@@ -47,21 +54,22 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     }, [open]);
 
     useEffect(() => {
-        if (logbook && open && statuses.length > 0 && locations.length > 0) {
+        if (logbook && open && statuses.length > 0 && locations.length > 0 && brands.length > 0 && models.length > 0) {
             setEditedLogbook({
                 id: logbook.id ?? "",
-                deviceId: logbook.deviceId ? logbook.deviceId.toString() : "",
-                deviceName: logbook.deviceName ?? "",
+                deviceId: logbook.deviceCode || "",
+                deviceBrand: logbook.deviceBrand || "",
+                deviceModel: logbook.deviceModel || "",
                 userEmail: logbook.userEmail ?? "",
-                statusId: statuses.find(s => s.name === logbook.statusName)?.id || "",  
-                locationId: locations.find(l => l.name === logbook.locationName)?.id || "",  
+                statusId: statuses.find(s => s.name === logbook.statusName)?.id?.toString() || "",
+                locationId: locations.find(l => l.name === logbook.locationName)?.id?.toString() || "",
                 note: logbook.note ?? "",
                 createdAt: logbook.createdAt ?? ""
             });
         } else if (!logbook) {
             setEditedLogbook(initialLogbookState);
         }
-    }, [logbook, open, statuses, locations]);
+    }, [logbook, open, statuses, locations, models, brands]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -77,9 +85,9 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
         try {
             const token = localStorage.getItem("token");
 
-            if (!editedLogbook.deviceId?.trim() || 
-                !editedLogbook.userId?.trim() || 
-                !editedLogbook.statusId || 
+            if (!editedLogbook.deviceId?.trim() ||
+                !editedLogbook.userId?.trim() ||
+                !editedLogbook.statusId ||
                 !editedLogbook.locationId) {
                 setErrorMessage("Todos los campos son obligatorios.");
                 return;
@@ -156,7 +164,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     borderRadius: 2,
                 }}>
                     <Typography variant="h6">{isEditing ? "Editar Bitácora" : "Registrar Bitácora"}</Typography>
-                    
+
                     {!isEditing && (
                         <>
                             <TextField
@@ -171,14 +179,10 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                             />
                         </>
                     )}
-                    
+
                     {isEditing && (
                         <>
-                            <TextField
-                                fullWidth margin="normal" label="Nombre del dispositivo"
-                                name="deviceName" value={editedLogbook.deviceName || ""}
-                                onChange={handleChange}
-                            />
+
                             <TextField
                                 fullWidth margin="normal" label="Email del Usuario"
                                 name="userEmail" value={editedLogbook.userEmail || ""}
@@ -186,6 +190,33 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                             />
                         </>
                     )}
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel>Marca</InputLabel>
+                        <Select
+                            name="deviceBrand"
+                            value={editedLogbook.deviceBrand || ""}
+                            onChange={handleChange}
+                        >
+                            {brands.map((brand) => (
+                                <MenuItem key={brand.id} value={brand.name}>{brand.name}</MenuItem>
+                                // Se usa brand.name como value en lugar de brand.id
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel>Modelo</InputLabel>
+                        <Select
+                            name="deviceModel"
+                            value={editedLogbook.deviceModel || ""}
+                            onChange={handleChange}
+                        >
+                            {models.map((model) => (
+                                <MenuItem key={model.id} value={model.name}>{model.name}</MenuItem>
+                                // Se usa model.name como value en lugar de model.id
+                            ))}
+                        </Select>
+                    </FormControl>
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Ubicación</InputLabel>
@@ -214,7 +245,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     </FormControl>
 
                     <TextField fullWidth margin="normal" label="Notas" name="note" value={editedLogbook.note || ""} onChange={handleChange} />
-                            
+
                     <Button fullWidth variant="contained" color="primary" onClick={isEditing ? handleUpdateLogbook : handleCreate} sx={{ mt: 2 }}>
                         {isEditing ? "Guardar Cambios" : "Registrar"}
                     </Button>
@@ -222,7 +253,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             </Modal>
 
             <Snackbar open={!!successMessage || !!errorMessage} autoHideDuration={4000} onClose={handleCloseSnackbar}
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
             >
                 <Alert onClose={handleCloseSnackbar} severity={successMessage ? "success" : "error"}>
                     {successMessage || errorMessage}
