@@ -11,7 +11,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
         deviceId: "",
         deviceBrand: "",
         deviceModel: "",
-        userEmail: "",
+        userId: "",  // Cambiado de userEmail a userId
         statusId: "",
         locationId: "",
         note: "",
@@ -37,7 +37,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                         axios.get("http://localhost:8085/api/v1/admin/status", { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get("http://localhost:8085/api/v1/admin/locations", { headers: { Authorization: `Bearer ${token}` } }),
                         axios.get("http://localhost:8085/api/v1/admin/brands", { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get("http://localhost:8085/api/v1/admin/models", { headers: { Authorization: `Bearer ${token}` } })
+                        axios.get("http://localhost:8085/api/v1/admin/models", { headers: { Authorization: `Bearer ${token}` } }),
                     ]);
 
                     setStatuses(statusResponse.data);
@@ -60,7 +60,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                 deviceId: logbook.deviceCode || "",
                 deviceBrand: brands.find(b => b.name === logbook.deviceBrand)?.id?.toString() || "",
                 deviceModel: models.find(m => m.name === logbook.deviceModel)?.id?.toString() || "",
-                userEmail: logbook.userEmail ?? "",
+                userId: logbook.userId ?? "",  // Usar userId en lugar de userEmail
                 statusId: statuses.find(s => s.name === logbook.statusName)?.id?.toString() || "",
                 locationId: locations.find(l => l.name === logbook.locationName)?.id?.toString() || "",
                 note: logbook.note ?? "",
@@ -85,14 +85,18 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
         try {
             const token = localStorage.getItem("token");
 
-            if (!editedLogbook.deviceId.trim() || !editedLogbook.statusId || !editedLogbook.locationId) {
+            if (!editedLogbook.deviceId.trim() || !editedLogbook.statusId || !editedLogbook.locationId || !editedLogbook.userId) {
                 setErrorMessage("Todos los campos son obligatorios.");
                 return;
             }
 
             const logbookData = {
+                device: { id: editedLogbook.deviceId },
+                brand: { id: editedLogbook.deviceBrand },
+                model: { id: editedLogbook.deviceModel },
                 status: { id: editedLogbook.statusId },
                 location: { id: editedLogbook.locationId },
+                user: { id: editedLogbook.userId },  // Cambiado de email a id
                 note: editedLogbook.note || ""
             };
 
@@ -104,9 +108,6 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                 );
                 setSuccessMessage("Bitácora actualizada correctamente.");
             } else {
-                logbookData.device = { id: editedLogbook.deviceId };
-                logbookData.user = { email: editedLogbook.userEmail };
-
                 await axios.post(
                     "http://localhost:8085/api/v1/admin/logbooks/register",
                     logbookData,
@@ -146,10 +147,10 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                         />
                     )}
 
+                    {/* Campo para ingresar el ID del usuario */}
                     <TextField
-                        fullWidth margin="normal" label="Email del Usuario"
-                        name="userEmail" value={editedLogbook.userEmail} onChange={handleChange}
-                        disabled={isEditing}
+                        fullWidth margin="normal" label="ID del Usuario"
+                        name="userId" value={editedLogbook.userId} onChange={handleChange}
                     />
 
                     <FormControl fullWidth margin="normal">
@@ -199,7 +200,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     </Button>
                 </Box>
             </Modal>
-            
+
             <Snackbar open={!!successMessage || !!errorMessage} autoHideDuration={4000} onClose={handleCloseSnackbar}
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
             >
