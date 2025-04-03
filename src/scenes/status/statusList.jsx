@@ -8,7 +8,7 @@ import {
   import Header from "../../components/Header";
   import EditIcon from "@mui/icons-material/Edit";
   import DeleteIcon from "@mui/icons-material/Delete";
-  import DonutLargeIcon from "@mui/icons-material/DonutLarge";
+  import AddIcon from "@mui/icons-material/Add";
   import StatusModal from "./statusModal";
   import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
   
@@ -118,7 +118,7 @@ import {
     return (
         <Box m="20px">
             <Header title="ESTADOS" subtitle="Gestión de los estados de los dispositivos de PTI" />
-            <Button variant="contained" color="primary" onClick={handleOpenAddModal} startIcon={<DonutLargeIcon />}>
+            <Button variant="contained" color="primary" onClick={handleOpenAddModal} startIcon={<AddIcon />}>
                 Agregar Estado
             </Button>   
               

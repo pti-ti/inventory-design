@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DonutLargeIcon from "@mui/icons-material/DonutLarge";
+import AddIcon from "@mui/icons-material/Add";
 import ModelModal from "./modelModal"; // Renombrado
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
@@ -118,7 +118,7 @@ const modelList = () => {
     return (
         <Box m="20px">
             <Header title="MODELOS" subtitle="Gestión de modelos de dispositivos de PTI" /> {/* Cambiado a 'Modelos' */}
-            <Button variant="contained" color="primary" onClick={handleOpenAddModal} startIcon={<DonutLargeIcon />}>
+            <Button variant="contained" color="primary" onClick={handleOpenAddModal} startIcon={<AddIcon />}>
                 Agregar Modelo {/* Cambiado a 'Modelo' */}
             </Button>   
               

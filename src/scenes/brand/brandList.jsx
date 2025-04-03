@@ -6,9 +6,9 @@ import { tokens } from "../../theme";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
+import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DonutLargeIcon from "@mui/icons-material/DonutLarge";
 import BrandModal from "./brandModal";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
@@ -118,7 +118,7 @@ const BrandList = () => {
     return (
         <Box m="20px">
             <Header title="MARCAS" subtitle="Gestión de las marcas de los dispositivos de PTI" />
-            <Button variant="contained" color="primary" onClick={handleOpenAddModal} startIcon={<DonutLargeIcon />}>
+            <Button variant="contained" color="primary" onClick={handleOpenAddModal} startIcon={<AddIcon />}>
                 Agregar Marca
             </Button>   
             
