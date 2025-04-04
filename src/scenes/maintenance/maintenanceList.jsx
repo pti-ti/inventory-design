@@ -78,15 +78,15 @@ const Maintenance = () => {
         console.error("No se encontró un token en localStorage");
         return;
       }
-      
+
       const response = await axios.get("http://localhost:8085/api/v1/admin/maintenances", {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       console.log("Mantenimientos obtenidos:", response.data);
 
-      
-      
+
+
       // Formatear datos correctamente
       const formattedMaintenances = response.data.map(maintenance => ({
         ...maintenance,
@@ -99,13 +99,12 @@ const Maintenance = () => {
         maintenanceType: maintenance.maintenanceType || "Desconocido",
         comment: maintenance.comment || "Desconocido",
         createdByEmail: maintenance.createdByEmail || "Desconocido",
-        maintenanceDate: maintenance.maintenanceDate 
-          ? new Date(maintenance.maintenanceDate).toLocaleDateString("es-ES", {
-              year: "numeric", month: "2-digit", day: "2-digit"
-            })
-          : "Fecha no disponible"
+        maintenanceDate: maintenance.maintenanceDate
+          ? new Date(maintenance.maintenanceDate).toISOString().split("T")[0]
+          : null
+
       }));
-  
+
       setRows(formattedMaintenances);
     } catch (error) {
       console.error("Error al obtener los datos:", error);
@@ -143,7 +142,7 @@ const Maintenance = () => {
       await axios.delete(`http://localhost:8085/api/v1/admin/maintenances/${maintenanceToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       setSnackbarMessage("Mantenimiento eliminado correctamente.");
       setSnackbarSeverity("success");
       setOpenSnackbar(true);
@@ -156,18 +155,18 @@ const Maintenance = () => {
     }
     setOpenConfirmModal(false);
   };
-  
+
 
   const columns = [
     { field: "id", headerName: "ID", width: 40 },
-    { field: "deviceId", headerName: "ID dispositivo", flex: 1,cellClassName: "name-column--cell"  },
-    { field: "deviceCode", headerName: "Código del dispositivo", flex: 1, cellClassName: "name-column--cell"  },
-    { field: "deviceBrand", headerName: "Marca", flex: 1, cellClassName: "name-column--cell"  },
-    { field: "deviceModel", headerName: "Modelo", flex: 1, cellClassName: "name-column--cell"  },
-    { field: "userEmail", headerName: "Email del usuario", flex: 1, cellClassName: "name-column--cell"  },
-    { field: "userLocation", headerName: "Ubicación del usuario", flex: 1, cellClassName: "name-column--cell"  },
-    { field: "maintenanceType", headerName: "Tipo de mantenimiento", flex: 1, cellClassName: "name-column--cell"  },
-    { field: "comment", headerName: "Comentarios", flex: 1, cellClassName: "name-column--cell"},
+    { field: "deviceId", headerName: "ID dispositivo", flex: 1, cellClassName: "name-column--cell" },
+    { field: "deviceCode", headerName: "Código del dispositivo", flex: 1, cellClassName: "name-column--cell" },
+    { field: "deviceBrand", headerName: "Marca", flex: 1, cellClassName: "name-column--cell" },
+    { field: "deviceModel", headerName: "Modelo", flex: 1, cellClassName: "name-column--cell" },
+    { field: "userEmail", headerName: "Email del usuario", flex: 1, cellClassName: "name-column--cell" },
+    { field: "userLocation", headerName: "Ubicación del usuario", flex: 1, cellClassName: "name-column--cell" },
+    { field: "maintenanceType", headerName: "Tipo de mantenimiento", flex: 1, cellClassName: "name-column--cell" },
+    { field: "comment", headerName: "Comentarios", flex: 1, cellClassName: "name-column--cell" },
     {
       field: "items",
       headerName: "Ítems utilizados",
@@ -175,19 +174,19 @@ const Maintenance = () => {
       renderCell: (params) => (
         <span>{params.value?.map(item => item.name).join(", ") || "Sin ítems"}</span>
       ),
-      cellClassName: "name-column--cell" 
+      cellClassName: "name-column--cell"
     },
-    { 
-      field: "maintenanceDate", 
-      headerName: "Fecha de mantenimiento", 
+    {
+      field: "maintenanceDate",
+      headerName: "Fecha de mantenimiento",
       flex: 1,
-      cellClassName: "name-column--cell" 
+      cellClassName: "name-column--cell"
     },
-    { 
-      field: "createdByEmail", 
-      headerName: "Creado por", 
+    {
+      field: "createdByEmail",
+      headerName: "Creado por",
       flex: 1,
-      cellClassName: "name-column--cell"  
+      cellClassName: "name-column--cell"
     },
     {
       field: "actions",
@@ -205,16 +204,16 @@ const Maintenance = () => {
       ),
     },
   ];
-  
+
 
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center"></Box>
-        <Header title="MANTENIMIENTOS" subtitle="Búsqueda de los mantenimientos de los dispositivos de TI" />
-        <Button variant="contained" color="primary" onClick={handleOpenCreateModal} startIcon={<BuildOutlinedIcon />}>
-          Agregar Mantenimiento
-        </Button> 
-             
+      <Header title="MANTENIMIENTOS" subtitle="Búsqueda de los mantenimientos de los dispositivos de TI" />
+      <Button variant="contained" color="primary" onClick={handleOpenCreateModal} startIcon={<BuildOutlinedIcon />}>
+        Agregar Mantenimiento
+      </Button>
+
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -232,10 +231,10 @@ const Maintenance = () => {
       </Box>
 
       {/* Modal para registrar/editar mantenimiento */}
-      <MaintenanceModal 
+      <MaintenanceModal
         open={openModal}
         handleClose={handleCloseModal}
-        maintenance={selectedMaintenance} 
+        maintenance={selectedMaintenance}
         isEditing={!!selectedMaintenance} // true si se está editando, false si se está creando
         refreshMaintenances={fetchData}
       />
