@@ -14,7 +14,8 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
         id: "",
         deviceId: "",
         deviceCode: "",
-        deviceName: "",
+        deviceBrand: "",
+        deviceModel: "",
         userId: "",
         userEmail: "",
         maintenanceType: "",
@@ -48,7 +49,8 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                 id: maintenance.id ?? "",
                 deviceId: maintenance.deviceId ?? "",
                 deviceCode: maintenance.deviceCode ?? "",
-                deviceName: maintenance.deviceName ?? "",
+                deviceBrand: maintenance.deviceBrand ?? "",
+                deviceModel: maintenance.deviceModel ?? "",
                 userEmail: maintenance.userEmail ?? "",
                 maintenanceType: maintenance.maintenanceType ?? "",
                 comment: maintenance.comment ?? "",
@@ -190,7 +192,8 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                     {isEditing && (
                         <>
                             <TextField fullWidth margin="normal" label="Código dispositivo" name="deviceCode" value={editedMaintenance.deviceCode} disabled />
-                            <TextField fullWidth margin="normal" label="Nombre del dispositivo" name="deviceName" value={editedMaintenance.deviceName} disabled />
+                            <TextField fullWidth margin="normal" label="Marca del dispositivo" name="deviceBrand" value={editedMaintenance.deviceBrand} disabled />
+                            <TextField fullWidth margin="normal" label="Modelo del dispositivo" name="deviceModel" value={editedMaintenance.deviceModel} disabled />
                             <TextField fullWidth margin="normal" label="Email del usuario" name="userEmail" value={editedMaintenance.userEmail} disabled />
                         </>
                     )}

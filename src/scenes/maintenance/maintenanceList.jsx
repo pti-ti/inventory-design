@@ -92,10 +92,13 @@ const Maintenance = () => {
         ...maintenance,
         deviceId: maintenance.deviceId ?? 0,
         deviceCode: maintenance.deviceCode || "Desconocido",
-        deviceName: maintenance.deviceName || "Desconocido",
+        deviceBrand: maintenance.deviceBrand || "Desconocido",
+        deviceModel: maintenance.deviceModel || "Desconocido",
         userEmail: maintenance.userEmail || "Desconocido",
+        userLocation: maintenance.userLocation || "Desconocida",
         maintenanceType: maintenance.maintenanceType || "Desconocido",
         comment: maintenance.comment || "Desconocido",
+        createdByEmail: maintenance.createdByEmail || "Desconocido",
         maintenanceDate: maintenance.maintenanceDate 
           ? new Date(maintenance.maintenanceDate).toLocaleDateString("es-ES", {
               year: "numeric", month: "2-digit", day: "2-digit"
@@ -156,27 +159,35 @@ const Maintenance = () => {
   
 
   const columns = [
-    { field: "id", headerName: "ID", width: 90 },
-    { field: "deviceId", headerName: "ID dispositivo", flex: 1, cellClassName: "name-column--cell" },
-    { field: "deviceCode", headerName: "Código del dispositivo", flex: 1, cellClassName: "name-column--cell" },
-    { field: "deviceName", headerName: "Nombre del dispositivo", flex: 1, cellClassName: "name-column--cell" },
-    { field: "userEmail", headerName: "Email del usuario", flex: 1, cellClassName: "name-column--cell" },
-    { field: "maintenanceType", headerName: "Tipo de mantenimiento", flex: 1, cellClassName: "name-column--cell" },
-    { field: "comment", headerName: "Comentarios", flex: 1, cellClassName: "name-column--cell" },
+    { field: "id", headerName: "ID", width: 40 },
+    { field: "deviceId", headerName: "ID dispositivo", flex: 1,cellClassName: "name-column--cell"  },
+    { field: "deviceCode", headerName: "Código del dispositivo", flex: 1, cellClassName: "name-column--cell"  },
+    { field: "deviceBrand", headerName: "Marca", flex: 1, cellClassName: "name-column--cell"  },
+    { field: "deviceModel", headerName: "Modelo", flex: 1, cellClassName: "name-column--cell"  },
+    { field: "userEmail", headerName: "Email del usuario", flex: 1, cellClassName: "name-column--cell"  },
+    { field: "userLocation", headerName: "Ubicación del usuario", flex: 1, cellClassName: "name-column--cell"  },
+    { field: "maintenanceType", headerName: "Tipo de mantenimiento", flex: 1, cellClassName: "name-column--cell"  },
+    { field: "comment", headerName: "Comentarios", flex: 1, cellClassName: "name-column--cell"},
     {
       field: "items",
       headerName: "Ítems utilizados",
       flex: 2,
-      cellClassName: "name-column--cell",
       renderCell: (params) => (
-        <span>{params.value.map(item => item.name).join(", ")}</span>
+        <span>{params.value?.map(item => item.name).join(", ") || "Sin ítems"}</span>
       ),
+      cellClassName: "name-column--cell" 
     },
     { 
       field: "maintenanceDate", 
       headerName: "Fecha de mantenimiento", 
-      flex: 1, 
-      cellClassName: "name-column--cell"
+      flex: 1,
+      cellClassName: "name-column--cell" 
+    },
+    { 
+      field: "createdByEmail", 
+      headerName: "Creado por", 
+      flex: 1,
+      cellClassName: "name-column--cell"  
     },
     {
       field: "actions",
@@ -194,6 +205,7 @@ const Maintenance = () => {
       ),
     },
   ];
+  
 
   return (
     <Box m="20px">

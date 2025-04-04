@@ -57,13 +57,15 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
     useEffect(() => {
         if (logbook && open && statuses.length > 0 && locations.length > 0 && brands.length > 0 && models.length > 0) {
+            console.log("Logbook recibido:", logbook);
             setEditedLogbook({
                 id: logbook.id ?? "",
                 deviceId: logbook.deviceId || "",
                 deviceCode: logbook.deviceCode || "",
                 deviceBrand: brands.find(b => b.name === logbook.deviceBrand)?.id?.toString() || "",
                 deviceModel: models.find(m => m.name === logbook.deviceModel)?.id?.toString() || "",
-                userId: logbook.userEmail ?? "",  // Usar userId en lugar de userEmail
+                userId: logbook.userId ? logbook.userId.toString() : "",
+                userEmail: logbook.userEmail || "",
                 statusId: statuses.find(s => s.name === logbook.statusName)?.id?.toString() || "",
                 locationId: locations.find(l => l.name === logbook.locationName)?.id?.toString() || "",
                 note: logbook.note ?? "",
@@ -151,7 +153,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                 status: { id: parseInt(editedLogbook.statusId) },
                 location: { id: parseInt(editedLogbook.locationId) },
                 user: { id: parseInt(editedLogbook.userId) }
-              };
+            };
 
             console.log("Datos enviados al backend:", logbookData);
 
@@ -215,15 +217,22 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                         />
                     )}
 
+                    {!isEditing && (
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="ID del Usuario"
+                            name="userId"
+                            value={editedLogbook.userId}
+                            onChange={handleUserIdChange}
+                        />
+                    )}
+
                     <TextField
                         fullWidth margin="normal" label="Código del Dispositivo"
                         name="deviceCode" value={editedLogbook.deviceCode} onChange={handleChange} disabled
                     />
 
-                    <TextField
-                        fullWidth margin="normal" label="ID del Usuario"
-                        name="userId" value={editedLogbook.userId} onChange={handleUserIdChange}
-                    />
 
                     <TextField
                         fullWidth margin="normal" label="Email del Usuario"
