@@ -9,9 +9,10 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const initialLogbookState = {
         id: "",
         deviceId: "",
+        deviceCode: "",
         deviceBrand: "",
         deviceModel: "",
-        userId: "",  // Cambiado de userEmail a userId
+        userId: "",
         statusId: "",
         locationId: "",
         note: "",
@@ -57,10 +58,11 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
         if (logbook && open && statuses.length > 0 && locations.length > 0 && brands.length > 0 && models.length > 0) {
             setEditedLogbook({
                 id: logbook.id ?? "",
-                deviceId: logbook.deviceCode || "",
+                deviceId: logbook.deviceId || "",
+                deviceCode: logbook.deviceCode || "",
                 deviceBrand: brands.find(b => b.name === logbook.deviceBrand)?.id?.toString() || "",
                 deviceModel: models.find(m => m.name === logbook.deviceModel)?.id?.toString() || "",
-                userId: logbook.userId ?? "",  // Usar userId en lugar de userEmail
+                userId: logbook.userEmail ?? "",  // Usar userId en lugar de userEmail
                 statusId: statuses.find(s => s.name === logbook.statusName)?.id?.toString() || "",
                 locationId: locations.find(l => l.name === logbook.locationName)?.id?.toString() || "",
                 note: logbook.note ?? "",
@@ -85,20 +87,16 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
         try {
             const token = localStorage.getItem("token");
 
-            if (!editedLogbook.deviceId.trim() || !editedLogbook.statusId || !editedLogbook.locationId || !editedLogbook.userId) {
-                setErrorMessage("Todos los campos son obligatorios.");
+            if (!editedLogbook.note.trim()) {
+                setErrorMessage("Las notas son obligatorias.");
                 return;
             }
 
             const logbookData = {
-                device: { id: editedLogbook.deviceId },
-                brand: { id: editedLogbook.deviceBrand },
-                model: { id: editedLogbook.deviceModel },
-                status: { id: editedLogbook.statusId },
-                location: { id: editedLogbook.locationId },
-                user: { id: editedLogbook.userId },  // Cambiado de email a id
                 note: editedLogbook.note || ""
             };
+
+            console.log("Datos enviados al backend:", logbookData);
 
             if (isEditing) {
                 await axios.put(
@@ -140,24 +138,31 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                 }}>
                     <Typography variant="h6">{isEditing ? "Editar Bitácora" : "Registrar Bitácora"}</Typography>
 
+                    {/* Campos deshabilitados durante la edición */}
                     {!isEditing && (
                         <TextField
-                            fullWidth margin="normal" label="Código del dispositivo"
-                            name="deviceId" value={editedLogbook.deviceId} onChange={handleChange}
+                            fullWidth
+                            margin="normal"
+                            label="ID del Dispositivo"
+                            name="deviceId"
+                            value={editedLogbook.deviceId}
+                            onChange={handleChange}
                         />
                     )}
 
-                    {/* Campo para ingresar el ID del usuario */}
+                    <TextField
+                        fullWidth margin="normal" label="Código del Dispositivo"
+                        name="deviceCode" value={editedLogbook.deviceCode} onChange={handleChange} disabled={isEditing}
+                    />
+
                     <TextField
                         fullWidth margin="normal" label="ID del Usuario"
-                        name="userId" value={editedLogbook.userId} onChange={handleChange}
+                        name="userId" value={editedLogbook.userId} onChange={handleChange} disabled
                     />
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Marca</InputLabel>
-                        <Select name="deviceBrand" value={editedLogbook.deviceBrand} onChange={handleChange}
-                        disabled={isEditing}
-                        >
+                        <Select name="deviceBrand" value={editedLogbook.deviceBrand} onChange={handleChange} disabled>
                             {brands.map(brand => (
                                 <MenuItem key={brand.id} value={brand.id}>{brand.name}</MenuItem>
                             ))}
@@ -166,9 +171,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Modelo</InputLabel>
-                        <Select name="deviceModel" value={editedLogbook.deviceModel} onChange={handleChange}
-                        disabled={isEditing}
-                        >
+                        <Select name="deviceModel" value={editedLogbook.deviceModel} onChange={handleChange} disabled>
                             {models.map(model => (
                                 <MenuItem key={model.id} value={model.id}>{model.name}</MenuItem>
                             ))}
@@ -177,7 +180,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Ubicación</InputLabel>
-                        <Select name="locationId" value={editedLogbook.locationId} onChange={handleChange}>
+                        <Select name="locationId" value={editedLogbook.locationId} onChange={handleChange} disabled>
                             {locations.map(location => (
                                 <MenuItem key={location.id} value={location.id}>{location.name}</MenuItem>
                             ))}
@@ -186,14 +189,18 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Estado</InputLabel>
-                        <Select name="statusId" value={editedLogbook.statusId} onChange={handleChange}>
+                        <Select name="statusId" value={editedLogbook.statusId} onChange={handleChange} disabled>
                             {statuses.map(status => (
                                 <MenuItem key={status.id} value={status.id}>{status.name}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
 
-                    <TextField fullWidth margin="normal" label="Notas" name="note" value={editedLogbook.note} onChange={handleChange} />
+                    {/* Solo el campo de "notas" es editable */}
+                    <TextField
+                        fullWidth margin="normal" label="Notas" name="note"
+                        value={editedLogbook.note} onChange={handleChange}
+                    />
 
                     <Button fullWidth variant="contained" color="primary" onClick={handleSave} sx={{ mt: 2 }}>
                         {isEditing ? "Guardar Cambios" : "Registrar"}
@@ -202,8 +209,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             </Modal>
 
             <Snackbar open={!!successMessage || !!errorMessage} autoHideDuration={4000} onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            >
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}>
                 <Alert onClose={handleCloseSnackbar} severity={successMessage ? "success" : "error"}>
                     {successMessage || errorMessage}
                 </Alert>
