@@ -144,8 +144,14 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             }
 
             const logbookData = {
-                note: editedLogbook.note || ""
-            };
+                note: editedLogbook.note,
+                device: { id: parseInt(editedLogbook.deviceId) },
+                brand: { id: parseInt(editedLogbook.deviceBrand) },
+                model: { id: parseInt(editedLogbook.deviceModel) },
+                status: { id: parseInt(editedLogbook.statusId) },
+                location: { id: parseInt(editedLogbook.locationId) },
+                user: { id: parseInt(editedLogbook.userId) }
+              };
 
             console.log("Datos enviados al backend:", logbookData);
 
