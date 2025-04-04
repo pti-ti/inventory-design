@@ -139,24 +139,34 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const handleSave = async () => {
         try {
             const token = localStorage.getItem("token");
-
+    
             if (!editedLogbook.note.trim()) {
                 setErrorMessage("Las notas son obligatorias.");
                 return;
             }
-
-            const logbookData = {
-                note: editedLogbook.note,
-                device: { id: parseInt(editedLogbook.deviceId) },
-                brand: { id: parseInt(editedLogbook.deviceBrand) },
-                model: { id: parseInt(editedLogbook.deviceModel) },
-                status: { id: parseInt(editedLogbook.statusId) },
-                location: { id: parseInt(editedLogbook.locationId) },
-                user: { id: parseInt(editedLogbook.userId) }
-            };
-
+    
+            let logbookData;
+    
+            if (isEditing) {
+                // Solo se edita la nota
+                logbookData = {
+                    note: editedLogbook.note
+                };
+            } else {
+                // Se envían todos los datos para crear
+                logbookData = {
+                    device: { id: parseInt(editedLogbook.deviceId) },
+                    brand: { id: parseInt(editedLogbook.deviceBrand) },
+                    model: { id: parseInt(editedLogbook.deviceModel) },
+                    status: { id: parseInt(editedLogbook.statusId) },
+                    location: { id: parseInt(editedLogbook.locationId) },
+                    user: { id: parseInt(editedLogbook.userId) },
+                    note: editedLogbook.note
+                };
+            }
+    
             console.log("Datos enviados al backend:", logbookData);
-
+    
             if (isEditing) {
                 await axios.put(
                     `http://localhost:8085/api/v1/admin/logbooks/${editedLogbook.id}`,
@@ -172,7 +182,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                 );
                 setSuccessMessage("Bitácora registrada correctamente.");
             }
-
+    
             refreshLogbooks();
             handleClose();
         } catch (error) {
@@ -180,6 +190,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             setErrorMessage("No se pudo procesar la solicitud.");
         }
     };
+    
 
     return (
         <>
@@ -217,27 +228,12 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                         />
                     )}
 
-                    {!isEditing && (
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="ID del Usuario"
-                            name="userId"
-                            value={editedLogbook.userId}
-                            onChange={handleUserIdChange}
-                        />
-                    )}
 
                     <TextField
                         fullWidth margin="normal" label="Código del Dispositivo"
                         name="deviceCode" value={editedLogbook.deviceCode} onChange={handleChange} disabled
                     />
 
-
-                    <TextField
-                        fullWidth margin="normal" label="Email del Usuario"
-                        name="userEmail" value={editedLogbook.userEmail} onChange={handleChange} disabled
-                    />
 
 
                     <FormControl fullWidth margin="normal">
@@ -260,9 +256,24 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                         </Select>
                     </FormControl>
 
+                    {!isEditing && (
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="ID del Usuario"
+                            name="userId"
+                            value={editedLogbook.userId}
+                            onChange={handleUserIdChange}
+                        />
+                    )}
+
+                    <TextField
+                        fullWidth margin="normal" label="Email del Usuario"
+                        name="userEmail" value={editedLogbook.userEmail} onChange={handleChange} disabled
+                    />
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Ubicación</InputLabel>
-                        <Select name="locationId" value={editedLogbook.locationId} onChange={handleChange} >
+                        <Select name="locationId" value={editedLogbook.locationId} onChange={handleChange} disabled={isEditing}>
                             {locations.map(location => (
                                 <MenuItem key={location.id} value={location.id}>{location.name}</MenuItem>
                             ))}
@@ -271,7 +282,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Estado</InputLabel>
-                        <Select name="statusId" value={editedLogbook.statusId} onChange={handleChange} >
+                        <Select name="statusId" value={editedLogbook.statusId} onChange={handleChange} disabled={isEditing} >
                             {statuses.map(status => (
                                 <MenuItem key={status.id} value={status.id}>{status.name}</MenuItem>
                             ))}
