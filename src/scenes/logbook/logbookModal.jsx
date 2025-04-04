@@ -13,6 +13,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
         deviceBrand: "",
         deviceModel: "",
         userId: "",
+        userEmail: "",
         statusId: "",
         locationId: "",
         note: "",
@@ -72,6 +73,56 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             setEditedLogbook(initialLogbookState);
         }
     }, [logbook, open, statuses, locations, brands, models]);
+
+    const fetchDeviceById = async (deviceId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(`http://localhost:8085/api/v1/admin/devices/${deviceId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const device = response.data;
+
+            setEditedLogbook(prev => ({
+                ...prev,
+                deviceCode: device.code || "",
+                deviceBrand: brands.find(b => b.name === device.brandName)?.id?.toString() || "",
+                deviceModel: models.find(m => m.name === device.modelName)?.id?.toString() || "",
+                locationId: locations.find(loc => loc.name === device.locationName)?.id?.toString() || "",
+                statusId: statuses.find(s => s.name === device.statusName)?.id?.toString() || ""
+            }));
+        } catch (error) {
+            console.error("No se pudo obtener el dispositivo", error.response?.data || error.message);
+            setErrorMessage("No se encontró el dispositivo con ese ID.");
+        }
+    };
+
+    const handleUserIdChange = async (e) => {
+        const value = e.target.value;
+
+        setEditedLogbook(prev => ({ ...prev, userId: value }));
+
+        if (value.trim().length === 0) return;
+
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(`http://localhost:8085/api/v1/admin/users/${value}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const user = response.data;
+
+            setEditedLogbook(prev => ({
+                ...prev,
+                userEmail: user.email || ""
+            }));
+        } catch (error) {
+            console.error("No se pudo obtener el usuario", error.response?.data || error.message);
+            setErrorMessage("No se encontró el usuario con ese ID.");
+        }
+    };
+
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -146,23 +197,38 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                             label="ID del Dispositivo"
                             name="deviceId"
                             value={editedLogbook.deviceId}
-                            onChange={handleChange}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setEditedLogbook(prev => ({ ...prev, deviceId: value }));
+
+                                // Si el ID tiene al menos 1 carácter, busca el dispositivo (puedes ajustar esto)
+                                if (value.trim().length > 0) {
+                                    fetchDeviceById(value);
+                                }
+                            }}
                         />
                     )}
 
                     <TextField
                         fullWidth margin="normal" label="Código del Dispositivo"
-                        name="deviceCode" value={editedLogbook.deviceCode} onChange={handleChange} disabled={isEditing}
+                        name="deviceCode" value={editedLogbook.deviceCode} onChange={handleChange} disabled
                     />
 
                     <TextField
                         fullWidth margin="normal" label="ID del Usuario"
-                        name="userId" value={editedLogbook.userId} onChange={handleChange} disabled
+                        name="userId" value={editedLogbook.userId} onChange={handleUserIdChange}
                     />
+
+                    <TextField
+                        fullWidth margin="normal" label="Email del Usuario"
+                        name="userEmail" value={editedLogbook.userEmail} onChange={handleChange} disabled
+                    />
+
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Marca</InputLabel>
-                        <Select name="deviceBrand" value={editedLogbook.deviceBrand} onChange={handleChange} disabled>
+                        <Select name="deviceBrand" value={editedLogbook.deviceBrand} onChange={handleChange} disabled
+                        >
                             {brands.map(brand => (
                                 <MenuItem key={brand.id} value={brand.id}>{brand.name}</MenuItem>
                             ))}
@@ -171,7 +237,8 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Modelo</InputLabel>
-                        <Select name="deviceModel" value={editedLogbook.deviceModel} onChange={handleChange} disabled>
+                        <Select name="deviceModel" value={editedLogbook.deviceModel} onChange={handleChange} disabled
+                        >
                             {models.map(model => (
                                 <MenuItem key={model.id} value={model.id}>{model.name}</MenuItem>
                             ))}
@@ -180,7 +247,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Ubicación</InputLabel>
-                        <Select name="locationId" value={editedLogbook.locationId} onChange={handleChange} disabled>
+                        <Select name="locationId" value={editedLogbook.locationId} onChange={handleChange} >
                             {locations.map(location => (
                                 <MenuItem key={location.id} value={location.id}>{location.name}</MenuItem>
                             ))}
@@ -189,7 +256,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Estado</InputLabel>
-                        <Select name="statusId" value={editedLogbook.statusId} onChange={handleChange} disabled>
+                        <Select name="statusId" value={editedLogbook.statusId} onChange={handleChange} >
                             {statuses.map(status => (
                                 <MenuItem key={status.id} value={status.id}>{status.name}</MenuItem>
                             ))}
