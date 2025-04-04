@@ -98,16 +98,15 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
         try {
             const token = localStorage.getItem("token");
     
-            // Asegurar que el objeto tenga la estructura correcta
             const maintenanceData = {
-                id: isEditing ? editedMaintenance.id : undefined, // Solo si es edición
+                id: isEditing ? editedMaintenance.id : undefined,
                 device: { id: Number(editedMaintenance.deviceId) },
                 user: { id: Number(editedMaintenance.userId) },
                 maintenanceType: editedMaintenance.maintenanceType,
                 maintenanceDate: editedMaintenance.maintenanceDate,
                 comment: editedMaintenance.comment,
                 items: editedMaintenance.items.map(id => ({ id: Number(id) })),
-                updatedBy: 3, // Aquí deberías reemplazar con el ID del usuario autenticado si aplica
+                updatedBy: 3,
             };
     
             if (isEditing) {
@@ -124,33 +123,32 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setSnackbarMessage("Mantenimiento registrado exitosamente.");
+    
+                // Descargar Excel solo en modo registro
+                try {
+                    const response = await axios.get("http://localhost:8085/api/v1/admin/excel/update", {
+                        headers: { Authorization: `Bearer ${token}` },
+                        responseType: "blob",
+                    });
+    
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.setAttribute("download", "Mantenimiento.xlsx");
+                    document.body.appendChild(link);
+                    link.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(link);
+                } catch (excelError) {
+                    console.error("Error al descargar el Excel:", excelError);
+                    setSnackbarMessage("Mantenimiento guardado, pero ocurrió un error al descargar el Excel.");
+                    setSnackbarSeverity("warning");
+                    setSnackbarOpen(true);
+                }
             }
     
             setSnackbarSeverity("success");
             setSnackbarOpen(true);
-    
-            // Descargar Excel solo si la petición fue exitosa
-            try {
-                const response = await axios.get("http://localhost:8085/api/v1/admin/excel/update", {
-                    headers: { Authorization: `Bearer ${token}` },
-                    responseType: "blob",
-                });
-    
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", "Mantenimiento.xlsx");
-                document.body.appendChild(link);
-                link.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(link);
-            } catch (excelError) {
-                console.error("Error al descargar el Excel:", excelError);
-                setSnackbarMessage("Mantenimiento guardado, pero ocurrió un error al descargar el Excel.");
-                setSnackbarSeverity("warning"); // Color amarillo
-                setSnackbarOpen(true);
-            }
-    
             refreshMaintenances();
             handleClose();
         } catch (error) {
@@ -160,6 +158,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
             setSnackbarOpen(true);
         }
     };
+    
     
     
     
