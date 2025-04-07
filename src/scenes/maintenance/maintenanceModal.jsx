@@ -1,7 +1,7 @@
-import { 
+import {
     Box, Button, Modal, TextField, Typography,
     Snackbar, Alert, Select, MenuItem, InputLabel,
-    FormControl 
+    FormControl
 } from "@mui/material";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { useState, useEffect } from "react";
@@ -44,7 +44,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                     formattedDate = maintenance.maintenanceDate; // Mantener formato si ya está correcto
                 }
             }
-    
+
             const updatedMaintenance = {
                 id: maintenance.id ?? "",
                 deviceId: maintenance.deviceId ?? "",
@@ -57,30 +57,43 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                 maintenanceDate: formattedDate, // Asignar la fecha formateada
                 items: maintenance.items?.map(item => item.id) ?? []
             };
-    
+
             setEditedMaintenance(updatedMaintenance);
-    
+
             console.log("Estado actualizado de editedMaintenance:", updatedMaintenance);
         } else {
             setEditedMaintenance(initialMaintenanceState);
         }
     }, [maintenance, open]);
-    
+
 
     useEffect(() => {
         if (open && itemsList.length === 0) {
             const token = localStorage.getItem("token");
-    
+
             axios.get("http://localhost:8085/api/v1/admin/items", {
                 headers: { Authorization: `Bearer ${token}` }
             })
-            .then(response => setItemsList(response.data))
-            .catch(error => {
-                console.error("Error al obtener ítems:", error);
-                setErrorMessage("No se pudieron cargar los ítems.");
-            });
+                .then(response => setItemsList(response.data))
+                .catch(error => {
+                    console.error("Error al obtener ítems:", error);
+                    setErrorMessage("No se pudieron cargar los ítems.");
+                });
         }
     }, [open]);
+
+    useEffect(() => {
+        if (!isEditing && editedMaintenance.deviceId) {
+            fetchDeviceData(editedMaintenance.deviceId);
+        }
+    }, [editedMaintenance.deviceId]);
+
+    useEffect(() => {
+        if (!isEditing && editedMaintenance.userId) {
+            fetchUserData(editedMaintenance.userId);
+        }
+    }, [editedMaintenance.userId]);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -97,7 +110,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
     const handleCreateOrUpdate = async () => {
         try {
             const token = localStorage.getItem("token");
-    
+
             const maintenanceData = {
                 id: isEditing ? editedMaintenance.id : undefined,
                 device: { id: Number(editedMaintenance.deviceId) },
@@ -108,7 +121,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                 items: editedMaintenance.items.map(id => ({ id: Number(id) })),
                 updatedBy: 3,
             };
-    
+
             if (isEditing) {
                 await axios.put(
                     `http://localhost:8085/api/v1/admin/maintenances/${editedMaintenance.id}`,
@@ -123,14 +136,14 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setSnackbarMessage("Mantenimiento registrado exitosamente.");
-    
+
                 // Descargar Excel solo en modo registro
                 try {
                     const response = await axios.get("http://localhost:8085/api/v1/admin/excel/update", {
                         headers: { Authorization: `Bearer ${token}` },
                         responseType: "blob",
                     });
-    
+
                     const url = window.URL.createObjectURL(new Blob([response.data]));
                     const link = document.createElement("a");
                     link.href = url;
@@ -146,7 +159,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
                     setSnackbarOpen(true);
                 }
             }
-    
+
             setSnackbarSeverity("success");
             setSnackbarOpen(true);
             refreshMaintenances();
@@ -158,10 +171,54 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
             setSnackbarOpen(true);
         }
     };
-    
-    
-    
-    
+
+    // Reemplaza con tus endpoints reales si son distintos
+    const fetchDeviceData = async (deviceId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(`http://localhost:8085/api/v1/admin/devices/${deviceId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const device = response.data;
+            console.log("Device data:", device);
+            setEditedMaintenance(prev => ({
+                ...prev,
+                deviceCode: device.code || "",
+                deviceBrand: device.brandName || "",
+                deviceModel: device.modelName || "",
+            }));
+        } catch (error) {
+            console.error("Error al obtener datos del dispositivo:", error);
+            setEditedMaintenance(prev => ({
+                ...prev,
+                deviceCode: "",
+                deviceBrand: "",
+                deviceModel: "",
+            }));
+        }
+    };
+
+    const fetchUserData = async (userId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(`http://localhost:8085/api/v1/admin/users/${userId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const user = response.data;
+            setEditedMaintenance(prev => ({
+                ...prev,
+                userEmail: user.email || "",
+            }));
+        } catch (error) {
+            console.error("Error al obtener datos del usuario:", error);
+            setEditedMaintenance(prev => ({
+                ...prev,
+                userEmail: "",
+            }));
+        }
+    };
 
     return (
         <>
@@ -183,19 +240,25 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
 
                     {!isEditing && (
                         <>
-                            <TextField fullWidth margin="normal" label="ID del dispositivo" name="deviceId" value={editedMaintenance.deviceId} onChange={handleChange} required />
-                            <TextField fullWidth margin="normal" label="ID del usuario" name="userId" value={editedMaintenance.userId} onChange={handleChange} required />
+                            <TextField fullWidth margin="normal" label="ID del dispositivo" name="deviceId" value={editedMaintenance.deviceId} onChange={handleChange} />
+                            <TextField fullWidth margin="normal" label="ID del usuario" name="userId" value={editedMaintenance.userId} onChange={handleChange} />
                         </>
                     )}
 
-                    {isEditing && (
+                    {/* {isEditing && (
                         <>
                             <TextField fullWidth margin="normal" label="Código dispositivo" name="deviceCode" value={editedMaintenance.deviceCode} disabled />
                             <TextField fullWidth margin="normal" label="Marca del dispositivo" name="deviceBrand" value={editedMaintenance.deviceBrand} disabled />
                             <TextField fullWidth margin="normal" label="Modelo del dispositivo" name="deviceModel" value={editedMaintenance.deviceModel} disabled />
                             <TextField fullWidth margin="normal" label="Email del usuario" name="userEmail" value={editedMaintenance.userEmail} disabled />
                         </>
-                    )}
+                    )} */}
+
+                    <TextField fullWidth margin="normal" label="Código dispositivo" name="deviceCode" value={editedMaintenance.deviceCode} disabled />
+                    <TextField fullWidth margin="normal" label="Marca del dispositivo" name="deviceBrand" value={editedMaintenance.deviceBrand} disabled />
+                    <TextField fullWidth margin="normal" label="Modelo del dispositivo" name="deviceModel" value={editedMaintenance.deviceModel} disabled />
+                    <TextField fullWidth margin="normal" label="Email del usuario" name="userEmail" value={editedMaintenance.userEmail} disabled />
+
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Tipo de Mantenimiento</InputLabel>
@@ -226,16 +289,16 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
 
                     <TextField fullWidth margin="normal" label="Comentarios" name="comment" value={editedMaintenance.comment} onChange={handleChange} />
 
-                    <TextField 
-                        fullWidth 
-                        margin="normal" 
-                        label="Fecha de mantenimiento" 
-                        name="maintenanceDate" 
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Fecha de mantenimiento"
+                        name="maintenanceDate"
                         type="date"
                         value={editedMaintenance.maintenanceDate}
                         onChange={handleChange}
                         disabled={isEditing}
-                        InputLabelProps={{ shrink: true }} 
+                        InputLabelProps={{ shrink: true }}
                     />
 
                     <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
