@@ -62,7 +62,7 @@
 }
 
 .light-mode .input-box input:focus {
-    border-color: #007bff;
+    border-color: #0014AA;
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.9);
 }
 
@@ -126,7 +126,7 @@
 }
 
 .wrapper button:hover {
-    background: #0056b3;
+    background: #0014AA;
 }
 
 .error-message {

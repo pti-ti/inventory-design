@@ -11,7 +11,8 @@ const exportDevices = (rows) => {
   const exportData = rows.map((device) => ({
     ID: device.id,
     CÓDIGO: device.code,
-    NOMBRE: device.name,
+    MARCA: device.brand,
+    MODELO: device.model,
     SERIAL: device.serial,
     ESPECIFICACIONES: device.specification,
     TIPO: device.type,
