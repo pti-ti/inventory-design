@@ -22,7 +22,7 @@ const modelModal = ({ open, handleClose, model, refreshModels }) => {
         name: yup.string()
             .required("Este campo es obligatorio")
             .min(2, "El nombre debe tener al menos 2 caracteres")
-            .matches(/^[a-zA-Z\s]+$/, "Solo se permiten letras y espacios"),
+            .matches(/^[a-zA-Z0-9\s]+$/, "Solo se permiten letras, números y espacios")
     });
 
     // Mostrar mensajes en Snackbar

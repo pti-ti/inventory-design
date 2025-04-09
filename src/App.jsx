@@ -20,18 +20,17 @@ import MaintenanceRegister from "./scenes/form/MaintenanceRegister";
 function App() {
   const [theme, colorMode] = useMode();
   const location = useLocation();
-  //const isLoginPage = location.pathname === "login"
 
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Routes>
-          {/* Redirigir la raíz "/" a "/login" */}
-          <Route path="/" element={<Navigate to="/login" />} />
+          {/* Redirigir la raíz "/" a "/auth/login" */}
+          <Route path="/" element={<Navigate to="/auth/login" />} />
 
           {/* Página de Login sin el Layout */}
-          <Route path="/login" element={<Login />} />
+          <Route path="/auth/login" element={<Login />} />
 
           {/* Layout con Sidebar y Topbar */}
           <Route path="/*" element={<Layout />}>

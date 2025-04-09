@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import "../assets/styles/Login.css"
 import { FaLock, FaUser } from "react-icons/fa";
 
-const API_URL = "http://localhost:8085/api/v1/security/login";
+const API_URL = "http://192.168.x.x:8085/api/v1/security/login";
 
 const Login = () => {
   const [username, setUsername] = useState("");
