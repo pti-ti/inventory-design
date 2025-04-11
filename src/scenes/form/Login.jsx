@@ -23,6 +23,7 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // 👈 clave para CORS + cookies
         body: JSON.stringify({ email: username, password }),
       });
   
