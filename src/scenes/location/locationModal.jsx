@@ -21,7 +21,7 @@ const LocationModal = ({ open, handleClose, location, refreshLocations }) => {
     const validationSchema = yup.object().shape({
         name: yup.string()
             .required("Este campo es obligatorio")
-            .min(3, "El nombre debe tener al menos 3 caracteres")
+            .min(2, "El nombre debe tener al menos 2 caracteres")
             .matches(/^[a-zA-Z\s]+$/, "Solo se permiten letras y espacios"),
     });
 

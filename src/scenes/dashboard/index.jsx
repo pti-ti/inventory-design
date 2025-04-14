@@ -51,11 +51,13 @@ const Dashboard = () => {
     Ipad: <TabletMacIcon fontSize="large" />,
   };
 
+  //const baseUrl = process.env.REACT_APP_API_URL;
+
   // Función para obtener datos
   const fetchData = async () => {
     try {
       // Obtener el valor total del inventario
-      const inventoryRes = await fetch("http://localhost:8085/api/v1/admin/devices/total-inventory-value");
+      const inventoryRes = await fetch(`http://localhost:8085/api/v1/admin/devices/total-inventory-value`);
       const inventoryData = await inventoryRes.json();
       setTotalInventoryValue(inventoryData);
 

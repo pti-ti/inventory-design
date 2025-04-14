@@ -59,18 +59,19 @@ const BarChart = ({ isDashboard = false }) => {
             legends: { text: { fill: colors.grey[100] } },
             tooltip: {
               container: {
-                background: colors.grey[100], // Mantiene un fondo oscuro en modo oscuro
-                color: colors.grey[900], // Mantiene el texto en color oscuro SIEMPRE
+                background: colors.grey[100],
+                color: colors.grey[900],
                 borderRadius: "4px",
                 border: `1px solid ${colors.grey[300]}`,
                 boxShadow: "0px 4px 10px rgba(0,0,0,0.2)",
-              }
-            }
+              },
+            },
           }}
           keys={["count"]}
           indexBy="city"
-          margin={{ top: 50, right: 50, bottom: 50, left: 60 }}
-          padding={0.6}
+          margin={{ top: 20, right: 50, bottom: 50, left: 120 }} // más margen a la izquierda
+          padding={0.2}
+          layout="horizontal" // 👈 cambio importante
           valueScale={{ type: "linear" }}
           indexScale={{ type: "band", round: true }}
           colors={(bar) => darkColors[bar.index % darkColors.length]}
@@ -80,22 +81,18 @@ const BarChart = ({ isDashboard = false }) => {
           axisBottom={{
             tickSize: 5,
             tickPadding: 5,
-            tickRotation: -20,
-            legend: isDashboard ? undefined : "",
+            tickRotation: 0,
+            legend: "Cantidad de dispositivos",
             legendPosition: "middle",
-            legendOffset: 32,
+            legendOffset: 40,
           }}
           axisLeft={{
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
-            legend: isDashboard ? undefined : "Cantidad de dispositivos",
+            legend: isDashboard ? undefined : "",
             legendPosition: "middle",
-            legendOffset: -40,
-            tickValues: data.length > 0
-              ? [...Array(Math.max(...data.map((d) => d.count)) + 1).keys()]
-              : undefined,
-            format: (value) => Math.round(value),
+            legendOffset: -100,
           }}
           enableLabel={false}
           labelSkipWidth={12}
@@ -123,6 +120,7 @@ const BarChart = ({ isDashboard = false }) => {
             `${e.id}: ${e.formattedValue} en ubicación: ${e.indexValue}`
           }
         />
+
 
       )}
     </div>

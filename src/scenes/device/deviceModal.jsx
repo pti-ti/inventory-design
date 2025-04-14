@@ -144,7 +144,7 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     borderRadius: 2,
                 }}>
                     <Typography variant="h6">{isEditing ? "Editar Dispositivo" : "Registrar Dispositivo"}</Typography>
-                    <TextField fullWidth margin="normal" label="Código" name="code" value={editedDevice.code} onChange={handleChange} disabled={isEditing} />
+                    <TextField fullWidth margin="normal" label="Código" name="code" value={editedDevice.code} onChange={handleChange}/>
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Marca</InputLabel>
