@@ -33,7 +33,7 @@ const Device = () => {
         return;
       }
 
-      const response = await axios.get("http://localhost:8085/api/v1/admin/devices", {
+      const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/devices", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -66,7 +66,7 @@ const Device = () => {
   const handleRegisterDevice = async (deviceData) => {
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = "http://localhost:8085/api/v1/admin/devices/register";
+      const apiUrl = "http://192.168.128.148:8085/api/v1/admin/devices/register";
 
       console.log("Registrando dispositivo:", JSON.stringify(deviceData, null, 2));
 
@@ -85,7 +85,7 @@ const Device = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = `http://localhost:8085/api/v1/admin/devices/${deviceData.id}`;
+      const apiUrl = `http://192.168.128.148:8085/api/v1/admin/devices/${deviceData.id}`;
 
       console.log("Actualizando dispositivo:", JSON.stringify(deviceData, null, 2));
 
@@ -115,7 +115,7 @@ const Device = () => {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8085/api/v1/admin/devices/${deviceToDelete}`, {
+      await axios.delete(`http://192.168.128.148:8085/api/v1/admin/devices/${deviceToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -31,7 +31,7 @@ const LogbookList = () => {
         throw new Error("No se encontró un token en localStorage");
       }
 
-      const response = await axios.get("http://localhost:8085/api/v1/admin/logbooks", {
+      const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/logbooks", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -90,7 +90,7 @@ const LogbookList = () => {
       }
 
       await axios.put(
-        `http://localhost:8085/api/v1/admin/logbooks/${updatedLogbook.id}`,
+        `http://192.168.128.148:8085/api/v1/admin/logbooks/${updatedLogbook.id}`,
         {
           statusName: updatedLogbook.statusName,
           locationName: updatedLogbook.locationName,
@@ -116,7 +116,7 @@ const LogbookList = () => {
     try {
       console.log("Intentando eliminar bitácora con ID:", logbookToDelete.id);
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8085/api/v1/admin/logbooks/${logbookToDelete}`, {
+      await axios.delete(`http://192.168.128.148:8085/api/v1/admin/logbooks/${logbookToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

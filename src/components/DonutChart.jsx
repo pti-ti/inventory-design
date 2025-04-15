@@ -5,15 +5,15 @@ import { tokens } from "../theme";
 
 // Colores predefinidos para ciertos estados específicos
 const STATUS_COLORS = {
-  disponible: "#34a853", // Verde
-  laptop: "#4285f4",  // Azul
+  entregado: "#1F77B4", // Azul
+  
 };
 
 // Lista de colores primarios suaves
 const PRIMARY_COLORS = [
-  "#ea4335",
-  "#fbbc05", 
-  "#0fd9f1", "#705b96", "#ff914d", 
+  "#1F77B4", "#D62728", "#2CA02C", "#FF7F0E",
+  "#9467BD", "#8C564B", "#E377C2", "#7F7F7F",
+  "#BCBD22", "#17BECF"
 ];
 
 // Función para generar un color aleatorio si se acaban los colores primarios

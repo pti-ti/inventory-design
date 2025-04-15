@@ -17,7 +17,7 @@ const updateMaintenanceExcel = async () => {
   try {
     // 1. Obtener datos de la API
     const token = "tu_token"; // Reemplaza con el token real
-    const response = await axios.get("http://localhost:8085/api/v1/admin/maintenances", {
+    const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/maintenances", {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -79,7 +79,7 @@ const Maintenance = () => {
         return;
       }
 
-      const response = await axios.get("http://localhost:8085/api/v1/admin/maintenances", {
+      const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/maintenances", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -139,7 +139,7 @@ const Maintenance = () => {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8085/api/v1/admin/maintenances/${maintenanceToDelete}`, {
+      await axios.delete(`http://192.168.128.148:8085/api/v1/admin/maintenances/${maintenanceToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

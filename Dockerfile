@@ -2,8 +2,11 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY . .
-ARG REACT_APP_API_URL
-ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
+# Inyectamos la variable como .env para que VITE la lea 
+ARG VITE_API_URL
+RUN echo "VITE_API_URL=$VITE_API_URL" > .env
+
 RUN npm install
 RUN npm run build
 

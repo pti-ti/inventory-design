@@ -10,7 +10,10 @@ import logoClaro from "../assets/logoClaro.png";
 import logoOscuro from "../assets/logoOscuro.png";
 import "../styles/Login.css";
 
-const API_URL = "http://localhost:8085/api/v1/security/login";
+//const API_URL = "http://localhost:8085/api/v1/security/login";
+//const API_URL = `${import.meta.env.VITE_API_URL}/api/v1/security/login`;
+const API_URL = `http://192.168.128.148:8085/api/v1/security/login`;
+console.log("API_URL", API_URL);
 
 const Login = () => {
   const { login } = useContext(AuthContext);

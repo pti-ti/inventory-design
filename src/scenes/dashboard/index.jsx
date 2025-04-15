@@ -51,33 +51,33 @@ const Dashboard = () => {
     Ipad: <TabletMacIcon fontSize="large" />,
   };
 
-  //const baseUrl = process.env.REACT_APP_API_URL;
+  const baseUrl = process.env.REACT_APP_API_URL;
 
   // Función para obtener datos
   const fetchData = async () => {
     try {
       // Obtener el valor total del inventario
-      const inventoryRes = await fetch(`http://localhost:8085/api/v1/admin/devices/total-inventory-value`);
+      const inventoryRes = await fetch(`http://192.168.128.148:8085/api/v1/admin/devices/total-inventory-value`);
       const inventoryData = await inventoryRes.json();
       setTotalInventoryValue(inventoryData);
 
       // Obtener dispositivos organizados por estado
-      const statusRes = await fetch("http://localhost:8085/api/v1/admin/status/device-status-count");
+      const statusRes = await fetch(`http://192.168.128.148:8085/api/v1/admin/status/device-status-count`);
       const statusData = await statusRes.json();
       setDeviceStatus(statusData);
 
       // Obtener dispositivos organizados por tipo
-      const typeRes = await fetch("http://localhost:8085/api/v1/admin/devices/count-by-type");
+      const typeRes = await fetch(`http://192.168.128.148:8085/api/v1/admin/devices/count-by-type`);
       const typeData = await typeRes.json();
       setDeviceTypeCounts(typeData);
 
       //Obtener dispositivos organizados por ubicación 
-      const locationRes = await fetch("http://localhost:8085/api/v1/admin/locations/device-location-count");
+      const locationRes = await fetch(`http://192.168.128.148:8085/api/v1/admin/locations/device-location-count`);
       const locationData = await locationRes.json();
       setTotalLocationValue(locationData);
 
       //Obtener dispositivos organizado por tipo y ubicación
-      const locationTypeRes = await fetch("http://localhost:8085/api/v1/admin/locations/device-location-type-count");
+      const locationTypeRes = await fetch(`http://192.168.128.148:8085/api/v1/admin/locations/device-location-type-count`);
       const locationTypeData = await locationTypeRes.json();
       setDeviceLocationTypeCounts(locationTypeData);
 

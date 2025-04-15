@@ -34,7 +34,7 @@ const LocationList = () => {
               throw new Error("No se encontró un token en localStorage.");
           }
 
-          const response = await axios.get("http://localhost:8085/api/v1/admin/locations", {
+          const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/locations", {
               headers: { Authorization: `Bearer ${token}` },
           });
 
@@ -80,7 +80,7 @@ const LocationList = () => {
   const handleDelete = async () => {
       try {
           const token = localStorage.getItem("token");
-          await axios.delete(`http://localhost:8085/api/v1/admin/locations/${locationToDelete}`, {
+          await axios.delete(`http://192.168.128.148:8085/api/v1/admin/locations/${locationToDelete}`, {
               headers: { Authorization: `Bearer ${token}` },
           });
 

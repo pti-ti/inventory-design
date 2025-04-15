@@ -169,14 +169,14 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     
             if (isEditing) {
                 await axios.put(
-                    `http://localhost:8085/api/v1/admin/logbooks/${editedLogbook.id}`,
+                    `http://192.168.128.148:8085/api/v1/admin/logbooks/${editedLogbook.id}`,
                     logbookData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setSuccessMessage("Bitácora actualizada correctamente.");
             } else {
                 await axios.post(
-                    "http://localhost:8085/api/v1/admin/logbooks/register",
+                    "http://192.168.128.148:8085/api/v1/admin/logbooks/register",
                     logbookData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );

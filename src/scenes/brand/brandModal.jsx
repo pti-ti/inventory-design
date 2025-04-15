@@ -36,7 +36,7 @@ const BrandModal = ({ open, handleClose, brand, refreshBrands }) => {
     const handleRegisterBrand = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.post("http://localhost:8085/api/v1/admin/brands/create", 
+            await axios.post("http://192.168.128.148:8085/api/v1/admin/brands/create", 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -55,7 +55,7 @@ const BrandModal = ({ open, handleClose, brand, refreshBrands }) => {
     const handleUpdateBrand = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.put(`http://localhost:8085/api/v1/admin/brands/${brand.id}`, 
+            await axios.put(`http://192.168.128.148:8085/api/v1/admin/brands/${brand.id}`, 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

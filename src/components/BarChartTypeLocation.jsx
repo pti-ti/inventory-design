@@ -25,7 +25,7 @@ const BarChartTypeLocation = ({ data }) => {
         data={chartData}
         keys={deviceTypes}
         indexBy="location"
-        margin={{ top: 40, right: 160, bottom: 80, left: 60 }}
+        margin={{ top: 40, right: 100, bottom: 80, left: 100 }}
         padding={0.3}
         colors={{ scheme: "category10" }}
         borderColor={{ from: "color", modifiers: [["darker", 1.6]] }}
@@ -49,9 +49,10 @@ const BarChartTypeLocation = ({ data }) => {
           tickSize: 5,
           tickPadding: 5,
           tickRotation: -20,
-          legend: "",
+          renderTick: () => null,
+          legend: "Ubicación y cantidad de dispositivos",
           legendPosition: "middle",
-          legendOffset: 40,
+          legendOffset: 20,
           tickLine: true,
         }}
 
@@ -67,13 +68,14 @@ const BarChartTypeLocation = ({ data }) => {
           tickLine: true,
         }}
 
-        enableGridX={true}
-        enableGridY={true}
+        enableGridX={false}
+        enableGridY={false}
         gridYValues={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
         enableLabel={true}
         labelSkipWidth={12}
         labelSkipHeight={12}
-        labelTextColor={{ from: "color", modifiers: [["darker", 1.6]] }}
+        labelTextColor="#ffffff"
+        //labelTextColor={{ from: "color", modifiers: [["darker", 1.6]] }}
 
         legends={[
           {
@@ -91,6 +93,11 @@ const BarChartTypeLocation = ({ data }) => {
 
         theme={{
           axis: {
+            legend: {
+              text: {
+                fill: theme.palette.text.primary,
+              },
+            },
             domain: {
               line: {
                 stroke: theme.palette.text.primary,
@@ -131,7 +138,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8085/api/v1/admin/locations/device-location-type-count");
+        const response = await fetch("http://192.168.128.148:8085/api/v1/admin/locations/device-location-type-count");
         if (!response.ok) {
           throw new Error("Error al obtener los datos");
         }

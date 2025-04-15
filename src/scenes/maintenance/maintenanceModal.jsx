@@ -71,7 +71,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
         if (open && itemsList.length === 0) {
             const token = localStorage.getItem("token");
 
-            axios.get("http://localhost:8085/api/v1/admin/items", {
+            axios.get("http://192.168.128.148:8085/api/v1/admin/items", {
                 headers: { Authorization: `Bearer ${token}` }
             })
                 .then(response => setItemsList(response.data))
@@ -124,14 +124,14 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
 
             if (isEditing) {
                 await axios.put(
-                    `http://localhost:8085/api/v1/admin/maintenances/${editedMaintenance.id}`,
+                    `http://192.168.128.148:8085/api/v1/admin/maintenances/${editedMaintenance.id}`,
                     maintenanceData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setSnackbarMessage("Mantenimiento actualizado exitosamente.");
             } else {
                 await axios.post(
-                    "http://localhost:8085/api/v1/admin/maintenances/register",
+                    "http://192.168.128.148:8085/api/v1/admin/maintenances/register",
                     maintenanceData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -139,7 +139,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
 
                 // Descargar Excel solo en modo registro
                 try {
-                    const response = await axios.get("http://localhost:8085/api/v1/admin/excel/update", {
+                    const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/excel/update", {
                         headers: { Authorization: `Bearer ${token}` },
                         responseType: "blob",
                     });
@@ -176,7 +176,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
     const fetchDeviceData = async (deviceId) => {
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.get(`http://localhost:8085/api/v1/admin/devices/${deviceId}`, {
+            const response = await axios.get(`http://192.168.128.148:8085/api/v1/admin/devices/${deviceId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -202,7 +202,7 @@ const MaintenanceModal = ({ open, handleClose, maintenance, refreshMaintenances 
     const fetchUserData = async (userId) => {
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.get(`http://localhost:8085/api/v1/admin/users/${userId}`, {
+            const response = await axios.get(`http://192.168.128.148:8085/api/v1/admin/users/${userId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

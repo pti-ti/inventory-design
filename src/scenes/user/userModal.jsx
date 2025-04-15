@@ -14,7 +14,7 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
         const fetchLocations = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get("http://localhost:8085/api/v1/admin/locations", {
+                const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/locations", {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setLocations(response.data);
@@ -46,8 +46,8 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
             const token = localStorage.getItem("token");
             const isEditing = Boolean(user?.id);
             const url = isEditing
-                ? `http://localhost:8085/api/v1/admin/users/${user.id}`
-                : "http://localhost:8085/api/v1/admin/users/register";
+                ? `http://192.168.128.148:8085/api/v1/admin/users/${user.id}`
+                : "http://192.168.128.148:8085/api/v1/admin/users/register";
 
             const method = isEditing ? "put" : "post";
 

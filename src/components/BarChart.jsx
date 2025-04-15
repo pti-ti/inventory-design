@@ -11,7 +11,7 @@ const BarChart = ({ isDashboard = false }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8085/api/v1/admin/locations/device-location-count");
+        const response = await fetch("http://192.168.128.148:8085/api/v1/admin/locations/device-location-count");
         if (!response.ok) {
           throw new Error("Error al obtener los datos");
         }
@@ -69,7 +69,7 @@ const BarChart = ({ isDashboard = false }) => {
           }}
           keys={["count"]}
           indexBy="city"
-          margin={{ top: 20, right: 50, bottom: 50, left: 120 }} // más margen a la izquierda
+          margin={{ top: 20, right: 50, bottom: 50, left: 40 }} // más margen a la izquierda
           padding={0.2}
           layout="horizontal" // 👈 cambio importante
           valueScale={{ type: "linear" }}
@@ -90,9 +90,11 @@ const BarChart = ({ isDashboard = false }) => {
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
-            legend: isDashboard ? undefined : "",
+            format: () => "",
+            legend: "Ubicación",
+            //legend: isDashboard ? undefined : "",
             legendPosition: "middle",
-            legendOffset: -100,
+            legendOffset: -20,
           }}
           enableLabel={false}
           labelSkipWidth={12}

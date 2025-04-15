@@ -30,7 +30,7 @@ const User = () => {
         console.error("No se encontró un token en localStorage");
         return;
       }
-      const response = await axios.get("http://localhost:8085/api/v1/admin/users", {
+      const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -70,7 +70,7 @@ const User = () => {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8085/api/v1/admin/users/${userToDelete}`, {
+      await axios.delete(`http://192.168.128.148:8085/api/v1/admin/users/${userToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       

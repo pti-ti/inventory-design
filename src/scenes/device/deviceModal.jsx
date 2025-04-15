@@ -34,10 +34,10 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     const headers = { Authorization: `Bearer ${token}` };
 
                     const [locRes, statRes, modRes, brandRes] = await Promise.all([
-                        axios.get("http://localhost:8085/api/v1/admin/locations", { headers }),
-                        axios.get("http://localhost:8085/api/v1/admin/status", { headers }),
-                        axios.get("http://localhost:8085/api/v1/admin/models", { headers }),
-                        axios.get("http://localhost:8085/api/v1/admin/brands", { headers }),
+                        axios.get("http://192.168.128.148:8085/api/v1/admin/locations", { headers }),
+                        axios.get("http://192.168.128.148:8085/api/v1/admin/status", { headers }),
+                        axios.get("http://192.168.128.148:8085/api/v1/admin/models", { headers }),
+                        axios.get("http://192.168.128.148:8085/api/v1/admin/brands", { headers }),
                     ]);
 
                     setLocations(locRes.data);
@@ -91,8 +91,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
             const token = localStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` };
             const apiUrl = isEditing
-                ? `http://localhost:8085/api/v1/admin/devices/${device.id}`
-                : "http://localhost:8085/api/v1/admin/devices/register";
+                ? `http://192.168.128.148:8085/api/v1/admin/devices/${device.id}`
+                : "http://192.168.128.148:8085/api/v1/admin/devices/register";
 
             const deviceData = {
                 ...editedDevice,
