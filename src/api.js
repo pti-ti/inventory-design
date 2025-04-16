@@ -2,11 +2,12 @@ import axios from "axios";
 
 // Crear una instancia de Axios
 const api = axios.create({
-    baseURL: "http://localhost:8085/api/v1",
-    headers: {
-        "Content-Type": "application/json"
-    }
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api/v1`,
+  headers: {
+      "Content-Type": "application/json"
+  }
 });
+
 
 api.interceptors.request.use(config =>{
   let token = localStorage.getItem("token");

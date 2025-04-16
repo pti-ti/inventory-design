@@ -10,11 +10,13 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
     const [successMessage, setSuccessMessage] = useState("");
     const [locations, setLocations] = useState([]);
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
     useEffect(() => {
         const fetchLocations = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/locations", {
+                const response = await axios.get(`${API_BASE_URL}/api/v1/admin/locations`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setLocations(response.data);
@@ -46,8 +48,8 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
             const token = localStorage.getItem("token");
             const isEditing = Boolean(user?.id);
             const url = isEditing
-                ? `http://192.168.128.148:8085/api/v1/admin/users/${user.id}`
-                : "http://192.168.128.148:8085/api/v1/admin/users/register";
+                ? `${API_BASE_URL}/api/v1/admin/users/${user.id}`
+                : `${API_BASE_URL}/api/v1/admin/users/register`;
 
             const method = isEditing ? "put" : "post";
 

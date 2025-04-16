@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
-import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import BlockIcon from "@mui/icons-material/Block";
-import BuildIcon from "@mui/icons-material/Build";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import LaptopMacIcon from "@mui/icons-material/LaptopMac";
 import MonitorIcon from "@mui/icons-material/Monitor";
 import KeyboardIcon from "@mui/icons-material/Keyboard";
@@ -15,8 +11,6 @@ import PrintIcon from "@mui/icons-material/Print";
 import TabletMacIcon from "@mui/icons-material/TabletMac";
 import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
-import BarChartTypeLocation from "../../components/BarChartTypeLocation";
-import StatBox from "../../components/StatBox";
 import DonutChart from "../../components/DonutChart";
 import BarChartComponent from "../../components/BarChartTypeLocation";
 
@@ -51,33 +45,33 @@ const Dashboard = () => {
     Ipad: <TabletMacIcon fontSize="large" />,
   };
 
-  const baseUrl = process.env.REACT_APP_API_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   // Función para obtener datos
   const fetchData = async () => {
     try {
       // Obtener el valor total del inventario
-      const inventoryRes = await fetch(`http://192.168.128.148:8085/api/v1/admin/devices/total-inventory-value`);
+      const inventoryRes = await fetch(`${API_BASE_URL}/api/v1/admin/devices/total-inventory-value`);
       const inventoryData = await inventoryRes.json();
       setTotalInventoryValue(inventoryData);
 
       // Obtener dispositivos organizados por estado
-      const statusRes = await fetch(`http://192.168.128.148:8085/api/v1/admin/status/device-status-count`);
+      const statusRes = await fetch(`${API_BASE_URL}/api/v1/admin/status/device-status-count`);
       const statusData = await statusRes.json();
       setDeviceStatus(statusData);
 
       // Obtener dispositivos organizados por tipo
-      const typeRes = await fetch(`http://192.168.128.148:8085/api/v1/admin/devices/count-by-type`);
+      const typeRes = await fetch(`${API_BASE_URL}/api/v1/admin/devices/count-by-type`);
       const typeData = await typeRes.json();
       setDeviceTypeCounts(typeData);
 
       //Obtener dispositivos organizados por ubicación 
-      const locationRes = await fetch(`http://192.168.128.148:8085/api/v1/admin/locations/device-location-count`);
+      const locationRes = await fetch(`${API_BASE_URL}/api/v1/admin/locations/device-location-count`);
       const locationData = await locationRes.json();
       setTotalLocationValue(locationData);
 
       //Obtener dispositivos organizado por tipo y ubicación
-      const locationTypeRes = await fetch(`http://192.168.128.148:8085/api/v1/admin/locations/device-location-type-count`);
+      const locationTypeRes = await fetch(`${API_BASE_URL}/api/v1/admin/locations/device-location-type-count`);
       const locationTypeData = await locationTypeRes.json();
       setDeviceLocationTypeCounts(locationTypeData);
 
@@ -151,27 +145,17 @@ const Dashboard = () => {
           }}
         >
           {/* El Header ocupa todo el espacio disponible */}
-          <Box flexGrow={1}>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            width="100%"
+            mb={2}
+          >
             <Header title="DASHBOARD" subtitle="Bienvenido al Inventario de TI" />
           </Box>
 
-          {/* Contenedor del botón alineado a la derecha */}
-          <Box display="flex" justifyContent="flex-end">
-            <Button
-              sx={{
-                backgroundColor: colors.blueAccent[700],
-                color: colors.grey[100],
-                fontSize: { xs: "12px", sm: "14px" },
-                fontWeight: "bold",
-                padding: { xs: "8px 16px", sm: "10px 20px" },
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <DownloadOutlinedIcon sx={{ mr: { xs: "15px", sm: "10px" } }} />
-              Descargar Reportes
-            </Button>
-          </Box>
+
         </Box>
       </Box>
       {/* BOX - Dispositivos por tipo con icono */}

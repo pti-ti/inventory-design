@@ -12,6 +12,8 @@ const modelModal = ({ open, handleClose, model, refreshModels }) => {
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
     // Valores iniciales del formulario
     const initialValues = {
         name: model?.name || "",
@@ -36,7 +38,7 @@ const modelModal = ({ open, handleClose, model, refreshModels }) => {
     const handleRegisterModel = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.post("http://192.168.128.148:8085/api/v1/admin/models/create", 
+            await axios.post(`${API_BASE_URL}/api/v1/admin/models/create`, 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -55,7 +57,7 @@ const modelModal = ({ open, handleClose, model, refreshModels }) => {
     const handleUpdateModel = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.put(`http://192.168.128.148:8085/api/v1/admin/models/${model.id}`, 
+            await axios.put(`${API_BASE_URL}/api/v1/admin/models/${model.id}`, 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

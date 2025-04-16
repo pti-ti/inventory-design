@@ -30,16 +30,18 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
     const isEditing = Boolean(logbook?.id);
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL; 
+
     useEffect(() => {
         if (open) {
             const fetchData = async () => {
                 try {
                     const token = localStorage.getItem("token");
                     const [statusResponse, locationResponse, brandResponse, modelResponse] = await Promise.all([
-                        axios.get("http://localhost:8085/api/v1/admin/status", { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get("http://localhost:8085/api/v1/admin/locations", { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get("http://localhost:8085/api/v1/admin/brands", { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get("http://localhost:8085/api/v1/admin/models", { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${API_BASE_URL}/api/v1/admin/status`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${API_BASE_URL}/api/v1/admin/locations`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${API_BASE_URL}/api/v1/admin/brands`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${API_BASE_URL}/api/v1/admin/models`, { headers: { Authorization: `Bearer ${token}` } }),
                     ]);
 
                     setStatuses(statusResponse.data);
@@ -79,7 +81,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const fetchDeviceById = async (deviceId) => {
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.get(`http://localhost:8085/api/v1/admin/devices/${deviceId}`, {
+            const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices/${deviceId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -108,7 +110,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.get(`http://localhost:8085/api/v1/admin/users/${value}`, {
+            const response = await axios.get(`${API_BASE_URL}/api/v1/admin/users/${value}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -169,14 +171,14 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     
             if (isEditing) {
                 await axios.put(
-                    `http://192.168.128.148:8085/api/v1/admin/logbooks/${editedLogbook.id}`,
+                    `${API_BASE_URL}/api/v1/admin/logbooks/${editedLogbook.id}`,
                     logbookData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setSuccessMessage("Bitácora actualizada correctamente.");
             } else {
                 await axios.post(
-                    "http://192.168.128.148:8085/api/v1/admin/logbooks/register",
+                    `${API_BASE_URL}/api/v1/admin/logbooks/register`,
                     logbookData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );

@@ -5,8 +5,11 @@ import { tokens } from "../theme";
 
 // Colores predefinidos para ciertos estados específicos
 const STATUS_COLORS = {
-  entregado: "#1F77B4", // Azul
-  
+  "pendiente reparacion": "#D62728",           // Rojo
+  "sin pendientes": "#1F77B4",                 // Azul
+  "entregado pendiente acta": "#FF7F0E",       // Naranja
+  "en data center": "#2CA02C",                 // Verde
+  "sin estado": "#9467BD"                      // Morado
 };
 
 // Lista de colores primarios suaves

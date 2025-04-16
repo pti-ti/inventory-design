@@ -26,6 +26,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
     useEffect(() => {
         if (open) {
             const fetchData = async () => {
@@ -34,10 +36,10 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     const headers = { Authorization: `Bearer ${token}` };
 
                     const [locRes, statRes, modRes, brandRes] = await Promise.all([
-                        axios.get("http://192.168.128.148:8085/api/v1/admin/locations", { headers }),
-                        axios.get("http://192.168.128.148:8085/api/v1/admin/status", { headers }),
-                        axios.get("http://192.168.128.148:8085/api/v1/admin/models", { headers }),
-                        axios.get("http://192.168.128.148:8085/api/v1/admin/brands", { headers }),
+                        axios.get(`${API_BASE_URL}/api/v1/admin/locations`, { headers }),
+                        axios.get(`${API_BASE_URL}/api/v1/admin/status`, { headers }),
+                        axios.get(`${API_BASE_URL}/api/v1/admin/models`, { headers }),
+                        axios.get(`${API_BASE_URL}/api/v1/admin/brands`, { headers }),
                     ]);
 
                     setLocations(locRes.data);
@@ -91,8 +93,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
             const token = localStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` };
             const apiUrl = isEditing
-                ? `http://192.168.128.148:8085/api/v1/admin/devices/${device.id}`
-                : "http://192.168.128.148:8085/api/v1/admin/devices/register";
+                ? `${API_BASE_URL}/api/v1/admin/devices/${device.id}`
+                : `${API_BASE_URL}/api/v1/admin/devices/register`;
 
             const deviceData = {
                 ...editedDevice,

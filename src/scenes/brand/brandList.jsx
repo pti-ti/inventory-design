@@ -26,6 +26,8 @@ const BrandList = () => {
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState("success"); 
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
     // 🔹 Función para obtener estados desde la API
     const fetchData = async () => {
         try {
@@ -34,7 +36,7 @@ const BrandList = () => {
                 throw new Error("No se encontró un token en localStorage.");
             }
 
-            const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/brands", {
+            const response = await axios.get(`${API_BASE_URL}/api/v1/admin/brands`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -80,7 +82,7 @@ const BrandList = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem("token");
-            await axios.delete(`http://192.168.128.148:8085/api/v1/admin/brands/${brandToDelete}`, {
+            await axios.delete(`${API_BASE_URL}/api/v1/admin/brands/${brandToDelete}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

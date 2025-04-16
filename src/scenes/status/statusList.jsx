@@ -25,6 +25,8 @@ import {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState("success"); 
+
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   
     // 🔹 Función para obtener estados desde la API
     const fetchData = async () => {
@@ -34,7 +36,7 @@ import {
                 throw new Error("No se encontró un token en localStorage.");
             }
   
-            const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/status", {
+            const response = await axios.get(`${API_BASE_URL}/api/v1/admin/status`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
   
@@ -80,7 +82,7 @@ import {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem("token");
-            await axios.delete(`http://192.168.128.148:8085/api/v1/admin/status/${statusToDelete}`, {
+            await axios.delete(`${API_BASE_URL}/api/v1/admin/status/${statusToDelete}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
   

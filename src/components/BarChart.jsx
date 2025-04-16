@@ -8,10 +8,13 @@ const BarChart = ({ isDashboard = false }) => {
   const colors = tokens(theme.palette.mode);
   const [data, setData] = useState([]);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://192.168.128.148:8085/api/v1/admin/locations/device-location-count");
+        const response = await fetch(`${API_BASE_URL}/api/v1/admin/locations/device-location-count`);
         if (!response.ok) {
           throw new Error("Error al obtener los datos");
         }

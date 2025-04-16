@@ -24,7 +24,8 @@ const Device = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // Puede ser "success", "error", "warning", etc.
 
-
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -33,7 +34,7 @@ const Device = () => {
         return;
       }
 
-      const response = await axios.get("http://192.168.128.148:8085/api/v1/admin/devices", {
+      const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -66,7 +67,7 @@ const Device = () => {
   const handleRegisterDevice = async (deviceData) => {
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = "http://192.168.128.148:8085/api/v1/admin/devices/register";
+      const apiUrl = `${API_BASE_URL}/api/v1/admin/devices/register`;
 
       console.log("Registrando dispositivo:", JSON.stringify(deviceData, null, 2));
 
@@ -85,7 +86,7 @@ const Device = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = `http://192.168.128.148:8085/api/v1/admin/devices/${deviceData.id}`;
+      const apiUrl = `${API_BASE_URL}/api/v1/admin/devices/${deviceData.id}`;
 
       console.log("Actualizando dispositivo:", JSON.stringify(deviceData, null, 2));
 
@@ -115,7 +116,7 @@ const Device = () => {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://192.168.128.148:8085/api/v1/admin/devices/${deviceToDelete}`, {
+      await axios.delete(`${API_BASE_URL}/api/v1/admin/devices/${deviceToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -32,11 +32,13 @@ const statusModal = ({ open, handleClose, status, refreshStatus }) => {
         setSnackbarOpen(true);
     };
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
     // Crear un nuevo estado
     const handleRegisterStatus = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.post("http://192.168.128.148:8085/api/v1/admin/status/create", 
+            await axios.post(`${API_BASE_URL}/api/v1/admin/status/create`, 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -55,7 +57,7 @@ const statusModal = ({ open, handleClose, status, refreshStatus }) => {
     const handleUpdateStatus = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.put(`http://192.168.128.148:8085/api/v1/admin/status/${status.id}`, 
+            await axios.put(`${API_BASE_URL}/api/v1/admin/status/${status.id}`, 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
