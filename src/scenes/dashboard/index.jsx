@@ -151,10 +151,10 @@ const Dashboard = () => {
             alignItems="center"
             width="100%"
             mb={2}
+            sx={{ marginLeft: "250px" }}
           >
             <Header title="DASHBOARD" subtitle="Bienvenido al Inventario de TI" />
           </Box>
-
 
         </Box>
       </Box>

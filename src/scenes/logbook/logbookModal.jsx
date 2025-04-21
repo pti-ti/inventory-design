@@ -183,8 +183,27 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setSuccessMessage("Bitácora registrada correctamente.");
-            }
+
+                try {
+                    const response = await axios.get(`${API_BASE_URL}/api/v1/admin/excel/logbook`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                        responseType: "blob",
+                    });
     
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.setAttribute("download", "Bitacora.xlsx");
+                    document.body.appendChild(link);
+                    link.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(link);
+                } catch (excelError) {
+                    console.error("Error al descargar el Excel de bitácora:", excelError);
+                    setSuccessMessage("Bitácora guardada, pero ocurrió un error al descargar el Excel.");
+                }
+            }
+
             refreshLogbooks();
             handleClose();
         } catch (error) {
