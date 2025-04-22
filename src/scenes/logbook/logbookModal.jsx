@@ -34,6 +34,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const [deviceSuggestions, setDeviceSuggestions] = useState([]);
     const [deviceCodeInput, setDeviceCodeInput] = useState('');
     const [selectedDevice, setSelectedDevice] = useState(null);
+    const [userLocation, setUserLocation] = useState('');
 
 
 
@@ -66,6 +67,16 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             fetchData();
         }
     }, [open]);
+
+    useEffect(() => {
+        if (!open) {
+            // Restablecer el estado cuando se cierra el modal
+            setEditedLogbook(initialLogbookState);  // Asegúrate de que `initialLogbookState` sea el estado por defecto
+            setSelectedUser(null);  // Limpiar el usuario seleccionado
+            setEmailInput("");      // Limpiar el campo de correo electrónico
+        }
+    }, [open]);  // El efecto se ejecuta cuando `open` cambia
+    
 
     useEffect(() => {
         if (logbook && open && statuses.length > 0 && locations.length > 0 && brands.length > 0 && models.length > 0) {
@@ -108,7 +119,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                 setDeviceSuggestions([]);
                 return;
             }
-    
+
             const fetchDeviceSuggestions = async () => {
                 try {
                     const token = localStorage.getItem("token");
@@ -120,7 +131,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                             code: deviceCodeInput,
                         },
                     });
-    
+
                     // Verificamos si la respuesta tiene dispositivos
                     if (response.data && response.data.length > 0) {
                         setDeviceSuggestions(response.data);
@@ -142,14 +153,15 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     setErrorMessage("Ocurrió un error al buscar el dispositivo.");
                 }
             };
-    
+
             fetchDeviceSuggestions();
         }, 300); // debounce
-    
+
         return () => clearTimeout(delayDebounce);
-    }, [deviceCodeInput]);    
+    }, [deviceCodeInput]);
 
     // Función para cargar los emails de los usuarios
+    // Función para cargar los emails y ubicaciones de los usuarios
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             if (emailInput.trim() === '') {
@@ -168,7 +180,14 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                             email: emailInput,
                         },
                     });
-                    setEmailSuggestions(response.data);
+
+                    // Suponiendo que la respuesta incluye la ubicación y el email
+                    const usersWithLocation = response.data.map(user => ({
+                        ...user,
+                        location: user.location || ""  // Asegúrate de que el campo 'location' esté en la respuesta
+                    }));
+
+                    setEmailSuggestions(usersWithLocation);
                 } catch (error) {
                     console.error("Error al buscar usuarios por email:", error);
                 }
@@ -179,6 +198,19 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
         return () => clearTimeout(delayDebounce);
     }, [emailInput]);
+
+
+    const handleUserChange = (event, newValue) => {
+        setSelectedUser(newValue);
+        if (newValue) {
+            // Asumimos que `newValue` tiene un campo `email` y `location`
+            setUserLocation(newValue.location || 'Ubicación no disponible');
+            setSuccessMessage('Usuario seleccionado exitosamente');
+        } else {
+            setUserLocation('');
+            setSuccessMessage('');
+        }
+    };
 
 
     const fetchDeviceById = async (deviceId) => {
@@ -201,33 +233,6 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
         } catch (error) {
             console.error("No se pudo obtener el dispositivo", error.response?.data || error.message);
             setErrorMessage("No se encontró el dispositivo con ese ID.");
-        }
-    };
-
-    const fetchDeviceByCode = async (code) => {
-        try {
-            const token = localStorage.getItem("token");
-            const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices`, {
-                headers: { Authorization: `Bearer ${token}` },
-                params: { code: code }  // Suponiendo que la API permite filtrar por código
-            });
-
-            const device = response.data;
-
-            setEditedLogbook(prev => ({
-                ...prev,
-                deviceCode: device.code || "",
-                deviceBrand: device.brand?.name || "",
-                deviceModel: device.model?.name || "",
-                // Aquí deberías agregar la asignación de otros campos necesarios
-            }));
-
-            // También puedes seleccionar el dispositivo de forma automática si se obtiene
-            setSelectedDevice(device);
-
-        } catch (error) {
-            console.error("Error al obtener el dispositivo por código", error.response?.data || error.message);
-            setErrorMessage("No se encontró el dispositivo con ese código.");
         }
     };
 
@@ -318,6 +323,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setSuccessMessage("Bitácora registrada correctamente.");
+                await new Promise(resolve => setTimeout(resolve, 1000));
 
                 try {
                     const response = await axios.get(`${API_BASE_URL}/api/v1/admin/excel/logbook`, {
@@ -347,10 +353,16 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
         }
     };
 
+    const handleCloseModal = () => {
+        handleClose();  // Cerrar el modal
+        // Limpiar el estado de la bitácora
+        refreshLogbooks(initialLogbookState); // Pasar el estado inicial para limpiar el logbook
+    };
+
 
     return (
         <>
-            <Modal open={open} onClose={handleClose}>
+            <Modal open={open} onClose={handleCloseModal}>
                 <Box sx={{
                     position: "absolute",
                     top: "50%",
@@ -365,7 +377,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     <Typography variant="h6">{isEditing ? "Editar Bitácora" : "Registrar Bitácora"}</Typography>
 
                     {/* Campos deshabilitados durante la edición */}
-                    {!isEditing && (
+                    {/* {!isEditing && (
                         <TextField
                             fullWidth
                             margin="normal"
@@ -382,45 +394,45 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                                 }
                             }}
                         />
-                    )}
+                    )} */}
 
 
                     {!isEditing && (
                         <Autocomplete
-                        fullWidth
-                        freeSolo
-                        options={deviceSuggestions}
-                        getOptionLabel={(option) => option.code || ""}  // Usamos el código como etiqueta de las opciones
-                        value={null}  // Aquí no vinculamos el valor directamente, dejamos que solo el input se controle
-                        onInputChange={(event, newInputValue) => {
-                            // Solo actualizamos el valor de deviceCodeInput cuando escribes
-                            setDeviceCodeInput(newInputValue);
-                        }}
-                        onChange={(event, newValue) => {
-                            // Cuando seleccionas un valor de la lista de sugerencias, lo usamos para actualizar el dispositivo
-                            if (newValue) {
-                                setSelectedDevice(newValue);
-                    
-                                setEditedLogbook((prev) => ({
-                                    ...prev,
-                                    deviceId: newValue.id.toString(),
-                                    deviceCode: newValue.code,
-                                    deviceBrand: newValue.brand?.name || "",  // Aquí usamos la marca por nombre
-                                    deviceModel: newValue.model?.name || "",  // Aquí usamos el modelo por nombre
-                                }));
-                            }
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Código del Dispositivo"
-                                margin="normal"
-                                value={deviceCodeInput}  // Aquí controlamos el valor con el estado de deviceCodeInput
-                                onChange={(e) => setDeviceCodeInput(e.target.value)}  // Actualizamos el valor del input al escribir
-                            />
-                        )}
-                    />
-                                                                                        
+                            fullWidth
+                            freeSolo
+                            options={deviceSuggestions}
+                            getOptionLabel={(option) => option.code || ""}  // Usamos el código como etiqueta de las opciones
+                            value={null}  // Aquí no vinculamos el valor directamente, dejamos que solo el input se controle
+                            onInputChange={(event, newInputValue) => {
+                                // Solo actualizamos el valor de deviceCodeInput cuando escribes
+                                setDeviceCodeInput(newInputValue);
+                            }}
+                            onChange={(event, newValue) => {
+                                // Cuando seleccionas un valor de la lista de sugerencias, lo usamos para actualizar el dispositivo
+                                if (newValue) {
+                                    setSelectedDevice(newValue);
+
+                                    setEditedLogbook((prev) => ({
+                                        ...prev,
+                                        deviceId: newValue.id.toString(),
+                                        deviceCode: newValue.code,
+                                        deviceBrand: newValue.brand?.name || "",  // Aquí usamos la marca por nombre
+                                        deviceModel: newValue.model?.name || "",  // Aquí usamos el modelo por nombre
+                                    }));
+                                }
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Código del Dispositivo"
+                                    margin="normal"
+                                    value={deviceCodeInput}  // Aquí controlamos el valor con el estado de deviceCodeInput
+                                    onChange={(e) => setDeviceCodeInput(e.target.value)}  // Actualizamos el valor del input al escribir
+                                />
+                            )}
+                        />
+
 
                     )}
 
@@ -446,37 +458,47 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
                     {!isEditing && (
                         <Autocomplete
-                            fullWidth
-                            freeSolo
-                            options={emailSuggestions}
-                            getOptionLabel={(option) => option.email || ""}
-                            value={selectedUser}
-                            onInputChange={(event, newInputValue) => {
-                                setEmailInput(newInputValue);
-                            }}
-                            onChange={(event, newValue) => {
-                                setSelectedUser(newValue);
-                                setEditedLogbook((prev) => ({
-                                    ...prev,
-                                    userId: newValue?.id?.toString() || '',
-                                    userEmail: newValue?.email || '',
-                                }));
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Correo del Usuario"
-                                    margin="normal"
-                                />
-                            )}
-                        />
+                        fullWidth
+                        freeSolo
+                        options={emailSuggestions}
+                        getOptionLabel={(option) => option.email || ""}
+                        value={selectedUser}  // Vincula al valor de `selectedUser`
+                        onInputChange={(event, newInputValue) => {
+                            setEmailInput(newInputValue);  // Actualiza el input del correo
+                        }}
+                        onChange={(event, newValue) => {
+                            setSelectedUser(newValue);  // Asigna el usuario seleccionado al estado
+                            setEditedLogbook((prev) => ({
+                                ...prev,
+                                userId: newValue?.id?.toString() || '',
+                                userEmail: newValue?.email || '',
+                                locationId: newValue?.location?.id || ''  // Aquí también gestionas la ubicación
+                            }));
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Correo del Usuario"
+                                margin="normal"
+                            />
+                        )}
+                    />
+                    
                     )}
 
+                    {/* Selección de ubicación */}
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Ubicación</InputLabel>
-                        <Select name="locationId" value={editedLogbook.locationId} onChange={handleChange} disabled={isEditing}>
+                        <Select
+                            name="locationId"
+                            value={editedLogbook.locationId}  // El valor de ubicación se toma de 'editedLogbook'
+                            onChange={handleChange}
+                            disabled={isEditing}
+                        >
                             {locations.map(location => (
-                                <MenuItem key={location.id} value={location.id}>{location.name}</MenuItem>
+                                <MenuItem key={location.id} value={location.id}>
+                                    {location.name}
+                                </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
