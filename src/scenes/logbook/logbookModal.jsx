@@ -1,9 +1,10 @@
 import {
     Box, Button, Modal, TextField, Typography, MenuItem,
-    Select, FormControl, InputLabel, Snackbar, Alert
+    Select, FormControl, InputLabel, Snackbar, Alert, Autocomplete
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "axios";
+
 
 const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const initialLogbookState = {
@@ -27,10 +28,19 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const [editedLogbook, setEditedLogbook] = useState(initialLogbookState);
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [emailInput, setEmailInput] = useState('');
+    const [emailSuggestions, setEmailSuggestions] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [deviceSuggestions, setDeviceSuggestions] = useState([]);
+    const [deviceCodeInput, setDeviceCodeInput] = useState('');
+    const [selectedDevice, setSelectedDevice] = useState(null);
+
+
+
 
     const isEditing = Boolean(logbook?.id);
 
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL; 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     useEffect(() => {
         if (open) {
@@ -73,10 +83,103 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                 note: logbook.note ?? "",
                 createdAt: logbook.createdAt ?? ""
             });
+
+            setSelectedUser({ id: logbook.userId, email: logbook.userEmail });
+            setEmailInput(logbook.userEmail || "");
+
+            setSelectedDevice({
+                id: logbook.deviceId,
+                code: logbook.deviceCode,
+                brand: { name: logbook.deviceBrand },
+                model: { name: logbook.deviceModel }
+            });
+            setDeviceCodeInput(logbook.deviceCode || "");
+
+
         } else {
             setEditedLogbook(initialLogbookState);
         }
     }, [logbook, open, statuses, locations, brands, models]);
+
+    // Función para cargar los dispositivos por código  
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            if (deviceCodeInput.trim() === '') {
+                setDeviceSuggestions([]);
+                return;
+            }
+    
+            const fetchDeviceSuggestions = async () => {
+                try {
+                    const token = localStorage.getItem("token");
+                    const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices/search`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        params: {
+                            code: deviceCodeInput,
+                        },
+                    });
+    
+                    // Verificamos si la respuesta tiene dispositivos
+                    if (response.data && response.data.length > 0) {
+                        setDeviceSuggestions(response.data);
+                        // Aquí, asignamos los valores de marca y modelo si se encuentran
+                        const device = response.data[0];  // Usamos el primer dispositivo de las sugerencias
+                        setEditedLogbook(prev => ({
+                            ...prev,
+                            deviceCode: device.code || "",
+                            deviceBrand: brands.find(b => b.name === device.brandName)?.id?.toString() || "",
+                            deviceModel: models.find(m => m.name === device.modelName)?.id?.toString() || "",
+                        }));
+                    } else {
+                        // Si no se encuentran dispositivos, mostramos un mensaje
+                        setDeviceSuggestions([]);
+                        setErrorMessage("No se encontraron dispositivos con ese código.");
+                    }
+                } catch (error) {
+                    console.error("Error al buscar dispositivos por código:", error);
+                    setErrorMessage("Ocurrió un error al buscar el dispositivo.");
+                }
+            };
+    
+            fetchDeviceSuggestions();
+        }, 300); // debounce
+    
+        return () => clearTimeout(delayDebounce);
+    }, [deviceCodeInput]);    
+
+    // Función para cargar los emails de los usuarios
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            if (emailInput.trim() === '') {
+                setEmailSuggestions([]);
+                return;
+            }
+
+            const fetchUserSuggestions = async () => {
+                try {
+                    const token = localStorage.getItem("token");
+                    const response = await axios.get(`${API_BASE_URL}/api/v1/admin/users/by-email`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        params: {
+                            email: emailInput,
+                        },
+                    });
+                    setEmailSuggestions(response.data);
+                } catch (error) {
+                    console.error("Error al buscar usuarios por email:", error);
+                }
+            };
+
+            fetchUserSuggestions();
+        }, 300); // 300ms de debounce
+
+        return () => clearTimeout(delayDebounce);
+    }, [emailInput]);
+
 
     const fetchDeviceById = async (deviceId) => {
         try {
@@ -100,6 +203,34 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             setErrorMessage("No se encontró el dispositivo con ese ID.");
         }
     };
+
+    const fetchDeviceByCode = async (code) => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices`, {
+                headers: { Authorization: `Bearer ${token}` },
+                params: { code: code }  // Suponiendo que la API permite filtrar por código
+            });
+
+            const device = response.data;
+
+            setEditedLogbook(prev => ({
+                ...prev,
+                deviceCode: device.code || "",
+                deviceBrand: device.brand?.name || "",
+                deviceModel: device.model?.name || "",
+                // Aquí deberías agregar la asignación de otros campos necesarios
+            }));
+
+            // También puedes seleccionar el dispositivo de forma automática si se obtiene
+            setSelectedDevice(device);
+
+        } catch (error) {
+            console.error("Error al obtener el dispositivo por código", error.response?.data || error.message);
+            setErrorMessage("No se encontró el dispositivo con ese código.");
+        }
+    };
+
 
     const handleUserIdChange = async (e) => {
         const value = e.target.value;
@@ -138,17 +269,21 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
         setErrorMessage("");
     };
 
+    const handleEmailInputChange = async (e) => {
+        const value = e.target.value;
+    }
+
     const handleSave = async () => {
         try {
             const token = localStorage.getItem("token");
-    
+
             if (!editedLogbook.note.trim()) {
                 setErrorMessage("Las notas son obligatorias.");
                 return;
             }
-    
+
             let logbookData;
-    
+
             if (isEditing) {
                 // Solo se edita la nota
                 logbookData = {
@@ -166,9 +301,9 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     note: editedLogbook.note
                 };
             }
-    
+
             console.log("Datos enviados al backend:", logbookData);
-    
+
             if (isEditing) {
                 await axios.put(
                     `${API_BASE_URL}/api/v1/admin/logbooks/${editedLogbook.id}`,
@@ -189,7 +324,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                         headers: { Authorization: `Bearer ${token}` },
                         responseType: "blob",
                     });
-    
+
                     const url = window.URL.createObjectURL(new Blob([response.data]));
                     const link = document.createElement("a");
                     link.href = url;
@@ -211,7 +346,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             setErrorMessage("No se pudo procesar la solicitud.");
         }
     };
-    
+
 
     return (
         <>
@@ -250,12 +385,44 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     )}
 
 
-                    <TextField
-                        fullWidth margin="normal" label="Código del Dispositivo"
-                        name="deviceCode" value={editedLogbook.deviceCode} onChange={handleChange} disabled
+                    {!isEditing && (
+                        <Autocomplete
+                        fullWidth
+                        freeSolo
+                        options={deviceSuggestions}
+                        getOptionLabel={(option) => option.code || ""}  // Usamos el código como etiqueta de las opciones
+                        value={null}  // Aquí no vinculamos el valor directamente, dejamos que solo el input se controle
+                        onInputChange={(event, newInputValue) => {
+                            // Solo actualizamos el valor de deviceCodeInput cuando escribes
+                            setDeviceCodeInput(newInputValue);
+                        }}
+                        onChange={(event, newValue) => {
+                            // Cuando seleccionas un valor de la lista de sugerencias, lo usamos para actualizar el dispositivo
+                            if (newValue) {
+                                setSelectedDevice(newValue);
+                    
+                                setEditedLogbook((prev) => ({
+                                    ...prev,
+                                    deviceId: newValue.id.toString(),
+                                    deviceCode: newValue.code,
+                                    deviceBrand: newValue.brand?.name || "",  // Aquí usamos la marca por nombre
+                                    deviceModel: newValue.model?.name || "",  // Aquí usamos el modelo por nombre
+                                }));
+                            }
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Código del Dispositivo"
+                                margin="normal"
+                                value={deviceCodeInput}  // Aquí controlamos el valor con el estado de deviceCodeInput
+                                onChange={(e) => setDeviceCodeInput(e.target.value)}  // Actualizamos el valor del input al escribir
+                            />
+                        )}
                     />
+                                                                                        
 
-
+                    )}
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Marca</InputLabel>
@@ -278,20 +445,33 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                     </FormControl>
 
                     {!isEditing && (
-                        <TextField
+                        <Autocomplete
                             fullWidth
-                            margin="normal"
-                            label="ID del Usuario"
-                            name="userId"
-                            value={editedLogbook.userId}
-                            onChange={handleUserIdChange}
+                            freeSolo
+                            options={emailSuggestions}
+                            getOptionLabel={(option) => option.email || ""}
+                            value={selectedUser}
+                            onInputChange={(event, newInputValue) => {
+                                setEmailInput(newInputValue);
+                            }}
+                            onChange={(event, newValue) => {
+                                setSelectedUser(newValue);
+                                setEditedLogbook((prev) => ({
+                                    ...prev,
+                                    userId: newValue?.id?.toString() || '',
+                                    userEmail: newValue?.email || '',
+                                }));
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Correo del Usuario"
+                                    margin="normal"
+                                />
+                            )}
                         />
                     )}
 
-                    <TextField
-                        fullWidth margin="normal" label="Email del Usuario"
-                        name="userEmail" value={editedLogbook.userEmail} onChange={handleChange} disabled
-                    />
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Ubicación</InputLabel>
                         <Select name="locationId" value={editedLogbook.locationId} onChange={handleChange} disabled={isEditing}>
