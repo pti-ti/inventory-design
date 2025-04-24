@@ -16,6 +16,8 @@ import {
   HandymanOutlined as ToolsIcon,
   LogoutOutlined as LogoutIcon,
   Menu as MenuIcon,
+  GroupOutlined as GroupIcon,
+  AdminPanelSettingsOutlined as AdminIcon
 } from "@mui/icons-material";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -44,11 +46,12 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
     { title: "Dispositivos", to: "/dispositivos", icon: <DevicesOtherIcon /> },
     { title: "Marcas", to: "/marcas", icon: <LabelIcon /> },
     { title: "Modelos", to: "/modelos", icon: <DevicesIcon /> },
-    { title: "Usuarios", to: "/usuarios", icon: <PersonIcon /> },
+    { title: "Colaboradores", to: "/usuarios", icon: <GroupIcon /> },
     { title: "Ubicación", to: "/ubicaciones", icon: <LocationIcon /> },
     { title: "Estado", to: "/estados", icon: <CheckIcon /> },
     { title: "Bitácoras", to: "/bitacoras", icon: <BookIcon /> },
     { title: "Mantenimientos", to: "/mantenimientos", icon: <ToolsIcon /> },
+    { title: "Usuarios", to: "/mantenimientos", icon: <AdminIcon /> },
   ];
 
   const handleLogout = () => {

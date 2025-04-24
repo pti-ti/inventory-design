@@ -56,8 +56,7 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
     }, [open]);
 
     useEffect(() => {
-        console.log("Dispositivo recibido para editar:", device);
-        if (open && isEditing && device) {
+        if (open && isEditing && device && brands.length && models.length && statuses.length && locations.length) {
             setEditedDevice({
                 code: device.code || "",
                 brandId: brands.find(b => b.name === device.brand)?.id || "",
@@ -82,13 +81,85 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                 locationId: ""
             });
         }
-    }, [device, open, isEditing]);
+    }, [device, open, isEditing, brands, models, statuses, locations]);
+
 
     const handleChange = (e) => {
         setEditedDevice(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
     const handleSubmit = async () => {
+        // Validación de campos requeridos
+        const requiredFields = [
+            { key: "code", label: "Código" },
+            { key: "brandId", label: "Marca" },
+            { key: "modelId", label: "Modelo" },
+            { key: "serial", label: "Serial" },
+            { key: "specification", label: "Especificaciones" },
+            { key: "type", label: "Tipo" },
+            { key: "statusId", label: "Estado" },
+            { key: "price", label: "Precio" },
+            { key: "locationId", label: "Ubicación" }
+        ];
+
+        for (const field of requiredFields) {
+            const value = editedDevice[field.key];
+            if (!value || value.toString().trim() === "") {
+                setSnackbarMessage(`Error al guardar dispositivo: el campo "${field.label}" es obligatorio.`);
+                setSnackbarSeverity("error");
+                setOpenSnackbar(true);
+                return;
+            }
+
+            // Validación específica para el campo "price"
+            if (field.key === "price") {
+                const price = parseFloat(value);
+                if (isNaN(price) || price < 0) {
+                    setSnackbarMessage(`Error al guardar dispositivo: el campo "Precio" debe ser un número positivo.`);
+                    setSnackbarSeverity("error");
+                    setOpenSnackbar(true);
+                    return;
+                }
+            }
+        }
+
+        try {
+            const token = localStorage.getItem("token");
+            const headers = { Authorization: `Bearer ${token}` };
+        
+            // Solo verificar código duplicado si el código fue modificado o si es una creación
+            const isCreating = !device?.id;
+            const codeChanged = editedDevice.code !== device.code;
+        
+            if (isCreating || codeChanged) {
+                const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices/search/${editedDevice.code}`, {
+                    headers,
+                });
+        
+                const existingDevice = response.data;
+        
+                if (existingDevice && (!device || existingDevice.id !== device.id)) {
+                    setSnackbarMessage(`Error: el código "${editedDevice.code}" ya está registrado para otro dispositivo.`);
+                    setSnackbarSeverity("error");
+                    setOpenSnackbar(true);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.error("Error al verificar código de dispositivo:", e);
+        
+            // Solo mostrar error si realmente hay duplicado y se está creando o cambiando el código
+            const isCreating = !device?.id;
+            const codeChanged = editedDevice.code !== device.code;
+        
+            if (isCreating || codeChanged) {
+                setSnackbarMessage("Error: el código ya se encuentra registrado.");
+                setSnackbarSeverity("error");
+                setOpenSnackbar(true);
+                return;
+            }
+        }        
+
         try {
             const token = localStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` };
@@ -104,12 +175,11 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                 location: { id: editedDevice.locationId }
             };
 
+            // Eliminar los IDs "puros" que ya se están usando como objetos
             delete deviceData.brandId;
             delete deviceData.modelId;
-            delete deviceData.locationId;
             delete deviceData.statusId;
-
-            console.log("Datos del dispositivo:", JSON.stringify(deviceData, null, 2));
+            delete deviceData.locationId;
 
             if (isEditing) {
                 await axios.put(apiUrl, deviceData, { headers });
@@ -125,11 +195,18 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
             handleClose();
         } catch (error) {
             console.error("Error al procesar la solicitud", error);
-            setSnackbarMessage("Error al guardar el dispositivo");
+
+            if (error.response && error.response.data && error.response.data.message) {
+                setSnackbarMessage(`Error: ${error.response.data.message}`);
+            } else {
+                setSnackbarMessage("Error al guardar el dispositivo");
+            }
+
             setSnackbarSeverity("error");
             setOpenSnackbar(true);
         }
     };
+
 
     return (
         <>
@@ -146,7 +223,7 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     borderRadius: 2,
                 }}>
                     <Typography variant="h6">{isEditing ? "Editar Dispositivo" : "Registrar Dispositivo"}</Typography>
-                    <TextField fullWidth margin="normal" label="Código" name="code" value={editedDevice.code} onChange={handleChange}/>
+                    <TextField fullWidth margin="normal" label="Código" name="code" value={editedDevice.code} onChange={handleChange} />
 
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Marca</InputLabel>

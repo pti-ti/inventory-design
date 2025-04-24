@@ -283,7 +283,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             const token = localStorage.getItem("token");
 
             if (!editedLogbook.note.trim()) {
-                setErrorMessage("Las notas son obligatorias.");
+                setErrorMessage("Error en algún campo no permite guardar la bitácora.");
                 return;
             }
 
