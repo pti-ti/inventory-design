@@ -45,6 +45,8 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
 
     const handleSubmit = async (values, { resetForm }) => {
         try {
+            console.log("Valores enviados al backend:", values); // ✅ DEBUG
+
             const token = localStorage.getItem("token");
             const isEditing = Boolean(user?.id);
             const url = isEditing
@@ -67,6 +69,7 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
             handleClose();
         } catch (error) {
             console.error("Error al guardar el usuario", error);
+            alert("Error al guardar el usuario: " + (error.response?.data?.message || error.message));
         }
     };
 
@@ -86,7 +89,12 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
                 }}>
                     <Typography variant="h6">{user ? "Editar Usuario" : "Agregar Usuario"}</Typography>
 
-                    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
+                    <Formik
+                        initialValues={initialValues}
+                        validationSchema={validationSchema}
+                        onSubmit={handleSubmit}
+                        enableReinitialize
+                    >
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
                             <form onSubmit={handleSubmit}>
                                 <TextField

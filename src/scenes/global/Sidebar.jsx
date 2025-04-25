@@ -51,7 +51,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
     { title: "Estado", to: "/estados", icon: <CheckIcon /> },
     { title: "Bitácoras", to: "/bitacoras", icon: <BookIcon /> },
     { title: "Mantenimientos", to: "/mantenimientos", icon: <ToolsIcon /> },
-    { title: "Usuarios", to: "/mantenimientos", icon: <AdminIcon /> },
+    { title: "Usuarios", to: "/admin", icon: <AdminIcon /> },
   ];
 
   const handleLogout = () => {

@@ -43,6 +43,7 @@ function App() {
             <Route path="estados" element={<Status />} />
             <Route path="bitacoras" element={<Logbook />} />
             <Route path="mantenimientos" element={<Maintenance />} />
+            <Route path="admin" element={<UserRegister />} />
             <Route path="registrar-usuario" element={<UserRegister />} />
             <Route path="registrar-dispositivo" element={<DeviceRegister />} />
             <Route path="registrar-bitacora" element={<LogbookRegister />} />

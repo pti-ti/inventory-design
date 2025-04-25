@@ -1,38 +1,60 @@
-import { Box, Button, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  MenuItem,
+  Select,
+  FormHelperText,
+  FormControl,
+  InputLabel,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
-import { MenuItem, Select, FormHelperText, FormControl, InputLabel } from "@mui/material";
-import api from "../../api"; // Importamos la instancia de Axios
+import api from "../../api";
+import { useState } from "react";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const UserRegister = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  const handleFormSubmit = async (values, { resetForm}) => {
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+
+  const handleSnackbarClose = () => {
+    setOpenSnackbar(false);
+  };
+
+  const handleFormSubmit = async (values, { resetForm }) => {
     const userData = {
-      email: values.email,
-      location: {
-        id: parseInt(values.location),
-      },
+      email: values.email, // Asumiendo que "email" es el campo a enviar
+      password: values.password,
+      userType: values.userType,
     };
 
-    console.log("Enviando datos:", userData);
-
     try {
-      const response = await api.post("/admin/users/register", userData);
-      console.log("Usuario registrado:", response.data);
-      alert("Usuario registrado con éxito");
-      resetForm();
+      const response = await api.post(`${API_BASE_URL}/api/v1/admin/users/create`, userData);
+      setSnackbarMessage("Usuario registrado con éxito");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
+      resetForm(); // Esto reseteará todos los campos, incluido el email
     } catch (error) {
-      console.error("Error:", error.response ? error.response.data : error.message);
-      alert("Hubo un error al registrar el usuario");
+      const errorMessage =
+        error.response?.data?.message || "Hubo un error al registrar el usuario";
+      setSnackbarMessage(errorMessage);
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
 
   return (
     <Box m="20px">
-      <Header title="REGISTRAR USUARIO" subtitle="Registro de los usuarios" />
+      <Header title="REGISTRAR USUARIO" subtitle="Registro de los usuarios del inventario" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -49,53 +71,88 @@ const UserRegister = () => {
         }) => (
           <form onSubmit={handleSubmit}>
             <Box
-              display="grid"
-              gap="30px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-              sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-              }}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              gap="20px"
             >
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Email...@pti-sa.com.co"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.email}
-                name="email"
-                error={!!touched.email && !!errors.email}
-                helperText={touched.email && errors.email}
-                sx={{ gridColumn: "span 2" }}
-              />
-
-              {/* Campo de selección de ciudad */}
-              <FormControl fullWidth variant="filled" error={!!touched.location && !!errors.location} sx={{ gridColumn: "span 2" }}>
-                <InputLabel>Ciudad</InputLabel>
-                <Select
-                  name="location"
-                  value={values.location || ""}
+              <Box width="100%" maxWidth="400px">
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  type="text"
+                  label="Email"
                   onBlur={handleBlur}
                   onChange={handleChange}
+                  value={values.email}
+                  name="email"
+                  error={!!touched.email && !!errors.email}
+                  helperText={touched.email && errors.email}
+                />
+              </Box>
+
+              <Box width="100%" maxWidth="400px">
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  type="password"
+                  label="Contraseña"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.password}
+                  name="password"
+                  error={!!touched.password && !!errors.password}
+                  helperText={touched.password && errors.password}
+                />
+              </Box>
+
+              <Box width="100%" maxWidth="400px">
+                <FormControl
+                  fullWidth
+                  variant="filled"
+                  error={!!touched.userType && !!errors.userType}
                 >
-                  <MenuItem value="1">Cali</MenuItem>
-                  <MenuItem value="2">Barranquilla</MenuItem>
-                  <MenuItem value="3">Bogotá</MenuItem>
-                  <MenuItem value="4">Popayán</MenuItem>
-                </Select>
-                {touched.location && errors.location && <FormHelperText>{errors.location}</FormHelperText>}
-              </FormControl>
-              
+                  <InputLabel>Tipo de Usuario</InputLabel>
+                  <Select
+                    name="userType"
+                    value={values.userType}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                  >
+                    <MenuItem value="ADMIN">Administrador</MenuItem>
+                    <MenuItem value="TECHNICIAN">Técnico</MenuItem>
+                  </Select>
+                  {touched.userType && errors.userType && (
+                    <FormHelperText>{errors.userType}</FormHelperText>
+                  )}
+                </FormControl>
+              </Box>
             </Box>
-            <Box display="flex" justifyContent="end" mt="20px">
+
+            <Box display="flex" justifyContent="center" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
-                Registrar Usuario
+                Crear Usuario
               </Button>
             </Box>
           </form>
         )}
       </Formik>
+
+      {/* Snackbar para mensajes */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
@@ -104,15 +161,20 @@ const UserRegister = () => {
 const checkoutSchema = yup.object().shape({
   email: yup
     .string()
-    .email("Correo inválido")
-    .matches(/^[a-zA-Z0-9._%+-]+@pti-sa\.com\.co$/, "El correo debe pertenecer a pti-sa.com.co")
+    .email("Debe ser un correo válido")
     .required("Este campo es obligatorio"),
-  location: yup.string().required("Seleccione una ciudad"),
+  password: yup
+    .string()
+    .min(3, "Debe tener al menos 3 caracteres")
+    .required("Este campo es obligatorio"),
+  userType: yup.string().required("Seleccione un tipo de usuario"),
 });
 
+// Valores iniciales
 const initialValues = {
   email: "",
-  location: "",
+  password: "",
+  userType: "",
 };
 
 export default UserRegister;
