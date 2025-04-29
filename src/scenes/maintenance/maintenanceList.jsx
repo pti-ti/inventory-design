@@ -19,7 +19,7 @@ const updateMaintenanceExcel = async () => {
   try {
     // 1. Obtener datos de la API
     const token = "tu_token"; // Reemplaza con el token real
-    const response = await axios.get(`${API_BASE_URL}/api/v1/admin/maintenances`, {
+    const response = await axios.get(`${API_BASE_URL}/api/v1/maintenances`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -81,7 +81,7 @@ const Maintenance = () => {
         return;
       }
 
-      const response = await axios.get(`${API_BASE_URL}/api/v1/admin/maintenances`, {
+      const response = await axios.get(`${API_BASE_URL}/api/v1/maintenances`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -141,7 +141,7 @@ const Maintenance = () => {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API_BASE_URL}/api/v1/admin/maintenances/${maintenanceToDelete}`, {
+      await axios.delete(`${API_BASE_URL}/api/v1/maintenances/${maintenanceToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

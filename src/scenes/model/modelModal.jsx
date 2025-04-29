@@ -38,7 +38,7 @@ const modelModal = ({ open, handleClose, model, refreshModels }) => {
     const handleRegisterModel = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.post(`${API_BASE_URL}/api/v1/admin/models/create`, 
+            await axios.post(`${API_BASE_URL}/api/v1/models/create`, 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -57,7 +57,7 @@ const modelModal = ({ open, handleClose, model, refreshModels }) => {
     const handleUpdateModel = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.put(`${API_BASE_URL}/api/v1/admin/models/${model.id}`, 
+            await axios.put(`${API_BASE_URL}/api/v1/models/${model.id}`, 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

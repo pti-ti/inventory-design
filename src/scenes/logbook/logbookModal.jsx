@@ -49,10 +49,10 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                 try {
                     const token = localStorage.getItem("token");
                     const [statusResponse, locationResponse, brandResponse, modelResponse] = await Promise.all([
-                        axios.get(`${API_BASE_URL}/api/v1/admin/status`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${API_BASE_URL}/api/v1/admin/locations`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${API_BASE_URL}/api/v1/admin/brands`, { headers: { Authorization: `Bearer ${token}` } }),
-                        axios.get(`${API_BASE_URL}/api/v1/admin/models`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${API_BASE_URL}/api/v1/status`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${API_BASE_URL}/api/v1/locations`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${API_BASE_URL}/api/v1/brands`, { headers: { Authorization: `Bearer ${token}` } }),
+                        axios.get(`${API_BASE_URL}/api/v1/models`, { headers: { Authorization: `Bearer ${token}` } }),
                     ]);
 
                     setStatuses(statusResponse.data);
@@ -123,7 +123,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             const fetchDeviceSuggestions = async () => {
                 try {
                     const token = localStorage.getItem("token");
-                    const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices/search`, {
+                    const response = await axios.get(`${API_BASE_URL}/api/v1/devices/search`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
@@ -172,7 +172,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             const fetchUserSuggestions = async () => {
                 try {
                     const token = localStorage.getItem("token");
-                    const response = await axios.get(`${API_BASE_URL}/api/v1/admin/users/by-email`, {
+                    const response = await axios.get(`${API_BASE_URL}/api/v1/users/by-email`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
@@ -216,7 +216,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
     const fetchDeviceById = async (deviceId) => {
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices/${deviceId}`, {
+            const response = await axios.get(`${API_BASE_URL}/api/v1/devices/${deviceId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -246,7 +246,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.get(`${API_BASE_URL}/api/v1/admin/users/${value}`, {
+            const response = await axios.get(`${API_BASE_URL}/api/v1/users/${value}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -311,14 +311,14 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
 
             if (isEditing) {
                 await axios.put(
-                    `${API_BASE_URL}/api/v1/admin/logbooks/${editedLogbook.id}`,
+                    `${API_BASE_URL}/api/v1/logbooks/${editedLogbook.id}`,
                     logbookData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setSuccessMessage("Bitácora actualizada correctamente.");
             } else {
                 await axios.post(
-                    `${API_BASE_URL}/api/v1/admin/logbooks/register`,
+                    `${API_BASE_URL}/api/v1/logbooks/register`,
                     logbookData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -326,7 +326,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
                 try {
-                    const response = await axios.get(`${API_BASE_URL}/api/v1/admin/excel/logbook`, {
+                    const response = await axios.get(`${API_BASE_URL}/api/v1/excel/logbook`, {
                         headers: { Authorization: `Bearer ${token}` },
                         responseType: "blob",
                     });

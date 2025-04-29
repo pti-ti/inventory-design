@@ -41,7 +41,7 @@ const adminModal = ({ open, onClose, ubicaciones = [], onSuccess }) => {
     };
 
     try {
-        await axios.post(`${API_BASE_URL}/api/v1/admin/users/create`, payload, { headers });
+        await axios.post(`${API_BASE_URL}/api/v1/users/create`, payload, { headers });
         if (onSuccess) onSuccess();
         handleClose();
       } catch (error) {

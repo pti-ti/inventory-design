@@ -14,7 +14,7 @@ const BarChart = ({ isDashboard = false }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/admin/locations/device-location-count`);
+        const response = await fetch(`${API_BASE_URL}/api/v1/locations/device-location-count`);
         if (!response.ok) {
           throw new Error("Error al obtener los datos");
         }

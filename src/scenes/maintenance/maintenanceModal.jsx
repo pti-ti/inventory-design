@@ -85,7 +85,7 @@ useEffect(() => {
     if (open && itemsList.length === 0) {
         const token = localStorage.getItem("token");
 
-        axios.get(`${API_BASE_URL}/api/v1/admin/items`, {
+        axios.get(`${API_BASE_URL}/api/v1/items`, {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(response => setItemsList(response.data))
@@ -120,7 +120,7 @@ useEffect(() => {
         const fetchDeviceSuggestions = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices/search`, {
+                const response = await axios.get(`${API_BASE_URL}/api/v1/devices/search`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -174,7 +174,7 @@ useEffect(() => {
         const fetchUserSuggestions = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get(`${API_BASE_URL}/api/v1/admin/users/by-email`, {
+                const response = await axios.get(`${API_BASE_URL}/api/v1/users/by-email`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -282,14 +282,14 @@ const handleCreateOrUpdate = async () => {
 
         if (isEditing) {
             await axios.put(
-                `${API_BASE_URL}/api/v1/admin/maintenances/${editedMaintenance.id}`,
+                `${API_BASE_URL}/api/v1/maintenances/${editedMaintenance.id}`,
                 maintenanceData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setSnackbarMessage("Mantenimiento actualizado exitosamente.");
         } else {
             await axios.post(
-                `${API_BASE_URL}/api/v1/admin/maintenances/register`,
+                `${API_BASE_URL}/api/v1/maintenances/register`,
                 maintenanceData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -297,7 +297,7 @@ const handleCreateOrUpdate = async () => {
 
             // Descargar Excel solo en modo registro
             try {
-                const response = await axios.get(`${API_BASE_URL}/api/v1/admin/excel/update`, {
+                const response = await axios.get(`${API_BASE_URL}/api/v1/excel/update`, {
                     headers: { Authorization: `Bearer ${token}` },
                     responseType: "blob",
                 });
@@ -335,7 +335,7 @@ const handleCreateOrUpdate = async () => {
 const fetchDeviceData = async (deviceId) => {
     try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices/${deviceId}`, {
+        const response = await axios.get(`${API_BASE_URL}/api/v1/devices/${deviceId}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -369,7 +369,7 @@ const fetchDeviceData = async (deviceId) => {
 const fetchUserData = async (userId) => {
     try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`${API_BASE_URL}/api/v1/admin/users/${userId}`, {
+        const response = await axios.get(`${API_BASE_URL}/api/v1/users/${userId}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
 

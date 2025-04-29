@@ -7,9 +7,6 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  
-  let inactivityTimeout; // Variable para el temporizador
-  const INACTIVITY_LIMIT = 10 * 60 * 1000; // ⏳ 10 minutos (ajústalo según necesidad)
 
   // Función para cerrar sesión
   const logout = () => {
@@ -18,15 +15,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("userType");
     setUser(null);
     navigate("/login");
-    console.log("🔴 Usuario cerró sesión por inactividad");
-  };
-
-  // 🔄 Reiniciar temporizador en cada interacción
-  const resetInactivityTimer = () => {
-    clearTimeout(inactivityTimeout);
-    inactivityTimeout = setTimeout(() => {
-      logout();
-    }, INACTIVITY_LIMIT);
+    console.log("🔴 Usuario cerró sesión");
   };
 
   useEffect(() => {
@@ -52,9 +41,6 @@ export const AuthProvider = ({ children }) => {
 
           setUser({ username, userType });
           console.log("✅ Usuario autenticado:", { username, userType });
-
-          // Iniciar detección de inactividad
-          resetInactivityTimer();
         } catch (error) {
           console.error("⚠️ Error al decodificar el token:", error);
           logout();
@@ -63,19 +49,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkTokenExpiration();
-
-    // Detectar eventos de actividad del usuario
-    window.addEventListener("mousemove", resetInactivityTimer);
-    window.addEventListener("keydown", resetInactivityTimer);
-    window.addEventListener("click", resetInactivityTimer);
-
-    return () => {
-      // Limpiar eventos y temporizador cuando el componente se desmonte
-      clearTimeout(inactivityTimeout);
-      window.removeEventListener("mousemove", resetInactivityTimer);
-      window.removeEventListener("keydown", resetInactivityTimer);
-      window.removeEventListener("click", resetInactivityTimer);
-    };
+    
+    // Limpiar eventos cuando el componente se desmonte (en caso de que quieras manejar algún otro evento)
+    return () => {};
   }, []);
 
   const login = (userData, token) => {
@@ -97,9 +73,6 @@ export const AuthProvider = ({ children }) => {
 
     setUser({ username, userType: userType || null });
     console.log("✅ Usuario después del login:", { username, userType });
-
-    // Iniciar temporizador de inactividad después del login
-    resetInactivityTimer();
   };
 
   return (

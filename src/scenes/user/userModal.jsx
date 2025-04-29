@@ -16,7 +16,7 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
         const fetchLocations = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get(`${API_BASE_URL}/api/v1/admin/locations`, {
+                const response = await axios.get(`${API_BASE_URL}/api/v1/locations`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setLocations(response.data);
@@ -50,8 +50,8 @@ const UserModal = ({ open, handleClose, user, refreshUsers }) => {
             const token = localStorage.getItem("token");
             const isEditing = Boolean(user?.id);
             const url = isEditing
-                ? `${API_BASE_URL}/api/v1/admin/users/${user.id}`
-                : `${API_BASE_URL}/api/v1/admin/users/register`;
+                ? `${API_BASE_URL}/api/v1/users/${user.id}`
+                : `${API_BASE_URL}/api/v1/users/register`;
 
             const method = isEditing ? "put" : "post";
 

@@ -36,10 +36,10 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     const headers = { Authorization: `Bearer ${token}` };
 
                     const [locRes, statRes, modRes, brandRes] = await Promise.all([
-                        axios.get(`${API_BASE_URL}/api/v1/admin/locations`, { headers }),
-                        axios.get(`${API_BASE_URL}/api/v1/admin/status`, { headers }),
-                        axios.get(`${API_BASE_URL}/api/v1/admin/models`, { headers }),
-                        axios.get(`${API_BASE_URL}/api/v1/admin/brands`, { headers }),
+                        axios.get(`${API_BASE_URL}/api/v1/locations`, { headers }),
+                        axios.get(`${API_BASE_URL}/api/v1/status`, { headers }),
+                        axios.get(`${API_BASE_URL}/api/v1/models`, { headers }),
+                        axios.get(`${API_BASE_URL}/api/v1/brands`, { headers }),
                     ]);
 
                     setLocations(locRes.data);
@@ -132,7 +132,7 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
             const codeChanged = editedDevice.code !== device.code;
         
             if (isCreating || codeChanged) {
-                const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices/search/${editedDevice.code}`, {
+                const response = await axios.get(`${API_BASE_URL}/api/v1/devices/search/${editedDevice.code}`, {
                     headers,
                 });
         
@@ -164,8 +164,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
             const token = localStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` };
             const apiUrl = isEditing
-                ? `${API_BASE_URL}/api/v1/admin/devices/${device.id}`
-                : `${API_BASE_URL}/api/v1/admin/devices/register`;
+                ? `${API_BASE_URL}/api/v1/devices/${device.id}`
+                : `${API_BASE_URL}/api/v1/devices/register`;
 
             const deviceData = {
                 ...editedDevice,

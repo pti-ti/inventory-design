@@ -1,17 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Box, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
 // Colores predefinidos para ciertos estados específicos
 const STATUS_COLORS = {
-  "pendiente reparacion": "#D62728",    // Rojo
-  "pendiente devolucion": "#8C564B",          // Marrón              
-  "entregado pendiente acta": "#FF7F0E",       // Naranja
-  "disponible": "#2CA02C",                 // Verde
-  "sin estado": "#9467BD",                // Morado
-  "asignado": "#1F77B4",                   // Azul
-  "inactivo": "#7F7F7F",                // Gris
+  "pendiente reparar": "#D62728", // Rojo
+  "pendiente devolver": "#FFD700", // Amarillo
+  "entregado pendiente acta": "#FF7F0E", // Naranja
+  "disponible": "#2CA02C", // Verde
+  "sin estado": "#9467BD", // Morado
+  "asignado": "#1F77B4", // Azul
+  "inactivo": "#7F7F7F", // Gris
 };
 
 // Lista de colores primarios suaves
@@ -58,7 +58,6 @@ const DonutChart = ({ data }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Convertir JSON en array y asignar colores sin repetición
   const chartData = assignUniqueColors(Object.entries(data));
 
   return (
@@ -82,14 +81,14 @@ const DonutChart = ({ data }) => {
             cy="50%"
             innerRadius="50%"
             outerRadius="80%"
-            fill="#8884d8"
             paddingAngle={5}
-            label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+            isAnimationActive={true}  // Habilita la animación al cargar la página
           >
             {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
+
           <Tooltip />
           <Legend />
         </PieChart>

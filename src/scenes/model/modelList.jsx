@@ -36,7 +36,7 @@ const modelList = () => {
                 throw new Error("No se encontró un token en localStorage.");
             }
 
-            const response = await axios.get(`${API_BASE_URL}/api/v1/admin/models`, { // Cambiado a 'model'
+            const response = await axios.get(`${API_BASE_URL}/api/v1/models`, { // Cambiado a 'model'
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -82,7 +82,7 @@ const modelList = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem("token");
-            await axios.delete(`${API_BASE_URL}/api/v1/admin/models/${modelToDelete}`, { // Cambiado a 'model'
+            await axios.delete(`${API_BASE_URL}/api/v1/models/${modelToDelete}`, { // Cambiado a 'model'
                 headers: { Authorization: `Bearer ${token}` },
             });
 

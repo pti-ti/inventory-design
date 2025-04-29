@@ -140,7 +140,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/admin/locations/device-location-type-count`);
+        const response = await fetch(`${API_BASE_URL}/api/v1/locations/device-location-type-count`);
         if (!response.ok) {
           throw new Error("Error al obtener los datos");
         }

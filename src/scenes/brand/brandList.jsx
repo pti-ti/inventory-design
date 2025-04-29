@@ -36,7 +36,7 @@ const BrandList = () => {
                 throw new Error("No se encontró un token en localStorage.");
             }
 
-            const response = await axios.get(`${API_BASE_URL}/api/v1/admin/brands`, {
+            const response = await axios.get(`${API_BASE_URL}/api/v1/brands`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

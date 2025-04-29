@@ -38,7 +38,7 @@ const LocationModal = ({ open, handleClose, location, refreshLocations }) => {
     const handleRegisterLocation = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.post(`${API_BASE_URL}/api/v1/admin/locations/create`, 
+            await axios.post(`${API_BASE_URL}/api/v1/locations/create`, 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -57,7 +57,7 @@ const LocationModal = ({ open, handleClose, location, refreshLocations }) => {
     const handleUpdateLocation = async (values, resetForm) => {
         try {
             const token = localStorage.getItem("token");
-            await axios.put(`${API_BASE_URL}/api/v1/admin/locations/${location.id}`, 
+            await axios.put(`${API_BASE_URL}/api/v1/locations/${location.id}`, 
                 { name: values.name },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

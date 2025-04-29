@@ -34,7 +34,7 @@ const Device = () => {
         return;
       }
 
-      const response = await axios.get(`${API_BASE_URL}/api/v1/admin/devices`, {
+      const response = await axios.get(`${API_BASE_URL}/api/v1/devices`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -67,7 +67,7 @@ const Device = () => {
   const handleRegisterDevice = async (deviceData) => {
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = `${API_BASE_URL}/api/v1/admin/devices/register`;
+      const apiUrl = `${API_BASE_URL}/api/v1/devices/register`;
 
       console.log("Registrando dispositivo:", JSON.stringify(deviceData, null, 2));
 
@@ -86,7 +86,7 @@ const Device = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = `${API_BASE_URL}/api/v1/admin/devices/${deviceData.id}`;
+      const apiUrl = `${API_BASE_URL}/api/v1/devices/${deviceData.id}`;
 
       console.log("Actualizando dispositivo:", JSON.stringify(deviceData, null, 2));
 
@@ -116,7 +116,7 @@ const Device = () => {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API_BASE_URL}/api/v1/admin/devices/${deviceToDelete}`, {
+      await axios.delete(`${API_BASE_URL}/api/v1/devices/${deviceToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
