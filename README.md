@@ -31,6 +31,16 @@ Permite a los usuarios interactuar con el sistema para **registrar**, **actualiz
  
 ### 3. Creación del Proyecto 
 
+- Crear la app con React + Vite:
+
+  ```bash
+  npm create vite@latest inventory-design --template react
+  cd inventory-design
+  npm install
+
+📦 Librerías y Dependencias Usadas
+  
+
 
 
 
