@@ -10,8 +10,10 @@ Permite a los usuarios interactuar con el sistema para **registrar**, **actualiz
 ## 🚀 Tecnologías Utilizadas 
 
 - **Control de versiones** : Git
-- **Framework**: React + Vite 
-- **Estilos** : Tailwind CSS 
+- **Framework**: React + Vite
+- **UI Components**: Material UI (MUI)
+- **Iconografía**: MUI Icons
+- **Grillas de datos**: MUI X Data Grid 
 - *Consumo de API REST**: Axios y Fetch API
 
 ---
@@ -38,7 +40,15 @@ Permite a los usuarios interactuar con el sistema para **registrar**, **actualiz
   cd inventory-design
   npm install
 
-📦 Librerías y Dependencias Usadas
+## 📦 Librerías y Dependencias Usadas
+  - react-router-dom: navegación entre vistas
+  - @mui/material : biblioteca principal de componentes de Material UI
+  - @mui/icons-material : íconos de MUI
+  - @mui/x-data-grid : componente avanzado para tablas y listas
+  - react-pro-sidebar : barra lateral con estilo profesional 
+  - axios: cliente HTTP para consumir APIs
+  - jwt-decode: para leer tokens JWT
+    
   
 
 
