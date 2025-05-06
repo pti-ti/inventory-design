@@ -153,7 +153,7 @@ const Dashboard = () => {
             mb={2}
             sx={{ marginLeft: "250px" }}
           >
-            <Header title="DASHBOARD" subtitle="Bienvenido al Inventario de TI" />
+            <Header title="DASHBOARD" subtitle="Inventario Gestión TI (Potencia y Tecnologias Incorporadas)" />
           </Box>
 
         </Box>
@@ -244,7 +244,7 @@ const Dashboard = () => {
           }}
         >
           <Typography variant="h5" fontWeight="600" color={colors.grey[100]} sx={{ marginBottom: "10px" }}>
-            Valor Total del Inventario de TI
+            Valor total del inventario de TI
           </Typography>
 
           <Typography

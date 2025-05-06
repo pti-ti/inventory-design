@@ -10,6 +10,8 @@ import LaptopOutlinedIcon from "@mui/icons-material/LaptopOutlined";
 import DeviceModal from "./deviceModal";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import { exportDevices } from "../excel/exportDevices";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext"; 
 
 const Device = () => {
   const theme = useTheme();
@@ -23,6 +25,8 @@ const Device = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // Puede ser "success", "error", "warning", etc.
+  const { user } = useContext(AuthContext);
+  const role = user?.userType?.replace("ROLE_", ""); // Ejemplo de rol: "TECHNICIAN"
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   
@@ -157,10 +161,10 @@ const Device = () => {
       cellClassName: "name-column--cell",
       renderCell: (params) => formatPrice(params.value) // Aplicar formato a los precios
     },
-    //{ field: "price", headerName: "Precio", flex: 1, cellClassName: "name-column--cell" },
     { field: "status", headerName: "Estado", flex: 1, cellClassName: "name-column--cell" },
     { field: "location", headerName: "Ubicación", flex: 1, cellClassName: "name-column--cell" },
-    {
+    // Solo mostrar acciones si el rol no es TECHNICIAN
+    ...(role !== "TECHNICIAN" ? [{
       field: "actions",
       headerName: "Acciones",
       flex: 1,
@@ -174,7 +178,7 @@ const Device = () => {
           </IconButton>
         </Box>
       ),
-    },
+    }] : []),
   ];
 
   return (
@@ -182,6 +186,7 @@ const Device = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center"></Box>
       <Header title="DISPOSITIVOS" subtitle="Búsqueda de los dispositivos de TI" />
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        {/* Mostrar el botón "Agregar Dispositivo" para todos los roles */}
         <Button variant="contained" color="primary" onClick={() => {
           setSelectedDevice(null);
           setIsEditing(false);
@@ -190,6 +195,7 @@ const Device = () => {
           Agregar Dispositivo
         </Button>
 
+        {/* Solo mostrar el botón "Exportar a Excel" si el rol no es TECHNICIAN */}
         <Button
           variant="contained"
           color="secondary"
@@ -251,6 +257,5 @@ const Device = () => {
     </Box>
   );
 };
-
 
 export default Device;

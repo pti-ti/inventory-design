@@ -38,7 +38,7 @@ const UserRegister = () => {
     };
 
     try {
-      const response = await api.post(`${API_BASE_URL}/api/v1/admin/users/create`, userData);
+      const response = await api.post(`${API_BASE_URL}/api/v1/users/create`, userData);
       setSnackbarMessage("Usuario registrado con éxito");
       setSnackbarSeverity("success");
       setOpenSnackbar(true);

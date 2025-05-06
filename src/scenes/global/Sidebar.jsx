@@ -1,6 +1,7 @@
-import { useContext } from "react";
+import React, { useState, useContext } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, Snackbar } from "@mui/material";
+import MuiAlert from '@mui/material/Alert';
 import { Link, useNavigate } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
@@ -21,11 +22,15 @@ import {
 } from "@mui/icons-material";
 import { AuthContext } from "../../context/AuthContext";
 
-const SidebarItem = ({ title, to, icon, isSidebarOpen }) => (
-  <MenuItem icon={icon}>
-    <Link to={to} style={{ textDecoration: "none", color: "inherit" }}>
-      {isSidebarOpen && <Typography>{title}</Typography>}
-    </Link>
+// Snackbar personalizado
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+// SidebarItem separado para claridad
+const SidebarItem = ({ title, icon, isSidebarOpen, onClick }) => (
+  <MenuItem icon={icon} onClick={onClick}>
+    {isSidebarOpen && <Typography>{title}</Typography>}
   </MenuItem>
 );
 
@@ -35,6 +40,14 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState("");
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
+  const role = user?.userType?.replace("ROLE_", "");
   const roleLabels = {
     ADMIN: "Administrador",
     USER: "Usuario",
@@ -42,34 +55,34 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   };
 
   const menuItems = [
-    { title: "Dashboard", to: "/dashboard", icon: <HomeIcon /> },
-    { title: "Dispositivos", to: "/dispositivos", icon: <DevicesOtherIcon /> },
-    { title: "Marcas", to: "/marcas", icon: <LabelIcon /> },
-    { title: "Modelos", to: "/modelos", icon: <DevicesIcon /> },
-    { title: "Colaboradores", to: "/usuarios", icon: <GroupIcon /> },
-    { title: "Ubicación", to: "/ubicaciones", icon: <LocationIcon /> },
-    { title: "Estado", to: "/estados", icon: <CheckIcon /> },
-    { title: "Bitácoras", to: "/bitacoras", icon: <BookIcon /> },
-    { title: "Mantenimientos", to: "/mantenimientos", icon: <ToolsIcon /> },
-    { title: "Usuarios", to: "/admin", icon: <AdminIcon /> },
+    { title: "Dashboard", to: "/dashboard", icon: <HomeIcon />, roles: ["ADMIN", "TECHNICIAN"] },
+    { title: "Dispositivos", to: "/dispositivos", icon: <DevicesOtherIcon />, roles: ["ADMIN", "TECHNICIAN"] },
+    { title: "Marcas", to: "/marcas", icon: <LabelIcon />, roles: ["ADMIN"] },
+    { title: "Modelos", to: "/modelos", icon: <DevicesIcon />, roles: ["ADMIN"] },
+    { title: "Colaboradores", to: "/usuarios", icon: <GroupIcon />, roles: ["ADMIN"] },
+    { title: "Ubicación", to: "/ubicaciones", icon: <LocationIcon />, roles: ["ADMIN"] },
+    { title: "Estado", to: "/estados", icon: <CheckIcon />, roles: ["ADMIN"] },
+    { title: "Bitácoras", to: "/bitacoras", icon: <BookIcon />, roles: ["ADMIN", "TECHNICIAN"] },
+    { title: "Mantenimientos", to: "/mantenimientos", icon: <ToolsIcon />, roles: ["ADMIN", "TECHNICIAN"] },
+    { title: "Usuarios", to: "/admin", icon: <AdminIcon />, roles: ["ADMIN"] },
   ];
+
+  const handleAccessDenied = (title) => {
+    setSnackbarMsg(`Acceso denegado a "${title}"`);
+    setSnackbarOpen(true);
+  };
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
-  // Función para extraer solo el nombre de usuario (antes del @)
-  const getUsername = (email) => {
-    if (!email) return "";
-    const [username] = email.split('@');  // Extrae el texto antes del '@'
-    return username;
-  };
+  const getUsername = (email) => email?.split("@")[0] || "";
 
   return (
     <Box
       sx={{
-        width: isSidebarOpen ? "210px" : "70px", // Ajuste de las dimensiones del Sidebar
+        width: isSidebarOpen ? "210px" : "70px",
         height: "150vh",
         transition: "width 0.3s ease-in-out",
         backgroundColor: colors.primary[1000],
@@ -83,21 +96,19 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           backgroundColor: "transparent !important",
         },
         "& .pro-inner-item:hover": {
-          color: "#868dfb !important", // Mantengo el hover en azul claro como antes
+          color: "#868dfb !important",
         },
         "& .pro-menu-item.active": {
-          color: "#6870fa !important", // Color del ítem activo en azul oscuro
+          color: "#6870fa !important",
         },
       }}
     >
       <ProSidebar collapsed={!isSidebarOpen} width="100%">
         <Menu iconShape="square">
-          {/* Botón para colapsar/expandir el sidebar */}
           <MenuItem onClick={toggleSidebar} icon={<MenuIcon />} style={{ textAlign: "center" }}>
             {isSidebarOpen && <Typography variant="h6">Menú</Typography>}
           </MenuItem>
 
-          {/* Sección de navegación */}
           {isSidebarOpen && (
             <Typography variant="h6" color={colors.grey[300]} sx={{ m: "10px 0 5px 10px" }}>
               Datos
@@ -105,35 +116,47 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           )}
 
           {menuItems.map((item, index) => (
-            <SidebarItem key={index} {...item} isSidebarOpen={isSidebarOpen} />
+            <SidebarItem
+              key={index}
+              {...item}
+              isSidebarOpen={isSidebarOpen}
+              onClick={() =>
+                item.roles.includes(role)
+                  ? navigate(item.to)
+                  : handleAccessDenied(item.title)
+              }
+            />
           ))}
 
-          {/* Sección de sesión */}
           {isSidebarOpen && (
             <Typography variant="h6" color={colors.grey[300]} sx={{ m: "20px 0 5px 10px" }}>
               Sesión
             </Typography>
           )}
 
-          {/* Información del usuario debajo de Cerrar sesión */}
           {user && isSidebarOpen && (
             <Box mb="20px" textAlign="center" sx={{ padding: "10px" }}>
               <Typography variant="h6" color={colors.grey[100]} fontWeight="bold">
-                {getUsername(user.username)} {/* Muestra solo la parte antes del '@' */}
+                {getUsername(user.username)}
               </Typography>
               <Typography variant="body2" color={colors.greenAccent[500]}>
-                {roleLabels[user?.userType?.replace("ROLE_", "")] || "Sin rol"}
+                {roleLabels[role] || "Sin rol"}
               </Typography>
             </Box>
           )}
-        
-          {/* Botón de cerrar sesión */}
+
           {user && (
             <MenuItem onClick={handleLogout} icon={<LogoutIcon />} style={{ color: "red" }}>
               {isSidebarOpen && <Typography>Cerrar Sesión</Typography>}
             </MenuItem>
           )}
         </Menu>
+
+        <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+          <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: "100%" }}>
+            {snackbarMsg}
+          </Alert>
+        </Snackbar>
       </ProSidebar>
     </Box>
   );

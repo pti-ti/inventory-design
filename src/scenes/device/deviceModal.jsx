@@ -111,7 +111,6 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                 return;
             }
 
-            // Validación específica para el campo "price"
             if (field.key === "price") {
                 const price = parseFloat(value);
                 if (isNaN(price) || price < 0) {
@@ -123,46 +122,45 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
             }
         }
 
-        try {
+        const isCreating = !device?.id;
+        const codeChanged = !device || editedDevice.code !== device.code;
+
+        // ✅ Validación del código duplicado
+        if (isCreating || codeChanged) {
             const token = localStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` };
-        
-            // Solo verificar código duplicado si el código fue modificado o si es una creación
-            const isCreating = !device?.id;
-            const codeChanged = editedDevice.code !== device.code;
-        
-            if (isCreating || codeChanged) {
-                const response = await axios.get(`${API_BASE_URL}/api/v1/devices/search/${editedDevice.code}`, {
-                    headers,
-                });
-        
-                const existingDevice = response.data;
-        
-                if (existingDevice && (!device || existingDevice.id !== device.id)) {
-                    setSnackbarMessage(`Error: el código "${editedDevice.code}" ya está registrado para otro dispositivo.`);
+
+            try {
+                const response = await axios.get(`${API_BASE_URL}/api/v1/devices/search/${editedDevice.code}`, { headers });
+                const existingDevices = response.data;
+
+                if (existingDevices.length > 0) {
+                    const existingDevice = existingDevices[0];
+                    if (!device || existingDevice.id !== device.id) {
+                        setSnackbarMessage(`Error: el código "${editedDevice.code}" ya está registrado para otro dispositivo.`);
+                        setSnackbarSeverity("error");
+                        setOpenSnackbar(true);
+                        return;
+                    }
+                }
+
+            } catch (error) {
+                // Aquí puedes verificar si el error es un 404, lo cual indicaría que el código no existe
+                if (error.response?.status !== 404) {
+                    console.error("Error al verificar código de dispositivo:", error);
+                    setSnackbarMessage("Error al verificar el código del dispositivo.");
                     setSnackbarSeverity("error");
                     setOpenSnackbar(true);
                     return;
                 }
             }
-        } catch (e) {
-            console.error("Error al verificar código de dispositivo:", e);
-        
-            // Solo mostrar error si realmente hay duplicado y se está creando o cambiando el código
-            const isCreating = !device?.id;
-            const codeChanged = editedDevice.code !== device.code;
-        
-            if (isCreating || codeChanged) {
-                setSnackbarMessage("Error: el código ya se encuentra registrado.");
-                setSnackbarSeverity("error");
-                setOpenSnackbar(true);
-                return;
-            }
-        }        
+        }
 
+        // ✅ Guardado del dispositivo
         try {
             const token = localStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` };
+
             const apiUrl = isEditing
                 ? `${API_BASE_URL}/api/v1/devices/${device.id}`
                 : `${API_BASE_URL}/api/v1/devices/register`;
@@ -175,7 +173,6 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                 location: { id: editedDevice.locationId }
             };
 
-            // Eliminar los IDs "puros" que ya se están usando como objetos
             delete deviceData.brandId;
             delete deviceData.modelId;
             delete deviceData.statusId;
@@ -183,6 +180,7 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
 
             if (isEditing) {
                 await axios.put(apiUrl, deviceData, { headers });
+                
                 setSnackbarMessage("Dispositivo actualizado con éxito");
             } else {
                 await axios.post(apiUrl, deviceData, { headers });
@@ -194,18 +192,17 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
             refreshDevices();
             handleClose();
         } catch (error) {
-            console.error("Error al procesar la solicitud", error);
-
-            if (error.response && error.response.data && error.response.data.message) {
+            console.error("Error al guardar el dispositivo:", error);
+            if (error.response?.data?.message) {
                 setSnackbarMessage(`Error: ${error.response.data.message}`);
             } else {
-                setSnackbarMessage("Error al guardar el dispositivo");
+                setSnackbarMessage("Error al guardar el dispositivo por código duplicado.");
             }
-
             setSnackbarSeverity("error");
             setOpenSnackbar(true);
         }
     };
+
 
 
     return (

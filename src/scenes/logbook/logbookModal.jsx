@@ -212,6 +212,16 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
         }
     };
 
+    const resetFormState = () => {
+        setEditedLogbook(initialLogbookState);
+        setSelectedUser(null);
+        setEmailInput('');
+        setDeviceCodeInput('');
+        setSelectedDevice(null);
+        setEmailSuggestions([]);
+        setDeviceSuggestions([]);
+        setUserLocation('');
+    };
 
     const fetchDeviceById = async (deviceId) => {
         try {
@@ -346,6 +356,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
             }
 
             refreshLogbooks();
+            resetFormState();  
             handleClose();
         } catch (error) {
             console.error("Error al guardar la bitácora", error.response?.data || error.message);
