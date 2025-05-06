@@ -51,21 +51,52 @@ Permite a los usuarios interactuar con el sistema para **registrar**, **actualiz
 
 ## 🗂️ Estructura del Proyecto
 
-inventory-design/
-├── dist/ # Archivos generados tras el build
-├── node_modules/ # Dependencias del proyecto
-├── public/ # Archivos estáticos públicos
-├── src/ # Código fuente principal
-│ ├── assets/ # Imágenes, fuentes y otros recursos
-│ ├── components/ # Componentes reutilizables
-│ ├── context/ # Contextos globales (React Context API)
-│ ├── scenes/ # Vistas principales de la app
-│ ├── styles/ # Estilos globales o compartidos
-├── .gitignore # Exclusiones de Git
-├── index.html # Documento HTML raíz
-├── package.json # Dependencias y configuración de scripts
-├── README.md # Documentación del proyecto
-├── vite.config.js # Configuración de Vite
+## 🗂️ Estructura del Proyecto
+
+    +--------------------+
+    |       src          | ← Código fuente principal
+    +--------------------+
+            |
+            v
+    +--------------------+
+    |     assets         | ← Imágenes, fuentes y recursos estáticos
+    +--------------------+
+            |
+            v
+    +--------------------+
+    |    components      | ← Componentes reutilizables
+    +--------------------+
+            |
+            v
+    +--------------------+
+    |     context        | ← Contexto global (React Context API)
+    +--------------------+
+            |
+            v
+    +--------------------+
+    |      scenes        | ← Vistas principales de la app
+    +--------------------+
+            |
+            v
+    +--------------------+
+    |      styles        | ← Estilos globales o compartidos
+    +--------------------+
+
+    +--------------------+
+    |    dist            | ← Archivos generados tras el build
+    +--------------------+
+            |
+            v
+    +--------------------+
+    |    node_modules    | ← Dependencias del proyecto
+    +--------------------+
+            |
+            v
+    +--------------------+
+    |    public          | ← Archivos estáticos públicos
+    +--------------------+
+
+
     
   
 
