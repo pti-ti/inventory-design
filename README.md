@@ -51,8 +51,6 @@ Permite a los usuarios interactuar con el sistema para **registrar**, **actualiz
 
 ## 🗂️ Estructura del Proyecto
 
-## 🗂️ Estructura del Proyecto
-
     +--------------------+
     |       src          | ← Código fuente principal
     +--------------------+
