@@ -48,6 +48,24 @@ Permite a los usuarios interactuar con el sistema para **registrar**, **actualiz
   - react-pro-sidebar : barra lateral con estilo profesional 
   - axios: cliente HTTP para consumir APIs
   - jwt-decode: para leer tokens JWT
+
+## 🗂️ Estructura del Proyecto
+
+inventory-design/
+├── dist/ # Archivos generados tras el build
+├── node_modules/ # Dependencias del proyecto
+├── public/ # Archivos estáticos públicos
+├── src/ # Código fuente principal
+│ ├── assets/ # Imágenes, fuentes y otros recursos
+│ ├── components/ # Componentes reutilizables
+│ ├── context/ # Contextos globales (React Context API)
+│ ├── scenes/ # Vistas principales de la app
+│ ├── styles/ # Estilos globales o compartidos
+├── .gitignore # Exclusiones de Git
+├── index.html # Documento HTML raíz
+├── package.json # Dependencias y configuración de scripts
+├── README.md # Documentación del proyecto
+├── vite.config.js # Configuración de Vite
     
   
 
