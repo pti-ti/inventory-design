@@ -96,7 +96,7 @@ import {
     };
   
     const columns = [
-        { field: "id", headerName: "ID", flex: 0.5, cellClassName: "name-column--cell" },
+        { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" }, 
         { field: "name", headerName: "Estado del dispositivo", flex: 1, cellClassName: "name-column--cell" },
         { field: "createdBy", headerName: "Creado Por (ID Usuario)", flex: 1, cellClassName: "name-column--cell" },
         { field: "createdAt", headerName: "Fecha de Creación", flex: 1, cellClassName: "name-column--cell" },

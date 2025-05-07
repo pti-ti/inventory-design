@@ -139,7 +139,7 @@ const LogbookList = () => {
 
 
   const columns = [
-    { field: "id", headerName: "ID", width: 90 },
+    { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" }, 
     { field: "deviceCode", headerName: "Código del dispositivo", flex: 1, cellClassName: "name-column--cell" },
     { field: "deviceBrand", headerName: "Marca del dispositivo", flex: 1, cellClassName: "name-column--cell" },
     { field: "deviceModel", headerName: "Modelo del dispositivo", flex: 1, cellClassName: "name-column--cell" },

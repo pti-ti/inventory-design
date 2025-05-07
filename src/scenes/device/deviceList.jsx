@@ -147,7 +147,7 @@ const Device = () => {
   };
 
   const columns = [
-    { field: "id", headerName: "ID" },
+    { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" }, 
     { field: "code", headerName: "Código", flex: 1, cellClassName: "name-column--cell" },
     { field: "brand", headerName: "Marca", flex: 1, cellClassName: "name-column--cell" },
     { field: "model", headerName: "Modelo", flex: 1, cellClassName: "name-column--cell" },

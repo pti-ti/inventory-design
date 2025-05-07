@@ -89,7 +89,7 @@ const User = () => {
   
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 0.5 },
+    { field: "id", headerName: "ID", width: 60, cellClassName: "name-column--cell" }, 
     { field: "email", headerName: "Email", flex: 1, cellClassName: "name-column--cell" },
     { field: "location", headerName: "Ubicación", flex: 1, cellClassName: "name-column--cell" },
     {

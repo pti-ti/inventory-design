@@ -153,7 +153,7 @@ const Dashboard = () => {
             mb={2}
             sx={{ marginLeft: "250px" }}
           >
-            <Header title="DASHBOARD" subtitle="Inventario Gestión TI (Potencia y Tecnologias Incorporadas)" />
+            <Header title="DASHBOARD" subtitle="Inventario Gestión TI (Potencia y Tecnologías Incorporadas)" />
           </Box>
 
         </Box>

@@ -160,7 +160,7 @@ const Maintenance = () => {
 
 
   const columns = [
-    { field: "id", headerName: "ID", width: 40 },
+    { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" }, 
     { field: "deviceId", headerName: "ID dispositivo", flex: 1, cellClassName: "name-column--cell" },
     { field: "deviceCode", headerName: "Código del dispositivo", flex: 1, cellClassName: "name-column--cell" },
     { field: "deviceBrand", headerName: "Marca", flex: 1, cellClassName: "name-column--cell" },
