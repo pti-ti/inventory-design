@@ -64,7 +64,7 @@ const Topbar = ({ isSidebarOpen }) => {
                     style={{
                         height: "auto",
                         width: "100%",
-                        maxWidth: "100px",
+                        maxWidth: "150px",
                     }}
                 />
             </Box>
