@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState } from "react";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
@@ -13,6 +14,10 @@ import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
 import DonutChart from "../../components/DonutChart";
 import BarChartComponent from "../../components/BarChartTypeLocation";
+import CountUp from "react-countup";
+import InventoryIcon from '@mui/icons-material/Inventory';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -24,6 +29,10 @@ const Dashboard = () => {
   const [deviceTypeCounts, setDeviceTypeCounts] = useState({});
   const [deviceLocationCounts, setTotalLocationValue] = useState({});
   const [deviceLocationTypeCounts, setDeviceLocationTypeCounts] = useState({});
+  const [statusReady, setStatusReady] = useState(false);
+  const [typeReady, setTypeReady] = useState(false);
+  const [statusKey, setStatusKey] = useState(0);
+  const [typeKey, setTypeKey] = useState(0);
 
   // Función para formatear moneda COP
   const formatCurrencyCOP = (value) => {
@@ -120,6 +129,26 @@ const Dashboard = () => {
     console.log("Ubicaciones obtenidas:", deviceLocationCounts);
   }, [deviceLocationCounts]);
 
+  useEffect(() => {
+    if (deviceStatus && Object.keys(deviceStatus).length > 0) {
+      setStatusReady(false); // pausa para forzar reinicio
+      setTimeout(() => {
+        setStatusKey((prev) => prev + 1);
+        setStatusReady(true);
+      }, 50); // breve delay permite que React desmonte el anterior
+    }
+  }, [deviceStatus]);
+
+  useEffect(() => {
+    if (deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0) {
+      setTypeReady(false);
+      setTimeout(() => {
+        setTypeKey((prev) => prev + 1);
+        setTypeReady(true);
+      }, 50);
+    }
+  }, [deviceTypeCounts]);
+
   return (
     <Box m="20px">
       {/* HEADER */}
@@ -160,20 +189,17 @@ const Dashboard = () => {
       </Box>
       {/* BOX - Dispositivos por tipo con icono */}
       <Box
-        gridColumn="span 12"
+        gridColumn="span 20"
         backgroundColor={colors.primary[1000]}
-        p="10px"
-        borderRadius="8px"
+        p="20px"
+        borderRadius="12px"
         margin="auto"
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
         sx={{
           width: isSidebarOpen ? "calc(100% - 260px)" : "calc(100% - 70px)",
+          background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
           transition: "width 0.3s ease-in-out",
-          height: "150px",
-          boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
-          marginBottom: "10px",
+          boxShadow: "4px 4px 12px rgba(0, 0, 0, 0.4)",
+          marginBottom: "20px",
         }}
       >
         <Typography
@@ -181,16 +207,17 @@ const Dashboard = () => {
           fontWeight="600"
           color={colors.grey[100]}
           textAlign="center"
-          marginBottom="10px"
+          marginBottom="20px"
         >
-          Dispositivos
+          Dispositivos por tipo
         </Typography>
 
         <Box
           display="flex"
+          flexWrap="wrap"
           justifyContent="center"
           alignItems="center"
-          gap="10px"
+          gap="5px"
           width="100%"
         >
           {Object.entries(deviceTypeCounts).map(([type, count]) => (
@@ -200,19 +227,35 @@ const Dashboard = () => {
               flexDirection="column"
               alignItems="center"
               justifyContent="center"
-              p="10px"
-              width="100px"
-              height="100px"
+              p="16px"
+              width="120px"
+              height="130px"
               backgroundColor={colors.blueAccent[700]}
-              borderRadius="8px"
-              sx={{ boxShadow: 2 }}
+              borderRadius="16px"
+              sx={{
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+                transition: "transform 0.2s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  backgroundColor: colors.blueAccent[600],
+                },
+              }}
             >
-              {/* Corregido: Verificación de íconos */}
-              {deviceIcons[type] ? deviceIcons[type] : <BlockIcon fontSize="large" />}
-              <Typography color={colors.grey[100]} sx={{ fontSize: 12 }}>
+              {deviceIcons[type] ? (
+                React.cloneElement(deviceIcons[type], {
+                  fontSize: "large",
+                  sx: { color: colors.grey[100], fontSize: 40 },
+                })
+              ) : (
+                <BlockIcon fontSize="large" sx={{ color: colors.grey[100], fontSize: 40 }} />
+              )}
+              <Typography
+                color={colors.grey[100]}
+                sx={{ fontSize: 13, textAlign: "center", marginTop: "8px" }}
+              >
                 {type}
               </Typography>
-              <Typography fontWeight="bold" color={colors.grey[100]} sx={{ fontSize: 14 }}>
+              <Typography fontWeight="bold" color={colors.grey[100]} sx={{ fontSize: 16 }}>
                 {count}
               </Typography>
             </Box>
@@ -223,42 +266,65 @@ const Dashboard = () => {
 
 
 
+
       {/* GRID & CHARTS */}
       <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="auto" gap="10px">
         {/* VALOR TOTAL DEL INVENTARIO */}
         <Box
           gridColumn="span 12"
-          backgroundColor={colors.primary[1000]}
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          p="20px"
-          borderRadius="8px"
           sx={{
-            width: isSidebarOpen ? "1150px" : "1700px",
-            height: "100px",
-            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
-            marginBottom: "10px", // Eliminado marginLeft innecesario
-            margin: "0 auto", // Centrado automático horizontalmente
+            width: isSidebarOpen ? "400px" : "1700px",
+            height: "130px",
+            background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
+            borderRadius: "16px",
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+            padding: "20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            color: colors.grey[100],
+            margin: "0 auto",
+            transition: "transform 0.3s ease, box-shadow 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.03)",
+              boxShadow: "0 8px 30px rgba(0, 0, 0, 0.4)",
+              cursor: "pointer",
+            },
           }}
         >
-          <Typography variant="h5" fontWeight="600" color={colors.grey[100]} sx={{ marginBottom: "10px" }}>
-            Valor total del inventario de TI
-          </Typography>
+          <Box>
+            <Typography variant="h5" fontWeight="600">
+              Valor total del inventario de TI
+            </Typography>
+            <Typography variant="h4" fontWeight="bold">
+              {totalInventoryValue ? (
+                <CountUp
+                  start={0}
+                  end={totalInventoryValue}
+                  duration={2.5}
+                  separator="."
+                  decimals={0}
+                  decimal=","
+                  prefix="$ "
+                  formattingFn={(value) => formatCurrencyCOP(value)}
+                />
+              ) : "Cargando..."}
+            </Typography>
+          </Box>
 
-          <Typography
-            variant="h4"
-            fontWeight="bold"
-            color={colors.grey[100]}
-            sx={{ textAlign: "center" }}
+          <Box
+            sx={{
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              borderRadius: "50%",
+              padding: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            {totalInventoryValue ? formatCurrencyCOP(totalInventoryValue) : "Cargando..."}
-          </Typography>
+            <MonetizationOnIcon sx={{ fontSize: 48, color: colors.grey[100] }} />
+          </Box>
         </Box>
-
-
-
 
         {/* DISPOSITIVOS POR ESTADO */}
         <Box
@@ -269,8 +335,15 @@ const Dashboard = () => {
           sx={{
             width: "600px",
             height: "350px",
+            background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
             margin: "0 auto", // Centrado horizontal
+            transition: "transform 0.3s ease, box-shadow 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.03)",
+              boxShadow: "0 8px 30px rgba(0, 0, 0, 0.4)",
+              cursor: "pointer",
+            },
           }}
         >
           <Typography
@@ -287,7 +360,7 @@ const Dashboard = () => {
           </Typography>
 
           {deviceStatus && Object.keys(deviceStatus).length > 0 ? (
-            <DonutChart data={deviceStatus} />
+            <DonutChart key={`status-${Date.now()}`} data={deviceStatus} />
           ) : (
             <Typography color="red">No hay datos disponibles</Typography>
           )}
@@ -302,8 +375,15 @@ const Dashboard = () => {
           sx={{
             width: "600px",
             height: "350px",
+            background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
             margin: "0 auto", // Centrado horizontal
+            transition: "transform 0.3s ease, box-shadow 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.03)",
+              boxShadow: "0 8px 30px rgba(0, 0, 0, 0.4)",
+              cursor: "pointer",
+            },
           }}
         >
           <Typography
@@ -320,7 +400,7 @@ const Dashboard = () => {
           </Typography>
 
           {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
-            <DonutChart data={deviceTypeCounts} />
+            <DonutChart key={`type-${Date.now()}`} data={deviceTypeCounts} />
           ) : (
             <Typography color="red">No hay datos disponibles</Typography>
           )}
@@ -335,8 +415,15 @@ const Dashboard = () => {
             borderRadius: "8px",
             width: "600px",
             height: "400px",
+            background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
             margin: "0 auto", // Centrado horizontal
+            transition: "transform 0.3s ease, box-shadow 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.03)",
+              boxShadow: "0 8px 30px rgba(0, 0, 0, 0.4)",
+              cursor: "pointer",
+            },
           }}
         >
           <Typography
@@ -370,9 +457,15 @@ const Dashboard = () => {
           sx={{
             width: "600px",
             height: "400px",
+            background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
             boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
             margin: "0 auto", // Centrado horizontal
-
+            transition: "transform 0.3s ease, box-shadow 0.3s ease",
+            "&:hover": {
+              transform: "scale(1.03)",
+              boxShadow: "0 8px 30px rgba(0, 0, 0, 0.4)",
+              cursor: "pointer",
+            },
           }}
         >
           <Typography

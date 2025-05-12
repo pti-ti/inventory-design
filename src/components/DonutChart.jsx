@@ -1,7 +1,15 @@
-import React, { useState } from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import React from "react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import { Box, useTheme } from "@mui/material";
 import { tokens } from "../theme";
+import { motion } from "framer-motion";
 
 // Colores predefinidos para ciertos estados específicos
 const STATUS_COLORS = {
@@ -33,23 +41,20 @@ const getRandomColor = () => {
 
 // Función para asignar colores sin repetir
 const assignUniqueColors = (data) => {
-  let availableColors = [...PRIMARY_COLORS]; // Copia de colores disponibles
-  let colorMap = {}; // Mapa para rastrear colores asignados
+  let availableColors = [...PRIMARY_COLORS];
+  let colorMap = {};
 
   return data.map(([name, value]) => {
     const lowerName = name.toLowerCase();
 
-    // Si el estado ya tiene un color asignado, usarlo
     if (colorMap[lowerName]) {
       return { name, value, color: colorMap[lowerName] };
     }
 
-    // Si el estado tiene un color predefinido, usarlo
-    let color = STATUS_COLORS[lowerName] || availableColors.shift() || getRandomColor();
+    let color =
+      STATUS_COLORS[lowerName] || availableColors.shift() || getRandomColor();
 
-    // Asignar el color al estado y guardarlo en el mapa
     colorMap[lowerName] = color;
-
     return { name, value, color };
   });
 };
@@ -61,39 +66,49 @@ const DonutChart = ({ data }) => {
   const chartData = assignUniqueColors(Object.entries(data));
 
   return (
-    <Box
-      p="px"
-      backgroundColor={colors.primary[1000]}
-      borderRadius="8px"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      width="100%"
-      height="300px"
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      style={{ width: "100%", height: "100%" }}
     >
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={chartData}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            innerRadius="50%"
-            outerRadius="80%"
-            paddingAngle={5}
-            isAnimationActive={true}  // Habilita la animación al cargar la página
-          >
-            {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
-    </Box>
+      <Box
+        p="0px"
+        backgroundColor={colors.primary[1000]}
+        borderRadius="8px"
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        width="100%"
+        height="300px"
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              key={chartData.map((d) => d.name).join(",")} // Para animar si cambian los datos
+              data={chartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius="50%"
+              outerRadius="80%"
+              paddingAngle={5}
+              isAnimationActive={true}
+              animationDuration={800}
+              animationEasing="ease-out"
+            >
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </Box>
+    </motion.div>
   );
 };
 
