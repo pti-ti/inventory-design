@@ -36,7 +36,7 @@ const User = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("Usuarios obtenidos:", response.data);
+      console.log("Colaboradores obtenidos:", response.data);
       
       const formattedUsers = response.data.map(user => ({
         ...user,
@@ -77,11 +77,11 @@ const User = () => {
       });
       
       fetchData(); // Refresca la lista de usuarios
-      setSnackbarMessage("Usuario eliminado correctamente"); 
+      setSnackbarMessage("Colaborador eliminado correctamente"); 
       setOpenSnackbar(true);
     } catch (error) {
-      console.error("Error al eliminar el usuario:", error);
-      setSnackbarMessage("Error al eliminar el usuario");
+      console.error("Error al eliminar el colaborador:", error);
+      setSnackbarMessage("Error al eliminar el colaborador");
       setOpenSnackbar(true);
     }
     setOpenConfirmModal(false);
@@ -114,7 +114,7 @@ const User = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center"></Box>
         <Header title="COLABORADORES" subtitle="Búsqueda de los colaboradores de TI" />
         <Button variant="contained" color="primary" onClick={() => handleOpenAddModal()} startIcon={<AddIcon />}>
-          Agregar Usuario
+          Agregar Colaborador
         </Button>     
       <Box
         m="40px 0 0 0"
@@ -138,7 +138,7 @@ const User = () => {
       <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>
         <DialogTitle>Confirmar eliminación</DialogTitle>
         <DialogContent>
-          <DialogContentText>¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.</DialogContentText>
+          <DialogContentText>¿Estás seguro de que deseas eliminar este colaborador? Esta acción no se puede deshacer.</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenConfirmModal(false)} color="primary">Cancelar</Button>

@@ -263,10 +263,6 @@ const Dashboard = () => {
         </Box>
       </Box>
 
-
-
-
-
       {/* GRID & CHARTS */}
       <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="auto" gap="10px">
         {/* VALOR TOTAL DEL INVENTARIO */}

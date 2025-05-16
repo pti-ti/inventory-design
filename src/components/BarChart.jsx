@@ -9,7 +9,7 @@ const BarChart = ({ isDashboard = false }) => {
   const [data, setData] = useState([]);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+  
 
   useEffect(() => {
     const fetchData = async () => {

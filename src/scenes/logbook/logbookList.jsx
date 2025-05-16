@@ -230,7 +230,6 @@ const LogbookList = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-
     </Box>
   );
 };
