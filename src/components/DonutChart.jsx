@@ -17,14 +17,14 @@ const STATUS_COLORS = {
   "pendiente devolver": "#FFD700", // Amarillo
   "entregado pendiente acta": "#FF7F0E", // Naranja
   "disponible": "#2CA02C", // Verde
-  "sin estado": "#9467BD", // Morado
+  "alistamiento": "#9467BD", // Morado
   "asignado": "#1F77B4", // Azul
   "inactivo": "#7F7F7F", // Gris
 };
 
 // Lista de colores primarios suaves
 const PRIMARY_COLORS = [
-  "#1F77B4", "#D62728", "#2CA02C", "#FF7F0E",
+  "#1F77B4", "#2CA02C", "#FF7F0E",
   "#9467BD", "#8C564B", "#E377C2", "#7F7F7F",
   "#BCBD22", "#17BECF"
 ];
@@ -40,19 +40,30 @@ const getRandomColor = () => {
 };
 
 // Función para asignar colores sin repetir
+// Función para asignar colores únicos sin repetir
 const assignUniqueColors = (data) => {
   let availableColors = [...PRIMARY_COLORS];
+  let usedColors = new Set();
   let colorMap = {};
 
   return data.map(([name, value]) => {
     const lowerName = name.toLowerCase();
 
-    if (colorMap[lowerName]) {
-      return { name, value, color: colorMap[lowerName] };
+    // Usa color predefinido si existe y no está usado
+    let color = STATUS_COLORS[lowerName];
+    if (color && !usedColors.has(color)) {
+      usedColors.add(color);
+    } else if (availableColors.length > 0) {
+      // Usa un color primario disponible
+      color = availableColors.shift();
+      usedColors.add(color);
+    } else {
+      // Genera un color aleatorio que no esté usado
+      do {
+        color = getRandomColor();
+      } while (usedColors.has(color));
+      usedColors.add(color);
     }
-
-    let color =
-      STATUS_COLORS[lowerName] || availableColors.shift() || getRandomColor();
 
     colorMap[lowerName] = color;
     return { name, value, color };

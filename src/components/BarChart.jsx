@@ -8,8 +8,14 @@ const BarChart = ({ isDashboard = false }) => {
   const colors = tokens(theme.palette.mode);
   const [data, setData] = useState([]);
 
+  // 🎨 Paleta de colores oscuros (puedes quitar el rojo si lo quieres solo para otro gráfico)
+  const darkColors = [
+    "#1F77B4", "#D62728", "#2CA02C", "#FF7F0E",
+    "#9467BD", "#8C564B", "#E377C2", "#7F7F7F",
+    "#BCBD22", "#17BECF"
+  ];
+
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,28 +26,42 @@ const BarChart = ({ isDashboard = false }) => {
         }
         const result = await response.json();
 
-        // Transformamos el objeto en un array compatible con Nivo Bar
-        const transformedData = Object.keys(result).map((city) => ({
-          city,
-          count: result[city],
-        }));
+        // Asignar un color único a cada ciudad
+        const usedColors = new Set();
+        let colorIndex = 0;
+        const transformedData = Object.keys(result).map((city) => {
+          let color;
+          // Usa un color de la paleta si quedan disponibles
+          while (colorIndex < darkColors.length && usedColors.has(darkColors[colorIndex])) {
+            colorIndex++;
+          }
+          if (colorIndex < darkColors.length) {
+            color = darkColors[colorIndex];
+            usedColors.add(color);
+            colorIndex++;
+          } else {
+            // Si se acaban los colores, genera uno aleatorio que no esté usado
+            do {
+              color = "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
+            } while (usedColors.has(color));
+            usedColors.add(color);
+          }
+          return {
+            city,
+            count: result[city],
+            color
+          };
+        });
 
         setData(transformedData);
       } catch (error) {
         console.error("Error al cargar los datos:", error);
-        setData([]); // Evita que la gráfica falle
+        setData([]);
       }
     };
 
     fetchData();
   }, []);
-
-  // 🎨 Paleta de colores oscuros
-  const darkColors = [
-    "#1F77B4", "#D62728", "#2CA02C", "#FF7F0E",
-    "#9467BD", "#8C564B", "#E377C2", "#7F7F7F",
-    "#BCBD22", "#17BECF"
-  ];
 
   return (
     <div style={{ maxWidth: "600px", height: "350px", margin: "0 auto" }}>
@@ -72,12 +92,12 @@ const BarChart = ({ isDashboard = false }) => {
           }}
           keys={["count"]}
           indexBy="city"
-          margin={{ top: 20, right: 50, bottom: 50, left: 40 }} // más margen a la izquierda
+          margin={{ top: 20, right: 50, bottom: 50, left: 40 }}
           padding={0.2}
-          layout="horizontal" // 👈 cambio importante
+          layout="horizontal"
           valueScale={{ type: "linear" }}
           indexScale={{ type: "band", round: true }}
-          colors={(bar) => darkColors[bar.index % darkColors.length]}
+          colors={({ data }) => data.color}
           borderColor={{ from: "color", modifiers: [["darker", "1.6"]] }}
           axisTop={null}
           axisRight={null}
@@ -95,7 +115,6 @@ const BarChart = ({ isDashboard = false }) => {
             tickRotation: 0,
             format: () => "",
             legend: "Ubicación",
-            //legend: isDashboard ? undefined : "",
             legendPosition: "middle",
             legendOffset: -20,
           }}
@@ -125,8 +144,6 @@ const BarChart = ({ isDashboard = false }) => {
             `${e.id}: ${e.formattedValue} en ubicación: ${e.indexValue}`
           }
         />
-
-
       )}
     </div>
   );

@@ -387,27 +387,7 @@ const LogbookModal = ({ open, handleClose, logbook, refreshLogbooks }) => {
                 }}>
                     <Typography variant="h6">{isEditing ? "Editar Bitácora" : "Registrar Bitácora"}</Typography>
 
-                    {/* Campos deshabilitados durante la edición */}
-                    {/* {!isEditing && (
-                        <TextField
-                            fullWidth
-                            margin="normal"
-                            label="ID del Dispositivo"
-                            name="deviceId"
-                            value={editedLogbook.deviceId}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                setEditedLogbook(prev => ({ ...prev, deviceId: value }));
-
-                                // Si el ID tiene al menos 1 carácter, busca el dispositivo (puedes ajustar esto)
-                                if (value.trim().length > 0) {
-                                    fetchDeviceById(value);
-                                }
-                            }}
-                        />
-                    )} */}
-
-
+                
                     {!isEditing && (
                         <Autocomplete
                             fullWidth

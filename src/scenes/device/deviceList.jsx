@@ -54,7 +54,8 @@ const Device = () => {
         specification: device.specification,
         location: device.locationName, // Se cambia 'location' por 'locationName'
         status: device.statusName,  // Se cambia 'status' por 'statusName'
-        price: device.price
+        price: device.price,
+        userEmail: device.userEmail || "Sin asignar",
       }));
 
       setRows(formattedDevices);
@@ -154,6 +155,7 @@ const Device = () => {
     { field: "serial", headerName: "Serial", flex: 1, cellClassName: "name-column--cell" },
     { field: "specification", headerName: "Especificaciones", flex: 1, cellClassName: "name-column--cell" },
     { field: "type", headerName: "Tipo", flex: 1, cellClassName: "name-column--cell" },
+    { field: "userEmail", headerName: "Asignado a:", flex: 1, cellClassName: "name-column--cell" },
     {
       field: "price",
       headerName: "Precio",

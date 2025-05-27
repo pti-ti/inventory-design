@@ -1,284 +1,263 @@
-import { Box, Button, Modal, TextField, Typography, Snackbar, Alert } from "@mui/material";
+import { Box, Button, Modal, TextField, Typography, Snackbar, Alert, Autocomplete, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import { useState, useEffect } from "react";
-import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import axios from "axios";
+
+const initialDevice = {
+    code: "", brandId: "", modelId: "", serial: "", specification: "",
+    type: "", statusId: "", price: "", locationId: "", userEmail: "", userId: ""
+};
 
 const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
     const isEditing = !!device;
-    const [editedDevice, setEditedDevice] = useState({
-        code: "",
-        brandId: "",
-        modelId: "",
-        serial: "",
-        specification: "",
-        type: "",
-        statusId: "",
-        price: "",
-        locationId: ""
-    });
-
-    const [locations, setLocations] = useState([]);
-    const [statuses, setStatuses] = useState([]);
-    const [brands, setBrands] = useState([]);
-    const [models, setModels] = useState([]);
-
-    const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState("");
-    const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+    const [editedDevice, setEditedDevice] = useState(initialDevice);
+    const [catalogs, setCatalogs] = useState({ locations: [], statuses: [], brands: [], models: [] });
+    const [emailInput, setEmailInput] = useState('');
+    const [emailSuggestions, setEmailSuggestions] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [loadingUserId, setLoadingUserId] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+    // Cargar catálogos
     useEffect(() => {
-        if (open) {
-            const fetchData = async () => {
-                try {
-                    const token = localStorage.getItem("token");
-                    const headers = { Authorization: `Bearer ${token}` };
-
-                    const [locRes, statRes, modRes, brandRes] = await Promise.all([
-                        axios.get(`${API_BASE_URL}/api/v1/locations`, { headers }),
-                        axios.get(`${API_BASE_URL}/api/v1/status`, { headers }),
-                        axios.get(`${API_BASE_URL}/api/v1/models`, { headers }),
-                        axios.get(`${API_BASE_URL}/api/v1/brands`, { headers }),
-                    ]);
-
-                    setLocations(locRes.data);
-                    setStatuses(statRes.data);
-                    setModels(modRes.data);
-                    setBrands(brandRes.data);
-                } catch (error) {
-                    console.error("Error al obtener datos", error);
-                }
-            };
-
-            fetchData();
-        }
+        if (!open) return;
+        const fetchData = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const headers = { Authorization: `Bearer ${token}` };
+                const [locations, statuses, models, brands] = await Promise.all([
+                    axios.get(`${API_BASE_URL}/api/v1/locations`, { headers }),
+                    axios.get(`${API_BASE_URL}/api/v1/status`, { headers }),
+                    axios.get(`${API_BASE_URL}/api/v1/models`, { headers }),
+                    axios.get(`${API_BASE_URL}/api/v1/brands`, { headers }),
+                ]);
+                setCatalogs({
+                    locations: locations.data, statuses: statuses.data,
+                    models: models.data, brands: brands.data
+                });
+            } catch (error) { console.error("Error al obtener catálogos", error); }
+        };
+        fetchData();
     }, [open]);
 
+    // Inicializar formulario
     useEffect(() => {
-        if (open && isEditing && device && brands.length && models.length && statuses.length && locations.length) {
+        if (open && isEditing && device && Object.values(catalogs).every(arr => arr.length)) {
             setEditedDevice({
                 code: device.code || "",
-                brandId: brands.find(b => b.name === device.brand)?.id || "",
-                modelId: models.find(m => m.name === device.model)?.id || "",
+                brandId: catalogs.brands.find(b => b.name === device.brand)?.id || "",
+                modelId: catalogs.models.find(m => m.name === device.model)?.id || "",
                 serial: device.serial || "",
                 specification: device.specification || "",
                 type: device.type || "",
-                statusId: statuses.find(s => s.name === device.status)?.id || "",
+                statusId: catalogs.statuses.find(s => s.name === device.status)?.id || "",
                 price: device.price || "",
-                locationId: locations.find(l => l.name === device.location)?.id || ""
+                locationId: catalogs.locations.find(l => l.name === device.location)?.id || "",
+                userEmail: device.userEmail || "",
+                userId: device.userId || ""
             });
+            setSelectedUser(device.userEmail ? { email: device.userEmail, id: device.userId } : null);
         } else if (open && !isEditing) {
-            setEditedDevice({
-                code: "",
-                brandId: "",
-                modelId: "",
-                serial: "",
-                specification: "",
-                type: "",
-                statusId: "",
-                price: "",
-                locationId: ""
-            });
+            setEditedDevice(initialDevice);
+            setSelectedUser(null);
         }
-    }, [device, open, isEditing, brands, models, statuses, locations]);
+    }, [device, open, isEditing, catalogs]);
 
+    // Limpiar al cerrar
+    useEffect(() => {
+        if (!open) {
+            setEditedDevice(initialDevice);
+            setSelectedUser(null);
+            setEmailInput('');
+            setEmailSuggestions([]);
+        }
+    }, [open]);
 
-    const handleChange = (e) => {
-        setEditedDevice(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    };
+    // Autocompletar usuario
+    useEffect(() => {
+        const delay = setTimeout(() => {
+            if (!emailInput.trim()) return setEmailSuggestions([]);
+            const fetchSuggestions = async () => {
+                try {
+                    const token = localStorage.getItem("token");
+                    const res = await axios.get(`${API_BASE_URL}/api/v1/users/by-email`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                        params: { email: emailInput }
+                    });
+                    setEmailSuggestions(res.data.map(u => ({ ...u, location: u.location || "" })));
+                } catch { setEmailSuggestions([]); }
+            };
+            fetchSuggestions();
+        }, 300);
+        return () => clearTimeout(delay);
+    }, [emailInput]);
+
+    // Buscar userId por email
+    useEffect(() => {
+        const fetchUserId = async () => {
+            if (editedDevice.userEmail && editedDevice.userEmail.includes('@')) {
+                setLoadingUserId(true);
+                try {
+                    const token = localStorage.getItem("token");
+                    const res = await axios.get(`${API_BASE_URL}/api/v1/users/by-email`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                        params: { email: editedDevice.userEmail }
+                    });
+                    setEditedDevice(prev => ({
+                        ...prev,
+                        userId: res.data?.[0]?.id?.toString() || ""
+                    }));
+                } catch { setEditedDevice(prev => ({ ...prev, userId: "" })); }
+                setLoadingUserId(false);
+            }
+        };
+        fetchUserId();
+    }, [editedDevice.userEmail]);
+
+    // Handlers
+    const handleChange = e => setEditedDevice(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
     const handleSubmit = async () => {
+        if (loadingUserId) {
+            return setSnackbar({ open: true, message: "Por favor espera a que se valide el usuario.", severity: "warning" });
+        }
+        if (!editedDevice.userId) {
+            return setSnackbar({ open: true, message: "Debes seleccionar un usuario válido del autocompletado.", severity: "error" });
+        }
         // Validación de campos requeridos
-        const requiredFields = [
-            { key: "code", label: "Código" },
-            { key: "brandId", label: "Marca" },
-            { key: "modelId", label: "Modelo" },
-            { key: "serial", label: "Serial" },
-            { key: "specification", label: "Especificaciones" },
-            { key: "type", label: "Tipo" },
-            { key: "statusId", label: "Estado" },
-            { key: "price", label: "Precio" },
-            { key: "locationId", label: "Ubicación" }
+        const required = [
+            { key: "code", label: "Código" }, { key: "brandId", label: "Marca" }, { key: "modelId", label: "Modelo" },
+            { key: "serial", label: "Serial" }, { key: "specification", label: "Especificaciones" }, { key: "type", label: "Tipo" },
+            { key: "userEmail", label: "Asignado a" }, { key: "statusId", label: "Estado" }, { key: "price", label: "Precio" }, { key: "locationId", label: "Ubicación" }
         ];
-
-        for (const field of requiredFields) {
+        for (const field of required) {
             const value = editedDevice[field.key];
             if (!value || value.toString().trim() === "") {
-                setSnackbarMessage(`Error al guardar dispositivo: el campo "${field.label}" es obligatorio.`);
-                setSnackbarSeverity("error");
-                setOpenSnackbar(true);
-                return;
+                return setSnackbar({ open: true, message: `El campo "${field.label}" es obligatorio.`, severity: "error" });
             }
-
-            if (field.key === "price") {
-                const price = parseFloat(value);
-                if (isNaN(price) || price < 0) {
-                    setSnackbarMessage(`Error al guardar dispositivo: el campo "Precio" debe ser un número positivo.`);
-                    setSnackbarSeverity("error");
-                    setOpenSnackbar(true);
-                    return;
-                }
+            if (field.key === "price" && (isNaN(parseFloat(value)) || parseFloat(value) < 0)) {
+                return setSnackbar({ open: true, message: `El campo "Precio" debe ser un número positivo.`, severity: "error" });
             }
         }
 
-        const isCreating = !device?.id;
-        const codeChanged = !device || editedDevice.code !== device.code;
-
-        // ✅ Validación del código duplicado
-        if (isCreating || codeChanged) {
-            const token = localStorage.getItem("token");
-            const headers = { Authorization: `Bearer ${token}` };
-
-            try {
-                const response = await axios.get(`${API_BASE_URL}/api/v1/devices/search/${editedDevice.code}`, { headers });
-                const existingDevices = response.data;
-
-                if (existingDevices.length > 0) {
-                    const existingDevice = existingDevices[0];
-                    if (!device || existingDevice.id !== device.id) {
-                        setSnackbarMessage(`Error: el código "${editedDevice.code}" ya está registrado para otro dispositivo.`);
-                        setSnackbarSeverity("error");
-                        setOpenSnackbar(true);
-                        return;
-                    }
-                }
-
-            } catch (error) {
-                // Aquí puedes verificar si el error es un 404, lo cual indicaría que el código no existe
-                if (error.response?.status !== 404) {
-                    console.error("Error al verificar código de dispositivo:", error);
-                    setSnackbarMessage("Error al verificar el código del dispositivo.");
-                    setSnackbarSeverity("error");
-                    setOpenSnackbar(true);
-                    return;
-                }
-            }
-        }
-
-        // ✅ Guardado del dispositivo
+        // Guardar (deja la validación de duplicado al backend)
         try {
             const token = localStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` };
-
             const apiUrl = isEditing
                 ? `${API_BASE_URL}/api/v1/devices/${device.id}`
                 : `${API_BASE_URL}/api/v1/devices/register`;
-
             const deviceData = {
-                ...editedDevice,
-                brand: { id: editedDevice.brandId },
-                model: { id: editedDevice.modelId },
-                status: { id: editedDevice.statusId },
-                location: { id: editedDevice.locationId }
+                code: editedDevice.code,
+                brand: { id: Number(editedDevice.brandId) },
+                model: { id: Number(editedDevice.modelId) },
+                serial: editedDevice.serial,
+                type: editedDevice.type,
+                specification: editedDevice.specification,
+                price: Number(editedDevice.price),
+                status: { id: Number(editedDevice.statusId) },
+                location: { id: Number(editedDevice.locationId) },
+                user: { id: Number(editedDevice.userId) }
             };
 
-            delete deviceData.brandId;
-            delete deviceData.modelId;
-            delete deviceData.statusId;
-            delete deviceData.locationId;
+            console.log("Datos enviados al backend:", deviceData);
 
-            if (isEditing) {
-                await axios.put(apiUrl, deviceData, { headers });
-                
-                setSnackbarMessage("Dispositivo actualizado con éxito");
-            } else {
-                await axios.post(apiUrl, deviceData, { headers });
-                setSnackbarMessage("Dispositivo registrado con éxito");
-            }
-
-            setSnackbarSeverity("success");
-            setOpenSnackbar(true);
+            await (isEditing
+                ? axios.put(apiUrl, deviceData, { headers })
+                : axios.post(apiUrl, deviceData, { headers }));
+            setSnackbar({ open: true, message: isEditing ? "Dispositivo actualizado con éxito" : "Dispositivo registrado con éxito", severity: "success" });
             refreshDevices();
             handleClose();
         } catch (error) {
-            console.error("Error al guardar el dispositivo:", error);
-            if (error.response?.data?.message) {
-                setSnackbarMessage(`Error: ${error.response.data.message}`);
-            } else {
-                setSnackbarMessage("Error al guardar el dispositivo por código duplicado.");
-            }
-            setSnackbarSeverity("error");
-            setOpenSnackbar(true);
+            setSnackbar({
+                open: true,
+                message: error.response?.data?.message || "Error al guardar el dispositivo.",
+                severity: "error"
+            });
         }
     };
-
-
 
     return (
         <>
             <Modal open={open} onClose={handleClose}>
                 <Box sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: 400,
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                    borderRadius: 2,
+                    position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+                    width: 400, bgcolor: "background.paper", boxShadow: 24, p: 4, borderRadius: 2,
                 }}>
                     <Typography variant="h6">{isEditing ? "Editar Dispositivo" : "Registrar Dispositivo"}</Typography>
                     <TextField fullWidth margin="normal" label="Código" name="code" value={editedDevice.code} onChange={handleChange} />
-
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Marca</InputLabel>
                         <Select name="brandId" value={editedDevice.brandId} onChange={handleChange}>
-                            {brands.map(brand => (
+                            {catalogs.brands.map(brand => (
                                 <MenuItem key={brand.id} value={brand.id}>{brand.name}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
-
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Modelo</InputLabel>
                         <Select name="modelId" value={editedDevice.modelId} onChange={handleChange}>
-                            {models.map(model => (
+                            {catalogs.models.map(model => (
                                 <MenuItem key={model.id} value={model.id}>{model.name}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
-
                     <TextField fullWidth margin="normal" label="Serial" name="serial" value={editedDevice.serial} onChange={handleChange} />
                     <TextField fullWidth margin="normal" label="Especificaciones" name="specification" value={editedDevice.specification} onChange={handleChange} />
                     <TextField fullWidth margin="normal" label="Tipo" name="type" value={editedDevice.type} onChange={handleChange} />
-
+                    <Autocomplete
+                        fullWidth
+                        options={emailSuggestions}
+                        getOptionLabel={option => option.email || ""}
+                        value={selectedUser}
+                        onInputChange={(_, newInputValue) => {
+                            setEmailInput(newInputValue);
+                            setEditedDevice(prev => ({ ...prev, userEmail: newInputValue }));
+                        }}
+                        onChange={(_, newValue) => {
+                            setSelectedUser(newValue);
+                            setEditedDevice(prev => ({
+                                ...prev,
+                                userId: newValue?.id?.toString() || '',
+                                userEmail: newValue?.email || '',
+                                locationId: newValue?.location?.id || prev.locationId
+                            }));
+                        }}
+                        renderInput={params => (
+                            <TextField {...params} label="Correo del Usuario" margin="normal" />
+                        )}
+                    />
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Estado</InputLabel>
                         <Select name="statusId" value={editedDevice.statusId} onChange={handleChange}>
-                            {statuses.map(status => (
+                            {catalogs.statuses.map(status => (
                                 <MenuItem key={status.id} value={status.id}>{status.name}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
-
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Localización</InputLabel>
                         <Select name="locationId" value={editedDevice.locationId} onChange={handleChange}>
-                            {locations.map(location => (
+                            {catalogs.locations.map(location => (
                                 <MenuItem key={location.id} value={location.id}>{location.name}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
-
-                    <TextField fullWidth margin="normal" label="Precio" name="price" value={editedDevice.price} onChange={handleChange} />
-
-                    <Button fullWidth variant="contained" color="primary" onClick={handleSubmit} sx={{ mt: 2 }}>
+                    <TextField fullWidth margin="normal" label="Precio" name="price" type="number" value={editedDevice.price} onChange={handleChange} />
+                    <Button fullWidth variant="contained" color="primary" onClick={handleSubmit} sx={{ mt: 2 }} disabled={loadingUserId}>
                         {isEditing ? "Guardar Cambios" : "Registrar"}
                     </Button>
                 </Box>
             </Modal>
-
-            {/* Diálogo de Éxito */}
             <Snackbar
-                open={openSnackbar}
+                open={snackbar.open}
                 autoHideDuration={3000}
-                onClose={() => setOpenSnackbar(false)}
+                onClose={() => setSnackbar(s => ({ ...s, open: false }))}
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
             >
-                <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
-                    {snackbarMessage}
+                <Alert onClose={() => setSnackbar(s => ({ ...s, open: false }))} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
                 </Alert>
             </Snackbar>
         </>
