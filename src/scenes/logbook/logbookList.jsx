@@ -8,6 +8,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
 import LogbookModal from "./logbookModal";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
 const LogbookList = () => {
@@ -44,7 +45,7 @@ const LogbookList = () => {
         id: logbook.id || 0,
         deviceCode: logbook.deviceCode || "Desconocido",
         deviceBrand: logbook.deviceBrand || "Desconocido",
-        deviceModel: logbook.deviceModel || "Desconocido",  
+        deviceModel: logbook.deviceModel || "Desconocido",
         userEmail: logbook.userEmail || "No asignado",
         statusName: logbook.deviceStatus || "Desconocido",
         locationName: logbook.deviceLocation || "Sin ubicación",
@@ -139,7 +140,7 @@ const LogbookList = () => {
 
 
   const columns = [
-    { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" }, 
+    { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" },
     { field: "deviceCode", headerName: "Código del dispositivo", flex: 1, cellClassName: "name-column--cell" },
     { field: "deviceBrand", headerName: "Marca del dispositivo", flex: 1, cellClassName: "name-column--cell" },
     { field: "deviceModel", headerName: "Modelo del dispositivo", flex: 1, cellClassName: "name-column--cell" },
@@ -153,7 +154,7 @@ const LogbookList = () => {
       flex: 1,
       cellClassName: "name-column--cell"
     },
-    {
+    /* {
       field: "actions",
       headerName: "Acciones",
       flex: 1,
@@ -170,6 +171,26 @@ const LogbookList = () => {
           </IconButton>
         </Box>
       ),
+    }, */
+    {
+      field: "actions",
+      headerName: "Historial",
+      flex: 1,
+      renderCell: (params) => (
+        <Box>
+          <IconButton color="primary" onClick={() => {
+            // Aquí puedes definir la acción al hacer clic en el ojo
+            // Por ejemplo, mostrar detalles o historial
+            console.log("Ver historial de:", params.row);
+          }}
+            sx={{
+              color: colors.greenAccent[400], // Usa un color de acento visible en ambos modos
+            }}
+          >
+            <VisibilityIcon />
+          </IconButton>
+        </Box>
+      ),
     },
   ];
 
@@ -178,9 +199,9 @@ const LogbookList = () => {
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center"></Box>
       <Header title="BITÁCORAS" subtitle="Búsqueda de las bitácoras de los dispositivos de TI" />
-      <Button variant="contained" color="primary" onClick={() => handleOpenModal()} startIcon={<FactCheckOutlinedIcon />}>
+      {/* <Button variant="contained" color="primary" onClick={() => handleOpenModal()} startIcon={<FactCheckOutlinedIcon />}>
         Agregar Bitácora
-      </Button>
+      </Button> */}
 
       <Box
         m="40px 0 0 0"

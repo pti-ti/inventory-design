@@ -17,8 +17,11 @@ const Login = () => {
   const { login } = useContext(AuthContext);
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState(() => localStorage.getItem("rememberedUsername") || "");
+  const [password, setPassword] = useState(() => localStorage.getItem("rememberedPassword") || "");
+  const [remember, setRemember] = useState(
+    !!localStorage.getItem("rememberedUsername") && !!localStorage.getItem("rememberedPassword")
+  )
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
 
   const textColor = theme.palette.mode === "dark" ? "#fff" : "#000";
@@ -39,12 +42,21 @@ const Login = () => {
       const data = await response.json();
       login({ username, userType: data.userType }, data.token);
 
+      // Guardar  o limpiar credenciales
+      if (remember) {
+        localStorage.setItem("rememberedUsername", username);
+        localStorage.setItem("rememberedPassword", password);
+      } else {
+        localStorage.removeItem("rememberedUsername");
+        localStorage.removeItem("rememberedPassword");
+      }
+
       setSnackbar({ open: true, message: "¡Login exitoso!", severity: "success" });
 
       setTimeout(() => {
         window.location.href = "/dashboard";
       }, 1500);
-      
+
     } catch (err) {
       setSnackbar({ open: true, message: err.message, severity: "error" });
     }
@@ -52,7 +64,7 @@ const Login = () => {
 
   return (
     <div className={`login-container ${theme.palette.mode === "dark" ? "dark-mode" : "light-mode"}`} style={{ color: textColor }}>
-      
+
       {/* Logo y Tema */}
       <div className="logo-container">
         <img src={theme.palette.mode === "dark" ? logoClaro : logoOscuro} alt="Logo" className="logo" />
@@ -90,6 +102,20 @@ const Login = () => {
               style={{ color: textColor }}
             />
             <LockOutlinedIcon className="icon" style={{ color: textColor }} />
+          </div>
+
+          {/* Casilla de recordar credenciales */}
+          <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+            <input
+              type="checkbox"
+              id="remember"
+              checked={remember}
+              onChange={() => setRemember(!remember)}
+              style={{ marginRight: 8 }}
+            />
+            <label htmlFor="remember" style={{ color: textColor, cursor: "pointer" }}>
+              Recordar credenciales
+            </label>
           </div>
 
           <button type="submit">Iniciar Sesión</button>

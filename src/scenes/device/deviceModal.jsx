@@ -52,10 +52,10 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                 specification: device.specification || "",
                 type: device.type || "",
                 statusId: catalogs.statuses.find(s => s.name === device.status)?.id || "",
-                price: device.price || "",
+                price: device.price ?? "",
                 locationId: catalogs.locations.find(l => l.name === device.location)?.id || "",
                 userEmail: device.userEmail || "",
-                userId: device.userId || ""
+                userId: device.userId?.toString() || ""
             });
             setSelectedUser(device.userEmail ? { email: device.userEmail, id: device.userId } : null);
         } else if (open && !isEditing) {
@@ -133,11 +133,13 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
         ];
         for (const field of required) {
             const value = editedDevice[field.key];
-            if (!value || value.toString().trim() === "") {
+            if (field.key !== "price" && (!value || value.toString().trim() === "")) {
                 return setSnackbar({ open: true, message: `El campo "${field.label}" es obligatorio.`, severity: "error" });
             }
-            if (field.key === "price" && (isNaN(parseFloat(value)) || parseFloat(value) < 0)) {
-                return setSnackbar({ open: true, message: `El campo "Precio" debe ser un número positivo.`, severity: "error" });
+            if (field.key === "price") {
+                if (value === "" || value === null || isNaN(parseFloat(value)) || parseFloat(value) < 0) {
+                    return setSnackbar({ open: true, message: `El campo "Precio" debe ser un número positivo.`, severity: "error" });
+                }
             }
         }
 
@@ -186,8 +188,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     width: 400, bgcolor: "background.paper", boxShadow: 24, p: 4, borderRadius: 2,
                 }}>
                     <Typography variant="h6">{isEditing ? "Editar Dispositivo" : "Registrar Dispositivo"}</Typography>
-                    <TextField fullWidth margin="normal" label="Código" name="code" value={editedDevice.code} onChange={handleChange} />
-                    <FormControl fullWidth margin="normal">
+                    <TextField fullWidth margin="normal" label="Código" name="code" value={editedDevice.code} onChange={handleChange} disabled={isEditing} />
+                    <FormControl fullWidth margin="normal" disabled={isEditing}>
                         <InputLabel>Marca</InputLabel>
                         <Select name="brandId" value={editedDevice.brandId} onChange={handleChange}>
                             {catalogs.brands.map(brand => (
@@ -195,7 +197,7 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                             ))}
                         </Select>
                     </FormControl>
-                    <FormControl fullWidth margin="normal">
+                    <FormControl fullWidth margin="normal" disabled={isEditing}>
                         <InputLabel>Modelo</InputLabel>
                         <Select name="modelId" value={editedDevice.modelId} onChange={handleChange}>
                             {catalogs.models.map(model => (
@@ -203,9 +205,9 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                             ))}
                         </Select>
                     </FormControl>
-                    <TextField fullWidth margin="normal" label="Serial" name="serial" value={editedDevice.serial} onChange={handleChange} />
+                    <TextField fullWidth margin="normal" label="Serial" name="serial" value={editedDevice.serial} onChange={handleChange} disabled={isEditing} />
                     <TextField fullWidth margin="normal" label="Especificaciones" name="specification" value={editedDevice.specification} onChange={handleChange} />
-                    <TextField fullWidth margin="normal" label="Tipo" name="type" value={editedDevice.type} onChange={handleChange} />
+                    <TextField fullWidth margin="normal" label="Tipo" name="type" value={editedDevice.type} onChange={handleChange} disabled={isEditing} />
                     <Autocomplete
                         fullWidth
                         options={emailSuggestions}
