@@ -7,7 +7,9 @@ import Header from "../../components/Header";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import LogbookModal from "./logbookModal";
+import LogbookHistoryModal from "./logbookHistoryModal";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
@@ -23,6 +25,8 @@ const LogbookList = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [selectedHistory, setSelectedHistory] = useState(null);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -54,7 +58,8 @@ const LogbookList = () => {
           ? new Date(logbook.createdAt).toLocaleDateString("es-ES", {
             year: "numeric", month: "2-digit", day: "2-digit"
           })
-          : "Fecha no disponible"
+          : "Fecha no disponible",
+          changes: logbook.changes || "" 
       }));
       console.log("Bitácoras formateadas:", formattedLogbooks);
       setRows(formattedLogbooks);
@@ -67,6 +72,11 @@ const LogbookList = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleShowHistory = (logbook) => {
+    setSelectedHistory(logbook);
+    setHistoryModalOpen(true);
+  };
 
   const handleEdit = (logbook) => {
     console.log("Bitácora seleccionada para editar:", logbook)
@@ -137,7 +147,35 @@ const LogbookList = () => {
     setLogbookToDelete(null); // Limpiar la variable de estado
   };
 
+  const handleDownloadExcel = async (logbook) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${API_BASE_URL}/api/v1/excel/logbook`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { logbookId: logbook.id },
+          responseType: "blob",
+        }
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
 
+      // Usa el código del dispositivo para el nombre del archivo
+      const filename = `Bitacora_${logbook.deviceCode}.xlsx`;
+      link.setAttribute("download", filename);
+
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    } catch (error) {
+      setSnackbarMessage("No se pudo descargar el Excel de la bitácora.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+  };
 
   const columns = [
     { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" },
@@ -178,22 +216,27 @@ const LogbookList = () => {
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton color="primary" onClick={() => {
-            // Aquí puedes definir la acción al hacer clic en el ojo
-            // Por ejemplo, mostrar detalles o historial
-            console.log("Ver historial de:", params.row);
-          }}
-            sx={{
-              color: colors.greenAccent[400], // Usa un color de acento visible en ambos modos
-            }}
+          <IconButton
+            color="primary"
+            onClick={() => handleShowHistory(params.row)}
+            sx={{ color: colors.greenAccent[400] }}
           >
             <VisibilityIcon />
+          </IconButton>
+          <IconButton
+            color="success"
+            onClick={() => handleDownloadExcel(params.row)}
+            sx={{
+              color: colors.greenAccent[400],
+              ml: 1,
+            }}
+          >
+            <DescriptionOutlinedIcon />
           </IconButton>
         </Box>
       ),
     },
   ];
-
 
   return (
     <Box m="20px">
@@ -227,7 +270,11 @@ const LogbookList = () => {
         refreshLogbooks={fetchData}
         handleUpdateLogbook={handleUpdateLogbook}
       />
-
+      <LogbookHistoryModal
+        open={historyModalOpen}
+        handleClose={() => setHistoryModalOpen(false)}
+        logbook={selectedHistory}
+      />
 
       {/* Modal de confirmación de eliminación */}
       <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>

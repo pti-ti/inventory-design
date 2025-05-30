@@ -1,5 +1,5 @@
-import { 
-    Box, useTheme, Button, IconButton, Snackbar, Alert 
+import {
+    Box, useTheme, Button, IconButton, Snackbar, Alert
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
@@ -21,10 +21,10 @@ const modelList = () => {
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openConfirmModal, setOpenConfirmModal] = useState(false);
     const [modelToDelete, setModelToDelete] = useState(null); // Renombrado
-    
+
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
-    const [snackbarSeverity, setSnackbarSeverity] = useState("success"); 
+    const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -96,7 +96,7 @@ const modelList = () => {
     };
 
     const columns = [
-        { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" }, 
+        { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" },
         { field: "name", headerName: "Nombre del Modelo", flex: 1, cellClassName: "name-column--cell" }, // Cambiado a 'Modelo'
         { field: "createdBy", headerName: "Creado Por (ID Usuario)", flex: 1, cellClassName: "name-column--cell" },
         { field: "createdAt", headerName: "Fecha de Creación", flex: 1, cellClassName: "name-column--cell" },
@@ -106,10 +106,16 @@ const modelList = () => {
             flex: 1,
             renderCell: (params) => (
                 <Box>
-                    <IconButton color="default" onClick={() => handleEdit(params.row)}>
+                    <IconButton
+                        onClick={() => handleEdit(params.row)}
+                        sx={{ color: colors.greenAccent[400] }}
+                    >
                         <EditIcon />
                     </IconButton>
-                    <IconButton color="error" onClick={() => handleOpenConfirmModal(params.row.id)}>
+                    <IconButton
+                        onClick={() => handleOpenConfirmModal(params.row.id)}
+                        sx={{ color: colors.greenAccent[400], ml: 1 }}
+                    >
                         <DeleteIcon />
                     </IconButton>
                 </Box>
@@ -122,37 +128,37 @@ const modelList = () => {
             <Header title="MODELOS" subtitle="Gestión de modelos de dispositivos de PTI" /> {/* Cambiado a 'Modelos' */}
             <Button variant="contained" color="primary" onClick={handleOpenAddModal} startIcon={<AddIcon />}>
                 Agregar Modelo {/* Cambiado a 'Modelo' */}
-            </Button>   
-              
-            <Box 
-              m="40px 0 0 0" 
-              height="75vh"
-              sx={{
-                "& .MuiDataGrid-root": { border: "none" },
-                "& .MuiDataGrid-cell": { borderBottom: "none" },
-                "& .name-column--cell": { color: colors.greenAccent[300] },
-                "& .MuiDataGrid-columnHeaders": { backgroundColor: colors.blueAccent[700], borderBottom: "none" },
-                "& .MuiDataGrid-virtualScroller": { backgroundColor: colors.primary[400] },
-                "& .MuiDataGrid-footerContainer": { borderTop: "none", backgroundColor: colors.blueAccent[700] },
-                "& .MuiCheckbox-root": { color: `${colors.greenAccent[200]} !important` },
-              }}
-             >
+            </Button>
+
+            <Box
+                m="40px 0 0 0"
+                height="75vh"
+                sx={{
+                    "& .MuiDataGrid-root": { border: "none" },
+                    "& .MuiDataGrid-cell": { borderBottom: "none" },
+                    "& .name-column--cell": { color: colors.greenAccent[300] },
+                    "& .MuiDataGrid-columnHeaders": { backgroundColor: colors.blueAccent[700], borderBottom: "none" },
+                    "& .MuiDataGrid-virtualScroller": { backgroundColor: colors.primary[400] },
+                    "& .MuiDataGrid-footerContainer": { borderTop: "none", backgroundColor: colors.blueAccent[700] },
+                    "& .MuiCheckbox-root": { color: `${colors.greenAccent[200]} !important` },
+                }}
+            >
                 <DataGrid checkboxSelection rows={rows} columns={columns} />
             </Box>
 
-            <ModelModal 
-                open={openAddModal} 
-                handleClose={() => setOpenAddModal(false)} 
+            <ModelModal
+                open={openAddModal}
+                handleClose={() => setOpenAddModal(false)}
                 model={null} // Cambiado a 'model'
                 refreshModels={fetchData} // Cambiado a 'model'
-                showSnackbar={showSnackbar} 
+                showSnackbar={showSnackbar}
             />
-            <ModelModal 
-                open={openEditModal} 
-                handleClose={() => setOpenEditModal(false)} 
+            <ModelModal
+                open={openEditModal}
+                handleClose={() => setOpenEditModal(false)}
                 model={selectedModels} // Cambiado a 'model'
                 refreshModels={fetchData} // Cambiado a 'model'
-                showSnackbar={showSnackbar} 
+                showSnackbar={showSnackbar}
             />
 
             <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>
@@ -169,7 +175,7 @@ const modelList = () => {
             {/* Notificación Snackbar */}
             <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                >
+            >
                 <Alert severity={snackbarSeverity} onClose={() => setSnackbarOpen(false)}>
                     {snackbarMessage}
                 </Alert>

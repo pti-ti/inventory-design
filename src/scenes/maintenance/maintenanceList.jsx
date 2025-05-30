@@ -160,7 +160,7 @@ const Maintenance = () => {
 
 
   const columns = [
-    { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" }, 
+    { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" },
     { field: "deviceId", headerName: "ID dispositivo", flex: 1, cellClassName: "name-column--cell" },
     { field: "deviceCode", headerName: "Código del dispositivo", flex: 1, cellClassName: "name-column--cell" },
     { field: "deviceBrand", headerName: "Marca", flex: 1, cellClassName: "name-column--cell" },
@@ -196,10 +196,16 @@ const Maintenance = () => {
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton color="default" onClick={() => handleEdit(params.row)}>
+          <IconButton
+            onClick={() => handleEdit(params.row)}
+            sx={{ color: colors.greenAccent[400] }}
+          >
             <EditIcon />
           </IconButton>
-          <IconButton color="error" onClick={() => handleOpenConfirmModal(params.row.id)}>
+          <IconButton
+            onClick={() => handleOpenConfirmModal(params.row.id)}
+            sx={{ color: colors.greenAccent[400], ml: 1 }}
+          >
             <DeleteIcon />
           </IconButton>
         </Box>

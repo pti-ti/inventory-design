@@ -4,7 +4,8 @@ import axios from "axios";
 
 const initialDevice = {
     code: "", brandId: "", modelId: "", serial: "", specification: "",
-    type: "", statusId: "", price: "", locationId: "", userEmail: "", userId: ""
+    type: "", statusId: "", price: "", locationId: "", userEmail: "", userId: "",
+    note: ""
 };
 
 const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
@@ -55,7 +56,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                 price: device.price ?? "",
                 locationId: catalogs.locations.find(l => l.name === device.location)?.id || "",
                 userEmail: device.userEmail || "",
-                userId: device.userId?.toString() || ""
+                userId: device.userId?.toString() || "",
+                note: device.note || "",
             });
             setSelectedUser(device.userEmail ? { email: device.userEmail, id: device.userId } : null);
         } else if (open && !isEditing) {
@@ -160,7 +162,8 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                 price: Number(editedDevice.price),
                 status: { id: Number(editedDevice.statusId) },
                 location: { id: Number(editedDevice.locationId) },
-                user: { id: Number(editedDevice.userId) }
+                user: { id: Number(editedDevice.userId) },
+                note: editedDevice.note
             };
 
             console.log("Datos enviados al backend:", deviceData);
@@ -208,6 +211,14 @@ const DeviceModal = ({ open, handleClose, device, refreshDevices }) => {
                     <TextField fullWidth margin="normal" label="Serial" name="serial" value={editedDevice.serial} onChange={handleChange} disabled={isEditing} />
                     <TextField fullWidth margin="normal" label="Especificaciones" name="specification" value={editedDevice.specification} onChange={handleChange} />
                     <TextField fullWidth margin="normal" label="Tipo" name="type" value={editedDevice.type} onChange={handleChange} disabled={isEditing} />
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Nota (opcional)"
+                        name="note"
+                        value={editedDevice.note}
+                        onChange={handleChange}
+                    />
                     <Autocomplete
                         fullWidth
                         options={emailSuggestions}

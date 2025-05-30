@@ -1,5 +1,5 @@
-import { 
-    Box, useTheme, Button, IconButton, Snackbar, Alert 
+import {
+    Box, useTheme, Button, IconButton, Snackbar, Alert
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
@@ -21,10 +21,10 @@ const BrandList = () => {
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openConfirmModal, setOpenConfirmModal] = useState(false);
     const [brandToDelete, setBrandToDelete] = useState(null);
-    
+
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
-    const [snackbarSeverity, setSnackbarSeverity] = useState("success"); 
+    const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -96,7 +96,7 @@ const BrandList = () => {
     };
 
     const columns = [
-        { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" }, 
+        { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" },
         { field: "name", headerName: "Marca del dispositivo", flex: 1, cellClassName: "name-column--cell" },
         { field: "createdBy", headerName: "Creado Por (ID Usuario)", flex: 1, cellClassName: "name-column--cell" },
         { field: "createdAt", headerName: "Fecha de Creación", flex: 1, cellClassName: "name-column--cell" },
@@ -106,10 +106,16 @@ const BrandList = () => {
             flex: 1,
             renderCell: (params) => (
                 <Box>
-                    <IconButton color="default" onClick={() => handleEdit(params.row)}>
+                    <IconButton
+                        onClick={() => handleEdit(params.row)}
+                        sx={{ color: colors.greenAccent[400] }}
+                    >
                         <EditIcon />
                     </IconButton>
-                    <IconButton color="error" onClick={() => handleOpenConfirmModal(params.row.id)}>
+                    <IconButton
+                        onClick={() => handleOpenConfirmModal(params.row.id)}
+                        sx={{ color: colors.greenAccent[400], ml: 1 }}
+                    >
                         <DeleteIcon />
                     </IconButton>
                 </Box>
@@ -122,10 +128,10 @@ const BrandList = () => {
             <Header title="MARCAS" subtitle="Gestión de las marcas de los dispositivos de PTI" />
             <Button variant="contained" color="primary" onClick={handleOpenAddModal} startIcon={<AddIcon />}>
                 Agregar Marca
-            </Button>   
-            
-            <Box 
-                m="40px 0 0 0" 
+            </Button>
+
+            <Box
+                m="40px 0 0 0"
                 height="75vh"
                 sx={{
                     "& .MuiDataGrid-root": { border: "none" },
@@ -140,19 +146,19 @@ const BrandList = () => {
                 <DataGrid checkboxSelection rows={rows} columns={columns} />
             </Box>
 
-            <BrandModal 
-                open={openAddModal} 
-                handleClose={() => setOpenAddModal(false)} 
-                brand={null} 
-                refreshBrands={fetchData} 
-                showSnackbar={showSnackbar} 
+            <BrandModal
+                open={openAddModal}
+                handleClose={() => setOpenAddModal(false)}
+                brand={null}
+                refreshBrands={fetchData}
+                showSnackbar={showSnackbar}
             />
-            <BrandModal 
-                open={openEditModal} 
-                handleClose={() => setOpenEditModal(false)} 
-                brand={selectedBrands} 
-                refreshBrands={fetchData} 
-                showSnackbar={showSnackbar} 
+            <BrandModal
+                open={openEditModal}
+                handleClose={() => setOpenEditModal(false)}
+                brand={selectedBrands}
+                refreshBrands={fetchData}
+                showSnackbar={showSnackbar}
             />
 
             <Dialog open={openConfirmModal} onClose={() => setOpenConfirmModal(false)}>

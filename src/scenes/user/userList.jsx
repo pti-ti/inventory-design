@@ -37,7 +37,7 @@ const User = () => {
       });
 
       console.log("Colaboradores obtenidos:", response.data);
-      
+
       const formattedUsers = response.data.map(user => ({
         ...user,
         id: user.id || user._id,
@@ -75,9 +75,9 @@ const User = () => {
       await axios.delete(`${API_BASE_URL}/api/v1/users/${userToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       fetchData(); // Refresca la lista de usuarios
-      setSnackbarMessage("Colaborador eliminado correctamente"); 
+      setSnackbarMessage("Colaborador eliminado correctamente");
       setOpenSnackbar(true);
     } catch (error) {
       console.error("Error al eliminar el colaborador:", error);
@@ -86,10 +86,10 @@ const User = () => {
     }
     setOpenConfirmModal(false);
   };
-  
+
 
   const columns = [
-    { field: "id", headerName: "ID", width: 60, cellClassName: "name-column--cell" }, 
+    { field: "id", headerName: "ID", width: 60, cellClassName: "name-column--cell" },
     { field: "email", headerName: "Email", flex: 1, cellClassName: "name-column--cell" },
     { field: "location", headerName: "Ubicación", flex: 1, cellClassName: "name-column--cell" },
     {
@@ -98,10 +98,16 @@ const User = () => {
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton color="default" onClick={() => handleEdit(params.row)}>
+          <IconButton
+            onClick={() => handleEdit(params.row)}
+            sx={{ color: colors.greenAccent[400] }}
+          >
             <EditIcon />
           </IconButton>
-          <IconButton color="error" onClick={() => handleOpenConfirmModal(params.row.id)}>
+          <IconButton
+            onClick={() => handleOpenConfirmModal(params.row.id)}
+            sx={{ color: colors.greenAccent[400], ml: 1 }}
+          >
             <DeleteIcon />
           </IconButton>
         </Box>
@@ -112,10 +118,10 @@ const User = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center"></Box>
-        <Header title="COLABORADORES" subtitle="Búsqueda de los colaboradores de TI" />
-        <Button variant="contained" color="primary" onClick={() => handleOpenAddModal()} startIcon={<AddIcon />}>
-          Agregar Colaborador
-        </Button>     
+      <Header title="COLABORADORES" subtitle="Búsqueda de los colaboradores de TI" />
+      <Button variant="contained" color="primary" onClick={() => handleOpenAddModal()} startIcon={<AddIcon />}>
+        Agregar Colaborador
+      </Button>
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -145,9 +151,9 @@ const User = () => {
           <Button onClick={handleDelete} color="error">Eliminar</Button>
         </DialogActions>
       </Dialog>
-      <Snackbar 
-        open={openSnackbar} 
-        autoHideDuration={3000} 
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
         onClose={() => setOpenSnackbar(false)}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >

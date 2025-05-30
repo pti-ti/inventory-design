@@ -26,6 +26,7 @@ import { List, ListItem, ListItemText, Divider, Typography } from "@mui/material
 import CloseIcon from "@mui/icons-material/Close";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import BuildCircleIcon from "@mui/icons-material/BuildCircle";
+import { useTheme } from "@mui/material/styles";
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -38,7 +39,7 @@ const UserRegister = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [usuarios, setUsuarios] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-
+  const theme = useTheme();
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
@@ -217,7 +218,20 @@ const UserRegister = () => {
                 bgcolor: "background.default",
               }}
             >
-              <Avatar sx={{ bgcolor: usuario.userType === "ADMIN" ? "primary.main" : "secondary.main", mr: 2 }}>
+              <Avatar
+                sx={{
+                  bgcolor:
+                    usuario.userType === "ADMIN"
+                      ? (theme.palette.mode === "dark" ? theme.palette.primary.light : theme.palette.primary.main)
+                      : (theme.palette.mode === "dark" ? theme.palette.secondary.light : theme.palette.secondary.main),
+                  color: theme.palette.getContrastText(
+                    usuario.userType === "ADMIN"
+                      ? (theme.palette.mode === "dark" ? theme.palette.primary.light : theme.palette.primary.main)
+                      : (theme.palette.mode === "dark" ? theme.palette.secondary.light : theme.palette.secondary.main)
+                  ),
+                  mr: 2,
+                }}
+              >
                 {usuario.userType === "ADMIN" ? (
                   <AdminPanelSettingsIcon />
                 ) : (

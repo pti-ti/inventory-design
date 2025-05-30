@@ -8,10 +8,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LaptopOutlinedIcon from "@mui/icons-material/LaptopOutlined";
 import DeviceModal from "./deviceModal";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeviceHistoryModal from "./DeviceHistoryModal"; // Ajusta la ruta si es necesario
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import { exportDevices } from "../excel/exportDevices";
 import { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext"; 
+import { AuthContext } from "../../context/AuthContext";
 
 const Device = () => {
   const theme = useTheme();
@@ -27,9 +29,11 @@ const Device = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // Puede ser "success", "error", "warning", etc.
   const { user } = useContext(AuthContext);
   const role = user?.userType?.replace("ROLE_", ""); // Ejemplo de rol: "TECHNICIAN"
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [deviceHistory, setDeviceHistory] = useState([]);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  
+
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -56,6 +60,7 @@ const Device = () => {
         status: device.statusName,  // Se cambia 'status' por 'statusName'
         price: device.price,
         userEmail: device.userEmail || "Sin asignar",
+        note: device.note || "Sin nota",
       }));
 
       setRows(formattedDevices);
@@ -106,6 +111,22 @@ const Device = () => {
     }
   };
 
+  const handleShowHistory = async (device) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${API_BASE_URL}/api/v1/logbooks/device/${device.id}/history`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setDeviceHistory(response.data);
+      setHistoryModalOpen(true);
+    } catch (error) {
+      setSnackbarMessage("No se pudo cargar el historial.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+  };
+
   const handleEdit = (device) => {
     console.log("Editando dispositivo:", device);
     setSelectedDevice(device);
@@ -148,18 +169,19 @@ const Device = () => {
   };
 
   const columns = [
-    { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" }, 
-    { field: "code", headerName: "Código", flex: 1, cellClassName: "name-column--cell" },
-    { field: "brand", headerName: "Marca", flex: 1, cellClassName: "name-column--cell" },
+    { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" },
+    { field: "code", headerName: "Código", width: 80, cellClassName: "name-column--cell" },
+    { field: "brand", headerName: "Marca", width: 80, cellClassName: "name-column--cell" },
     { field: "model", headerName: "Modelo", flex: 1, cellClassName: "name-column--cell" },
     { field: "serial", headerName: "Serial", flex: 1, cellClassName: "name-column--cell" },
     { field: "specification", headerName: "Especificaciones", flex: 1, cellClassName: "name-column--cell" },
     { field: "type", headerName: "Tipo", flex: 1, cellClassName: "name-column--cell" },
+    { field: "note", headerName: "Nota", flex: 1, cellClassName: "name-column--cell" },
     { field: "userEmail", headerName: "Asignado a:", flex: 1, cellClassName: "name-column--cell" },
     {
       field: "price",
       headerName: "Precio",
-      flex: 1,
+      width: 50,
       cellClassName: "name-column--cell",
       renderCell: (params) => formatPrice(params.value) // Aplicar formato a los precios
     },
@@ -169,14 +191,26 @@ const Device = () => {
     ...(role !== "TECHNICIAN" ? [{
       field: "actions",
       headerName: "Acciones",
-      flex: 1,
+      width: 150,
       renderCell: (params) => (
         <Box>
-          <IconButton color="default" onClick={() => handleEdit(params.row)}>
+          <IconButton
+            onClick={() => handleEdit(params.row)}
+            sx={{ color: colors.greenAccent[400] }}
+          >
             <EditIcon />
           </IconButton>
-          <IconButton color="error" onClick={() => handleOpenConfirmModal(params.row.id)}>
+          <IconButton
+            onClick={() => handleOpenConfirmModal(params.row.id)}
+            sx={{ color: colors.greenAccent[400], ml: 1 }}
+          >
             <DeleteIcon />
+          </IconButton>
+          <IconButton
+            onClick={() => handleShowHistory(params.row)}
+            sx={{ color: colors.greenAccent[400], ml: 1 }}
+          >
+            <VisibilityIcon />
           </IconButton>
         </Box>
       ),
@@ -231,6 +265,12 @@ const Device = () => {
         handleRegister={handleRegisterDevice}
         handleUpdate={handleUpdateDevice}
         isEditing={isEditing}
+      />
+
+      <DeviceHistoryModal
+        open={historyModalOpen}
+        handleClose={() => setHistoryModalOpen(false)}
+        history={deviceHistory}
       />
 
       {/* Modal de confirmación de eliminación */}
