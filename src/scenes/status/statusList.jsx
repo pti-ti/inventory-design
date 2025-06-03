@@ -10,6 +10,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import StatusModal from "./statusModal";
+import Tooltip from "@mui/material/Tooltip";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 
 const StatusList = () => {
@@ -106,18 +107,22 @@ const StatusList = () => {
             flex: 1,
             renderCell: (params) => (
                 <Box>
-                    <IconButton
-                        onClick={() => handleEdit(params.row)}
-                        sx={{ color: colors.greenAccent[400] }}
-                    >
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton
-                        onClick={() => handleOpenConfirmModal(params.row.id)}
-                        sx={{ color: colors.greenAccent[400], ml: 1 }}
-                    >
-                        <DeleteIcon />
-                    </IconButton>
+                    <Tooltip title="Editar">
+                        <IconButton
+                            onClick={() => handleEdit(params.row)}
+                            sx={{ color: colors.greenAccent[400] }}
+                        >
+                            <EditIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Eliminar">
+                        <IconButton
+                            onClick={() => handleOpenConfirmModal(params.row.id)}
+                            sx={{ color: colors.greenAccent[400], ml: 1 }}
+                        >
+                            <DeleteIcon />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
             ),
         },

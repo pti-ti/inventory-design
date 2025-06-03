@@ -103,7 +103,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
         },
       }}
     >
-      <ProSidebar collapsed={!isSidebarOpen} width="100%">
+      <ProSidebar
+        collapsed={!isSidebarOpen}
+        width={isSidebarOpen ? 210 : 70} // Usa los mismos valores que en Layout.jsx
+      >
         <Menu iconShape="square">
           <MenuItem onClick={toggleSidebar} icon={<MenuIcon />} style={{ textAlign: "center" }}>
             {isSidebarOpen && <Typography variant="h6">Menú</Typography>}

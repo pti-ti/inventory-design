@@ -152,50 +152,61 @@ const Dashboard = () => {
   return (
     <Box m="20px">
       {/* HEADER */}
-      <Box m="20px">
-        {/* HEADER */}
+      <Box width="100%" display="flex" justifyContent="center" alignItems="center" mb={2}>
+        <Header title="DASHBOARD" subtitle="Inventario Gestión TI (Potencia y Tecnologías Incorporadas)" />
+      </Box>
+
+      {/* VALOR TOTAL DEL INVENTARIO EN ESQUINA SUPERIOR DERECHA */}
+      <Box
+        width="100%"
+        display="flex"
+        justifyContent="flex-end"
+        alignItems="center"
+        mb={2}
+      >
         <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          flexDirection={{ xs: "column", sm: "row" }}
-          gap={{ xs: 2, sm: 0 }}
           sx={{
-            maxWidth: "85%",
-            maxHeight: "1080px",
-            transform: {
-              xs: "scale(1)",
-              sm: "scale(1)",
-              md: "scale(0.95)",
-              lg: "scale(0.9)",
-            },
-            transformOrigin: "top",
-            overflow: "hidden",
+            background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
+            color: colors.grey[100],
+            borderRadius: "16px",
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+            padding: "20px 32px",
+            minWidth: 320,
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
           }}
         >
-          {/* El Header ocupa todo el espacio disponible */}
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            width="100%"
-            mb={2}
-            sx={{ marginLeft: "250px" }}
-          >
-            <Header title="DASHBOARD" subtitle="Inventario Gestión TI (Potencia y Tecnologías Incorporadas)" />
+          <Box>
+            <Typography variant="subtitle2" color={colors.grey[200]}>
+              Valor total del inventario de TI
+            </Typography>
+            <Typography variant="h5" fontWeight="bold" color={colors.grey[100]}>
+              {totalInventoryValue ? (
+                <CountUp
+                  start={0}
+                  end={totalInventoryValue}
+                  duration={2.5}
+                  separator="."
+                  decimals={0}
+                  decimal=","
+                  prefix="$ "
+                  formattingFn={(value) => formatCurrencyCOP(value)}
+                />
+              ) : "Cargando..."}
+            </Typography>
           </Box>
-
+          <MonetizationOnIcon sx={{ fontSize: 48, color: colors.grey[100] }} />
         </Box>
       </Box>
+
       {/* BOX - Dispositivos por tipo con icono */}
       <Box
-        gridColumn="span 20"
         backgroundColor={colors.primary[1000]}
         p="20px"
         borderRadius="12px"
-        margin="auto"
         sx={{
-          width: isSidebarOpen ? "calc(100% - 260px)" : "calc(100% - 70px)",
+          width: "100%",
           background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
           transition: "width 0.3s ease-in-out",
           boxShadow: "4px 4px 12px rgba(0, 0, 0, 0.4)",
@@ -265,161 +276,110 @@ const Dashboard = () => {
 
       {/* GRID & CHARTS */}
       <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="auto" gap="10px">
-        {/* VALOR TOTAL DEL INVENTARIO */}
-        <Box
-          gridColumn="span 12"
-          sx={{
-            width: isSidebarOpen ? "400px" : "1700px",
-            height: "130px",
-            background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
-            borderRadius: "16px",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
-            padding: "20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            color: colors.grey[100],
-            margin: "0 auto",
-            transition: "transform 0.3s ease, box-shadow 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.03)",
-              boxShadow: "0 8px 30px rgba(0, 0, 0, 0.4)",
-              cursor: "pointer",
-            },
-          }}
-        >
-          <Box>
-            <Typography variant="h5" fontWeight="600">
-              Valor total del inventario de TI
-            </Typography>
-            <Typography variant="h4" fontWeight="bold">
-              {totalInventoryValue ? (
-                <CountUp
-                  start={0}
-                  end={totalInventoryValue}
-                  duration={2.5}
-                  separator="."
-                  decimals={0}
-                  decimal=","
-                  prefix="$ "
-                  formattingFn={(value) => formatCurrencyCOP(value)}
-                />
-              ) : "Cargando..."}
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              borderRadius: "50%",
-              padding: "10px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <MonetizationOnIcon sx={{ fontSize: 48, color: colors.grey[100] }} />
-          </Box>
-        </Box>
-
         {/* DISPOSITIVOS POR ESTADO */}
         <Box
           gridColumn="span 6"
-          backgroundColor={colors.primary[1000]}
+
           p="20px"
-          borderRadius="8px"
+          borderRadius="12px"
           sx={{
-            width: "600px",
-            height: "350px",
+            width: "100%",
+            height: "400px",
+            backgroundColor: colors.primary[1000],
             background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
-            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
-            margin: "0 auto", // Centrado horizontal
+            boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
             transition: "transform 0.3s ease, box-shadow 0.3s ease",
             "&:hover": {
               transform: "scale(1.03)",
-              boxShadow: "0 8px 30px rgba(0, 0, 0, 0.4)",
+              boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
               cursor: "pointer",
             },
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
           <Typography
             variant="h5"
             fontWeight="600"
-            color={colors.grey[100]}
+            color={colors.grey[100]} // Así se adapta al tema
             sx={{
-              alignSelf: "center", // Centrar título
               textAlign: "center",
-              marginBottom: "5px",
+              marginBottom: "10px",
             }}
           >
             Dispositivos organizados por estado
           </Typography>
-
-          {deviceStatus && Object.keys(deviceStatus).length > 0 ? (
-            <DonutChart key={`status-${Date.now()}`} data={deviceStatus} />
-          ) : (
-            <Typography color="red">No hay datos disponibles</Typography>
-          )}
+          <Box flex={1} display="flex" justifyContent="center" alignItems="center">
+            {deviceStatus && Object.keys(deviceStatus).length > 0 ? (
+              <DonutChart key={`status-${Date.now()}`} data={deviceStatus} height={260} width={260} />
+            ) : (
+              <Typography color="red">No hay datos disponibles</Typography>
+            )}
+          </Box>
         </Box>
 
         {/* DISPOSITIVOS POR TIPO */}
         <Box
           gridColumn="span 6"
-          backgroundColor={colors.primary[1000]}
           p="20px"
-          borderRadius="8px"
+          borderRadius="12px"
           sx={{
-            width: "600px",
-            height: "350px",
+            width: "100%",
+            height: "400px",
+            backgroundColor: colors.primary[1000],
             background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
-            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
-            margin: "0 auto", // Centrado horizontal
+            boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
             transition: "transform 0.3s ease, box-shadow 0.3s ease",
             "&:hover": {
               transform: "scale(1.03)",
-              boxShadow: "0 8px 30px rgba(0, 0, 0, 0.4)",
+              boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
               cursor: "pointer",
             },
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
           <Typography
             variant="h5"
             fontWeight="600"
-            color={colors.grey[100]}
+            color={colors.grey[100]} // Así se adapta al tema
             sx={{
-              alignSelf: "center", // Centrar título
               textAlign: "center",
-              marginBottom: "5px",
+              marginBottom: "10px",
             }}
           >
             Dispositivos organizados por tipo
           </Typography>
-
-          {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
-            <DonutChart key={`type-${Date.now()}`} data={deviceTypeCounts} />
-          ) : (
-            <Typography color="red">No hay datos disponibles</Typography>
-          )}
+          <Box flex={1} display="flex" justifyContent="center" alignItems="center">
+            {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
+              <DonutChart key={`type-${Date.now()}`} data={deviceTypeCounts} height={260} width={260} />
+            ) : (
+              <Typography color="red">No hay datos disponibles</Typography>
+            )}
+          </Box>
         </Box>
-
         {/* GRÁFICOS DE DISPOSITIVOS POR UBICACIÓN Y POR TIPO Y UBICACIÓN */}
         <Box
           gridColumn="span 6"
+          p="20px"
+          borderRadius="12px"
           sx={{
-            backgroundColor: colors.primary[1000],
-            padding: "20px",
-            borderRadius: "8px",
-            width: "600px",
+            width: "100%",
             height: "400px",
+            backgroundColor: colors.primary[1000],
             background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
-            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)",
-            margin: "0 auto", // Centrado horizontal
+            boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
             transition: "transform 0.3s ease, box-shadow 0.3s ease",
             "&:hover": {
               transform: "scale(1.03)",
-              boxShadow: "0 8px 30px rgba(0, 0, 0, 0.4)",
+              boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
               cursor: "pointer",
             },
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
           <Typography
@@ -427,10 +387,9 @@ const Dashboard = () => {
             fontWeight="600"
             color={colors.grey[100]}
             sx={{
-              alignSelf: "center",
-              textAlign: "left",
-              marginLeft: "150px",
-              marginBottom: "5px"
+              textAlign: "center", // Cambiado de "left" a "center"
+              marginBottom: "10px", // Puedes dejarlo en 10px para igualar los otros boxes
+              // Quita marginLeft
             }}
           >
             Dispositivos organizados por ubicación
@@ -447,21 +406,23 @@ const Dashboard = () => {
         {/* DISPOSITIVOS POR TIPO Y UBICACIÓN */}
         <Box
           gridColumn="span 6"
-          backgroundColor={colors.primary[1000]}
           p="20px"
-          borderRadius="8px"
+          borderRadius="12px"
           sx={{
-            width: "600px",
+            width: "100%",
             height: "400px",
+            backgroundColor: colors.primary[1000],
             background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
-            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.4)", // Sombra ligera
-            margin: "0 auto", // Centrado horizontal
+            boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
             transition: "transform 0.3s ease, box-shadow 0.3s ease",
             "&:hover": {
               transform: "scale(1.03)",
-              boxShadow: "0 8px 30px rgba(0, 0, 0, 0.4)",
+              boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
               cursor: "pointer",
             },
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
           <Typography
@@ -469,15 +430,14 @@ const Dashboard = () => {
             fontWeight="600"
             color={colors.grey[100]}
             sx={{
-              alignSelf: "center",
-              textAlign: "left",
-              marginLeft: "150px",
-              marginBottom: "5px"
+              textAlign: "center", // Cambiado de "left" a "center"
+              marginBottom: "10px",
+              // Quita marginLeft
             }}
           >
             Dispositivos organizados por ubicación y tipo
           </Typography>
-          <Box height="370px">
+          <Box height="340px">
             {deviceLocationTypeCounts && Object.keys(deviceLocationTypeCounts).length > 0 ? (
               <BarChartComponent data={transformLocationData(deviceLocationTypeCounts)} />
             ) : (

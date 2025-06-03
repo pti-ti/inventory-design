@@ -14,6 +14,7 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } 
 import { exportDevices } from "../excel/exportDevices";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import Tooltip from "@mui/material/Tooltip";
 
 const Device = () => {
   const theme = useTheme();
@@ -170,7 +171,7 @@ const Device = () => {
 
   const columns = [
     { field: "id", headerName: "ID", width: 50, cellClassName: "name-column--cell" },
-    { field: "code", headerName: "Código", width: 80, cellClassName: "name-column--cell" },
+    { field: "code", headerName: "Código", width: 0, cellClassName: "name-column--cell" },
     { field: "brand", headerName: "Marca", width: 80, cellClassName: "name-column--cell" },
     { field: "model", headerName: "Modelo", flex: 1, cellClassName: "name-column--cell" },
     { field: "serial", headerName: "Serial", flex: 1, cellClassName: "name-column--cell" },
@@ -194,24 +195,30 @@ const Device = () => {
       width: 150,
       renderCell: (params) => (
         <Box>
-          <IconButton
-            onClick={() => handleEdit(params.row)}
-            sx={{ color: colors.greenAccent[400] }}
-          >
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            onClick={() => handleOpenConfirmModal(params.row.id)}
-            sx={{ color: colors.greenAccent[400], ml: 1 }}
-          >
-            <DeleteIcon />
-          </IconButton>
-          <IconButton
-            onClick={() => handleShowHistory(params.row)}
-            sx={{ color: colors.greenAccent[400], ml: 1 }}
-          >
-            <VisibilityIcon />
-          </IconButton>
+          <Tooltip title="Editar">
+            <IconButton
+              onClick={() => handleEdit(params.row)}
+              sx={{ color: colors.greenAccent[400] }}
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Eliminar">
+            <IconButton
+              onClick={() => handleOpenConfirmModal(params.row.id)}
+              sx={{ color: colors.greenAccent[400], ml: 1 }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Historial">
+            <IconButton
+              onClick={() => handleShowHistory(params.row)}
+              sx={{ color: colors.greenAccent[400], ml: 1 }}
+            >
+              <VisibilityIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
       ),
     }] : []),

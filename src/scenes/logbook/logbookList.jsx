@@ -9,6 +9,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import LogbookModal from "./logbookModal";
+import Tooltip from "@mui/material/Tooltip";
 import LogbookHistoryModal from "./logbookHistoryModal";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
@@ -59,7 +60,7 @@ const LogbookList = () => {
             year: "numeric", month: "2-digit", day: "2-digit"
           })
           : "Fecha no disponible",
-          changes: logbook.changes || "" 
+        changes: logbook.changes || ""
       }));
       console.log("Bitácoras formateadas:", formattedLogbooks);
       setRows(formattedLogbooks);
@@ -212,27 +213,31 @@ const LogbookList = () => {
     }, */
     {
       field: "actions",
-      headerName: "Historial",
+      headerName: "Acciones",
       flex: 1,
       renderCell: (params) => (
         <Box>
-          <IconButton
-            color="primary"
-            onClick={() => handleShowHistory(params.row)}
-            sx={{ color: colors.greenAccent[400] }}
-          >
-            <VisibilityIcon />
-          </IconButton>
-          <IconButton
-            color="success"
-            onClick={() => handleDownloadExcel(params.row)}
-            sx={{
-              color: colors.greenAccent[400],
-              ml: 1,
-            }}
-          >
-            <DescriptionOutlinedIcon />
-          </IconButton>
+          <Tooltip title="Ver historial">
+            <IconButton
+              color="primary"
+              onClick={() => handleShowHistory(params.row)}
+              sx={{ color: colors.greenAccent[400] }}
+            >
+              <VisibilityIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Descargar Excel">
+            <IconButton
+              color="success"
+              onClick={() => handleDownloadExcel(params.row)}
+              sx={{
+                color: colors.greenAccent[400],
+                ml: 1,
+              }}
+            >
+              <DescriptionOutlinedIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
       ),
     },
