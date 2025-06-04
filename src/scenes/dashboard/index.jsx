@@ -45,7 +45,7 @@ const Dashboard = () => {
 
   // Mapeo de dispositivos con su respectivo icono
   const deviceIcons = {
-    Laptop: <LaptopMacIcon fontSize="large" />,
+    Portatil: <LaptopMacIcon fontSize="large" />,
     Monitor: <MonitorIcon fontSize="large" />,
     Mouse: <MouseIcon fontSize="large" />,
     Impresora: <PrintIcon fontSize="large" />,
