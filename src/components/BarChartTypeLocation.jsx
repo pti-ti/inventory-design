@@ -134,6 +134,7 @@ const BarChartTypeLocation = ({ data }) => {
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
+  const theme = useTheme(); // <--- Agrega esto
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -145,16 +146,14 @@ const Dashboard = () => {
           throw new Error("Error al obtener los datos");
         }
         const result = await response.json();
-        console.log("Datos recibidos de la API:", result);
         setData(result);
       } catch (error) {
-        console.error("Error al cargar los datos:", error);
         setData(null);
       }
     };
 
     fetchData();
-  }, []);
+  }, [theme.palette.mode]); // <--- Agrega theme.palette.mode aquí
 
   return <div>{data ? <BarChartTypeLocation data={data} /> : <p>Cargando datos...</p>}</div>;
 };

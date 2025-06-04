@@ -123,7 +123,7 @@ const Dashboard = () => {
   // Cargar datos al montar el componente
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [theme.palette.mode]);
 
   useEffect(() => {
     console.log("Ubicaciones obtenidas:", deviceLocationCounts);
@@ -175,6 +175,12 @@ const Dashboard = () => {
             display: "flex",
             alignItems: "center",
             gap: 2,
+            transition: "transform 0.3s ease, box-shadow 0.3s ease", // Añade transición
+            "&:hover": {
+              transform: "scale(1.03)",
+              boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
+              cursor: "pointer",
+            },
           }}
         >
           <Box>
@@ -208,9 +214,14 @@ const Dashboard = () => {
         sx={{
           width: "100%",
           background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
-          transition: "width 0.3s ease-in-out",
+          transition: "transform 0.3s ease, box-shadow 0.3s ease", // Efecto de transición
           boxShadow: "4px 4px 12px rgba(0, 0, 0, 0.4)",
           marginBottom: "20px",
+          "&:hover": {
+            transform: "scale(1.03)",
+            boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
+            cursor: "pointer",
+          },
         }}
       >
         <Typography
@@ -439,7 +450,10 @@ const Dashboard = () => {
           </Typography>
           <Box height="340px">
             {deviceLocationTypeCounts && Object.keys(deviceLocationTypeCounts).length > 0 ? (
-              <BarChartComponent data={transformLocationData(deviceLocationTypeCounts)} />
+              <BarChartComponent
+                key={theme.palette.mode}
+                data={transformLocationData(deviceLocationTypeCounts)}
+              />
             ) : (
               <Typography color="red">No hay datos disponibles</Typography>
             )}

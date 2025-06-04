@@ -62,6 +62,9 @@ const Device = () => {
         price: device.price,
         userEmail: device.userEmail || "Sin asignar",
         note: device.note || "Sin nota",
+        createdAt: device.createdAt,
+        createdBy: device.createdByEmail,
+
       }));
 
       setRows(formattedDevices);
@@ -112,6 +115,8 @@ const Device = () => {
     }
   };
 
+  const [deviceInfo, setDeviceInfo] = useState({});
+
   const handleShowHistory = async (device) => {
     try {
       const token = localStorage.getItem("token");
@@ -120,6 +125,11 @@ const Device = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setDeviceHistory(response.data);
+      // Guarda la info del dispositivo seleccionado
+      setDeviceInfo({
+        createdAt: device.createdAt,
+        createdBy: device.createdBy,
+      });
       setHistoryModalOpen(true);
     } catch (error) {
       setSnackbarMessage("No se pudo cargar el historial.");
@@ -278,6 +288,8 @@ const Device = () => {
         open={historyModalOpen}
         handleClose={() => setHistoryModalOpen(false)}
         history={deviceHistory}
+        deviceCreatedAt={deviceInfo.createdAt}
+        deviceCreatedBy={deviceInfo.createdBy}
       />
 
       {/* Modal de confirmación de eliminación */}

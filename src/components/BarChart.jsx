@@ -7,8 +7,9 @@ const BarChart = ({ isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // 🎨 Paleta de colores oscuros (puedes quitar el rojo si lo quieres solo para otro gráfico)
+  // 🎨 Paleta de colores oscuros
   const darkColors = [
     "#1F77B4", "#D62728", "#2CA02C", "#FF7F0E",
     "#9467BD", "#8C564B", "#E377C2", "#7F7F7F",
@@ -17,55 +18,56 @@ const BarChart = ({ isDashboard = false }) => {
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/locations/device-location-count`);
-        if (!response.ok) {
-          throw new Error("Error al obtener los datos");
-        }
-        const result = await response.json();
-
-        // Asignar un color único a cada ciudad
-        const usedColors = new Set();
-        let colorIndex = 0;
-        const transformedData = Object.keys(result).map((city) => {
-          let color;
-          // Usa un color de la paleta si quedan disponibles
-          while (colorIndex < darkColors.length && usedColors.has(darkColors[colorIndex])) {
-            colorIndex++;
-          }
-          if (colorIndex < darkColors.length) {
-            color = darkColors[colorIndex];
-            usedColors.add(color);
-            colorIndex++;
-          } else {
-            // Si se acaban los colores, genera uno aleatorio que no esté usado
-            do {
-              color = "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
-            } while (usedColors.has(color));
-            usedColors.add(color);
-          }
-          return {
-            city,
-            count: result[city],
-            color
-          };
-        });
-
-        setData(transformedData);
-      } catch (error) {
-        console.error("Error al cargar los datos:", error);
-        setData([]);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/locations/device-location-count`);
+      if (!response.ok) {
+        throw new Error("Error al obtener los datos");
       }
-    };
+      const result = await response.json();
 
+      // Asignar un color único a cada ciudad
+      const usedColors = new Set();
+      let colorIndex = 0;
+      const transformedData = Object.keys(result).map((city) => {
+        let color;
+        while (colorIndex < darkColors.length && usedColors.has(darkColors[colorIndex])) {
+          colorIndex++;
+        }
+        if (colorIndex < darkColors.length) {
+          color = darkColors[colorIndex];
+          usedColors.add(color);
+          colorIndex++;
+        } else {
+          do {
+            color = "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
+          } while (usedColors.has(color));
+          usedColors.add(color);
+        }
+        return {
+          city,
+          count: result[city],
+          color
+        };
+      });
+
+      setData(transformedData);
+    } catch (error) {
+      console.error("Error al cargar los datos:", error);
+      setData([]);
+    }
+    setLoading(false);
+  };
+
+  // Recarga datos cada vez que cambia el tema
+  useEffect(() => {
     fetchData();
-  }, []);
+  }, [theme.palette.mode]);
 
   return (
     <div style={{ maxWidth: "600px", height: "350px", margin: "0 auto" }}>
-      {data.length === 0 ? (
+      {loading ? (
         <p>Cargando datos...</p>
       ) : (
         <ResponsiveBar
