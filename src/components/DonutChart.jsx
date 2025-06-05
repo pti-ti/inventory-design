@@ -8,8 +8,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Box, useTheme } from "@mui/material";
+import { Tooltip as MuiTooltip, Typography, Box as MuiBox } from "@mui/material";
 import { tokens } from "../theme";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 // Colores predefinidos para ciertos estados específicos
 const STATUS_COLORS = {
@@ -39,7 +41,6 @@ const getRandomColor = () => {
   return color;
 };
 
-// Función para asignar colores sin repetir
 // Función para asignar colores únicos sin repetir
 const assignUniqueColors = (data) => {
   let availableColors = [...PRIMARY_COLORS];
@@ -70,11 +71,48 @@ const assignUniqueColors = (data) => {
   });
 };
 
-const DonutChart = ({ data }) => {
+const DonutChart = ({ data, filterKey = "estado" }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate();
 
   const chartData = assignUniqueColors(Object.entries(data));
+
+  // Maneja el clic en un segmento del gráfico
+  const handlePieClick = (data, index) => {
+    if (data && data.name) {
+      // Navega al listado filtrado por el filtro correspondiente
+      navigate(`/dispositivos?${filterKey}=${encodeURIComponent(data.name)}`);
+    }
+  };
+
+  // Tooltip personalizado para el DonutChart
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const { name, value, color } = payload[0].payload;
+      return (
+        <MuiBox
+          sx={{
+            background: theme.palette.background.paper,
+            color: theme.palette.text.primary,
+            borderRadius: 2,
+            boxShadow: 3,
+            p: 2,
+            minWidth: 180,
+            border: `2px solid ${color}`,
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ color, fontWeight: "bold" }}>
+            {name}
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            Dispositivos: <b>{value}</b>
+          </Typography>
+        </MuiBox>
+      );
+    }
+    return null;
+  };
 
   return (
     <motion.div
@@ -97,7 +135,7 @@ const DonutChart = ({ data }) => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              key={chartData.map((d) => d.name).join(",")} // Para animar si cambian los datos
+              key={chartData.map((d) => d.name).join(",")}
               data={chartData}
               dataKey="value"
               nameKey="name"
@@ -109,12 +147,13 @@ const DonutChart = ({ data }) => {
               isAnimationActive={true}
               animationDuration={800}
               animationEasing="ease-out"
+              onClick={handlePieClick} // <-- Agrega el manejador de clic
             >
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip />
+            <Tooltip content={<CustomTooltip />} />
             <Legend />
           </PieChart>
         </ResponsiveContainer>

@@ -323,7 +323,7 @@ const Dashboard = () => {
           </Typography>
           <Box flex={1} display="flex" justifyContent="center" alignItems="center">
             {deviceStatus && Object.keys(deviceStatus).length > 0 ? (
-              <DonutChart key={`status-${Date.now()}`} data={deviceStatus} height={260} width={260} />
+              <DonutChart key={`status-${Date.now()}`} data={deviceStatus} height={260} width={260} filterKey="estado" />
             ) : (
               <Typography color="red">No hay datos disponibles</Typography>
             )}
@@ -365,7 +365,7 @@ const Dashboard = () => {
           </Typography>
           <Box flex={1} display="flex" justifyContent="center" alignItems="center">
             {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
-              <DonutChart key={`type-${Date.now()}`} data={deviceTypeCounts} height={260} width={260} />
+              <DonutChart key={`type-${Date.now()}`} data={deviceTypeCounts} height={260} width={260} filterKey="tipo"/>
             ) : (
               <Typography color="red">No hay datos disponibles</Typography>
             )}

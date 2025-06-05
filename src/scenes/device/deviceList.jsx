@@ -15,6 +15,7 @@ import { exportDevices } from "../excel/exportDevices";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import Tooltip from "@mui/material/Tooltip";
+import { useLocation } from "react-router-dom";
 
 const Device = () => {
   const theme = useTheme();
@@ -34,6 +35,13 @@ const Device = () => {
   const [deviceHistory, setDeviceHistory] = useState([]);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  const getEstadoFromQuery = () => {
+    const params = new URLSearchParams(location.search);
+    return params.get("estado");
+  };
+
+  const [estadoFiltro, setEstadoFiltro] = useState(getEstadoFromQuery());
 
   const fetchData = async () => {
     try {
@@ -77,6 +85,15 @@ const Device = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    setEstadoFiltro(getEstadoFromQuery());
+  }, [location.search]);
+
+  // Filtra los dispositivos si hay filtro de estado
+  const filteredRows = estadoFiltro
+    ? rows.filter((row) => row.status?.toLowerCase() === estadoFiltro.toLowerCase())
+    : rows;
 
   const handleRegisterDevice = async (deviceData) => {
     try {
@@ -270,7 +287,7 @@ const Device = () => {
           "& .MuiCheckbox-root": { color: `${colors.greenAccent[200]} !important` },
         }}
       >
-        <DataGrid checkboxSelection rows={rows} columns={columns} />
+        <DataGrid checkboxSelection rows={filteredRows} columns={columns} />
       </Box>
 
       {/* Modal para registrar/editar dispositivo */}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
+import { Box, Typography } from "@mui/material";
 
 const BarChart = ({ isDashboard = false }) => {
   const theme = useTheme();
@@ -17,6 +18,27 @@ const BarChart = ({ isDashboard = false }) => {
   ];
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  const CustomBarTooltip = ({ id, value, indexValue, color }) => (
+    <Box
+      sx={{
+        background: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+        borderRadius: 2,
+        boxShadow: 3,
+        p: 2,
+        minWidth: 180,
+        border: `2px solid ${color}`,
+      }}
+    >
+      <Typography variant="subtitle2" sx={{ color, fontWeight: "bold" }}>
+        {indexValue}
+      </Typography>
+      <Typography variant="body2" sx={{ mt: 1 }}>
+        Dispositivos: <b>{value}</b>
+      </Typography>
+    </Box>
+  );
 
   const fetchData = async () => {
     setLoading(true);
@@ -141,6 +163,9 @@ const BarChart = ({ isDashboard = false }) => {
               effects: [{ on: "hover", style: { itemOpacity: 1 } }],
             },
           ]}
+          tooltip={({ id, value, indexValue, color }) => (
+            <CustomBarTooltip id={id} value={value} indexValue={indexValue} color={color} />
+          )}
           role="application"
           barAriaLabel={(e) =>
             `${e.id}: ${e.formattedValue} en ubicación: ${e.indexValue}`
