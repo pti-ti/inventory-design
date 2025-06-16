@@ -17,11 +17,14 @@ import BarChartComponent from "../../components/BarChartTypeLocation";
 import CountUp from "react-countup";
 import InventoryIcon from '@mui/icons-material/Inventory';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import { useNavigate } from "react-router-dom";
+
 
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate();
 
   // Estados
   const [totalInventoryValue, setTotalInventoryValue] = useState(null);
@@ -55,6 +58,7 @@ const Dashboard = () => {
   };
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const [lastDevice, setLastDevice] = useState(null);
 
   // Función para obtener datos
   const fetchData = async () => {
@@ -83,6 +87,10 @@ const Dashboard = () => {
       const locationTypeRes = await fetch(`${API_BASE_URL}/api/v1/locations/device-location-type-count`);
       const locationTypeData = await locationTypeRes.json();
       setDeviceLocationTypeCounts(locationTypeData);
+
+      const lastDeviceRes = await fetch(`${API_BASE_URL}/api/v1/devices/last-modified`);
+      const lastDeviceData = await lastDeviceRes.json();
+      setLastDevice(lastDeviceData);
 
     } catch (error) {
       console.error("Error al obtener datos:", error);
@@ -152,18 +160,57 @@ const Dashboard = () => {
   return (
     <Box m="20px">
       {/* HEADER */}
-      <Box width="100%" display="flex" justifyContent="center" alignItems="center" mb={2}>
+      <Box width="100%" display="flex" justifyContent="center" alignItems="center" mb={2} >
         <Header title="DASHBOARD" subtitle="Inventario Gestión TI (Potencia y Tecnologías Incorporadas)" />
       </Box>
 
-      {/* VALOR TOTAL DEL INVENTARIO EN ESQUINA SUPERIOR DERECHA */}
       <Box
         width="100%"
         display="flex"
-        justifyContent="flex-end"
+        justifyContent="space-between"
         alignItems="center"
         mb={2}
+        gap={2}
       >
+        {/* Box: Última acción del dispositivo */}
+        <Box
+          sx={{
+            color: colors.grey[100],
+            borderRadius: "16px",
+            padding: "20px 32px",
+            minWidth: 320,
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Box>
+            <Typography variant="subtitle2" color={colors.grey[200]}>
+              Último dispositivo agregado o modificado
+            </Typography>
+            {lastDevice ? (
+              <>
+                <Typography variant="h6" fontWeight="bold" color={colors.grey[100]}>
+                  {lastDevice.nombre || lastDevice.tipo || lastDevice.code || "Dispositivo"}
+                </Typography>
+                <Typography color={colors.grey[200]}>
+                  Acción: {lastDevice.lastAction || "Modificado/Agregado"}
+                </Typography>
+                <Typography color={colors.grey[200]}>
+                  Por: {lastDevice.createdByEmail || lastDevice.userEmail || "Desconocido"}
+                </Typography>
+                <Typography color={colors.grey[200]}>
+                  Fecha: {lastDevice.lastActionDate ? new Date(lastDevice.lastActionDate).toLocaleString("es-CO") : "Desconocida"}
+                </Typography>
+              </>
+            ) : (
+              <Typography color={colors.grey[200]}>Cargando...</Typography>
+            )}
+          </Box>
+          <InventoryIcon sx={{ fontSize: 48, color: colors.grey[100] }} />
+        </Box>
+
+        {/* Box: Valor total del inventario */}
         <Box
           sx={{
             background: `linear-gradient(135deg, ${colors.blueAccent[600]}, ${colors.blueAccent[800]})`,
@@ -175,7 +222,7 @@ const Dashboard = () => {
             display: "flex",
             alignItems: "center",
             gap: 2,
-            transition: "transform 0.3s ease, box-shadow 0.3s ease", // Añade transición
+            transition: "transform 0.3s ease, box-shadow 0.3s ease",
             "&:hover": {
               transform: "scale(1.03)",
               boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
@@ -262,6 +309,9 @@ const Dashboard = () => {
                   backgroundColor: colors.blueAccent[600],
                 },
               }}
+
+              onClick={() => navigate(`/dispositivos?tipo=${encodeURIComponent(type)}`)} // <-- Agrega esto
+
             >
               {deviceIcons[type] ? (
                 React.cloneElement(deviceIcons[type], {
@@ -365,7 +415,7 @@ const Dashboard = () => {
           </Typography>
           <Box flex={1} display="flex" justifyContent="center" alignItems="center">
             {deviceTypeCounts && Object.keys(deviceTypeCounts).length > 0 ? (
-              <DonutChart key={`type-${Date.now()}`} data={deviceTypeCounts} height={260} width={260} filterKey="tipo"/>
+              <DonutChart key={`type-${Date.now()}`} data={deviceTypeCounts} height={260} width={260} filterKey="tipo" />
             ) : (
               <Typography color="red">No hay datos disponibles</Typography>
             )}

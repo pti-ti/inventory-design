@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../scenes/global/Sidebar";
 import Topbar from "../scenes/global/Topbar";
+import Footer from "../scenes/global/Footer";
 
-const SIDEBAR_WIDTH_OPEN = 210;   // Ajusta según el ancho real de tu sidebar abierto
-const SIDEBAR_WIDTH_CLOSED = 70;  // Ajusta según el ancho real de tu sidebar cerrado
+const SIDEBAR_WIDTH_OPEN = 210;
+const SIDEBAR_WIDTH_CLOSED = 70;
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -17,20 +18,19 @@ const Layout = () => {
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       />
 
-      <main
-        className="content"
-        style={{
-          flex: 1,
-          transition: "margin-left 0.3s ease-in-out",
-          minWidth: 0,
-        }}
-      >
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        {/* Topbar fuera del main */}
         <Topbar
           isSidebarOpen={isSidebarOpen}
           toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         />
-        <Outlet />
-      </main>
+
+        <main className="content" style={{ flex: 1, minWidth: 0 }}>
+          <Outlet />
+        </main>
+
+        <Footer isSidebarOpen={isSidebarOpen} />
+      </div>
     </div>
   );
 };
